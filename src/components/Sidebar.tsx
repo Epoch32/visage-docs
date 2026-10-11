@@ -25,7 +25,7 @@ export const navigationSections: NavSection[] = [
       { id: "signals", title: "Signals (createSignal)" },
       { id: "computed", title: "Derived State (computed)" },
       { id: "effects", title: "Side Effects (effect)" },
-      { id: "store", title: "Deep State (createStore)", badge: "New" },
+      { id: "store", title: "Deep State (createStore)" },
       { id: "batch-scope", title: "Batching & Scopes" }
     ]
   },
@@ -50,7 +50,7 @@ export const navigationSections: NavSection[] = [
     title: "Headless UI & Charts",
     items: [
       { id: "ui-primitives", title: "Accessible UI Components" },
-      { id: "charts", title: "Reactive SVG Charts", badge: "v1.0" },
+      { id: "charts", title: "Reactive SVG Charts" },
       { id: "virtual-lists", title: "Virtualizer (100k+ Rows)" }
     ]
   },

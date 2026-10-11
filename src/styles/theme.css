@@ -126,3 +126,15 @@ h1, h2, h3, h4, h5, h6 {
   background: var(--pink-200);
   color: #831843;
 }
+
+/* Shiki Code Highlighting */
+.shiki {
+  padding: 18px 20px !important;
+  margin: 0 !important;
+  overflow-x: auto;
+  font-family: var(--font-mono) !important;
+  font-size: 13.5px !important;
+  line-height: 1.6 !important;
+  border-radius: 0 0 12px 12px;
+}
+

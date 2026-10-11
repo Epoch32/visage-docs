@@ -1,14 +1,11 @@
 import { defineConfig } from "vite";
+import visage, { visageLucide } from "@epoch32/visage/vite";
 
 export default defineConfig({
-  esbuild: {
-    jsx: "automatic",
-    jsxImportSource: "@epoch32/visage"
-  },
-  oxc: {
-    jsx: {
-      runtime: "automatic",
-      importSource: "@epoch32/visage"
+  plugins: [visage(), visageLucide()],
+  resolve: {
+    alias: {
+      visage: "@epoch32/visage"
     }
   }
 });

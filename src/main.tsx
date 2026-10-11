@@ -3,6 +3,7 @@ import { createSignal } from "@epoch32/visage/signals";
 import { Header } from "./components/Header";
 import { Sidebar } from "./components/Sidebar";
 import { TableOfContents } from "./components/TableOfContents";
+import { CodeBlock } from "./components/CodeBlock";
 
 function App() {
   const [activeSection, setActiveSection] = createSignal("introduction");
@@ -163,19 +164,10 @@ function App() {
               Quickstart Example
             </h2>
 
-            <pre
-              style={{
-                background: "var(--code-bg)",
-                color: "var(--code-text)",
-                padding: "20px 24px",
-                borderRadius: "12px",
-                fontSize: "13px",
-                lineHeight: 1.5,
-                overflowX: "auto",
-                fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace'
-              }}
-            >
-              <code>{`import { render } from "@epoch32/visage/dom";
+            <CodeBlock
+              filename="Counter.tsx"
+              lang="tsx"
+              code={`import { render } from "@epoch32/visage/dom";
 import { createSignal } from "@epoch32/visage/signals";
 
 function Counter() {
@@ -188,8 +180,8 @@ function Counter() {
   );
 }
 
-render(() => <Counter />, document.getElementById("app")!);`}</code>
-            </pre>
+render(() => <Counter />, document.getElementById("app")!);`}
+            />
           </article>
         </main>
 
