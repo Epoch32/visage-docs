@@ -1,4 +1,4 @@
-import { createSignal } from "@epoch32/visage";
+import { createSignal, effect } from "@epoch32/visage";
 import { codeToHtml } from "shiki";
 
 interface CodeBlockProps {
@@ -16,9 +16,13 @@ export function CodeBlock(props: CodeBlockProps) {
   codeToHtml(props.code.trim(), {
     lang,
     theme: "rose-pine-moon"
-  }).then((res) => {
-    setHtml(res);
-  });
+  })
+    .then((res) => {
+      setHtml(res);
+    })
+    .catch((err) => {
+      console.error("[Shiki] Failed to highlight code:", err);
+    });
 
   const handleCopy = () => {
     navigator.clipboard.writeText(props.code.trim());
@@ -70,12 +74,20 @@ export function CodeBlock(props: CodeBlockProps) {
       </div>
 
       <div
-        dangerouslySetInnerHTML={() => ({
-          __html:
-            html() ||
-            `<pre class="shiki" style="background-color: #232136; color: #e0def4;"><code>${props.code.trim()}</code></pre>`
-        })}
-      />
+        ref={(el) => {
+          if (!el) return;
+          effect(() => {
+            const content = html();
+            if (content) {
+              el.innerHTML = content;
+            }
+          });
+        }}
+      >
+        <pre class="shiki" style="background-color: #232136; color: #e0def4; padding: 18px 20px; margin: 0;">
+          <code>{props.code.trim()}</code>
+        </pre>
+      </div>
     </div>
   );
 }
