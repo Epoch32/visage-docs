@@ -75,20 +75,29 @@ export function Sidebar(props: SidebarProps) {
     <aside
       style={{
         width: "270px",
-        height: "calc(100vh - 128px)",
+        height: "calc(100vh - 120px)",
         position: "sticky",
-        top: "84px",
-        margin: "32px 0 32px 24px",
-        overflowY: "auto",
-        padding: "24px 16px 32px 20px",
+        top: "88px",
+        margin: "24px 0 24px 24px",
         background: "var(--surface-card)",
         borderRadius: "16px",
         border: "1px solid var(--border-pink)",
         boxShadow: "var(--shadow-card)",
-        backdropFilter: "blur(12px)"
+        backdropFilter: "blur(12px)",
+        overflow: "hidden",
+        display: "flex",
+        flexDirection: "column"
       }}
     >
-      <div style={{ display: "flex", flexDirection: "column", gap: "24px" }}>
+      <div
+        class="sidebar-scroll"
+        style={{
+          flex: 1,
+          overflowY: "auto",
+          padding: "20px 14px 24px 18px"
+        }}
+      >
+        <div style={{ display: "flex", flexDirection: "column", gap: "24px" }}>
         {navigationSections.map((section) => (
           <div key={section.title}>
             <div
@@ -168,6 +177,7 @@ export function Sidebar(props: SidebarProps) {
             </nav>
           </div>
         ))}
+        </div>
       </div>
     </aside>
   );
