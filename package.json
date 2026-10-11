@@ -9,8 +9,8 @@
     "preview": "bun --bun vite preview"
   },
   "dependencies": {
-    "@epoch32/visage": "1.1.0",
-    "lucide": "^1.54.0",
+    "@epoch32/visage": "file:../visage",
+    "lucide-react": "^1.54.0",
     "shiki": "^4.5.0"
   },
   "devDependencies": {

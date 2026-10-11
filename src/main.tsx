@@ -1,5 +1,4 @@
-import { render } from "@epoch32/visage/dom";
-import { createSignal } from "@epoch32/visage/signals";
+import { createSignal, render } from "@epoch32/visage";
 import { Header } from "./components/Header";
 import { Sidebar } from "./components/Sidebar";
 import { TableOfContents } from "./components/TableOfContents";

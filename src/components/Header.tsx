@@ -1,3 +1,4 @@
+import { Show } from "@epoch32/visage";
 import { Moon, Sun } from "lucide-react";
 import { theme, toggleTheme } from "../theme";
 
@@ -167,8 +168,9 @@ export function Header() {
         {/* Theme Toggle Button (Icon only) */}
         <button
           onClick={toggleTheme}
-          aria-label="Toggle dark mode"
-          title="Toggle dark mode"
+          type="button"
+          aria-label="Toggle theme"
+          title="Toggle theme"
           style={{
             display: "flex",
             alignItems: "center",
@@ -178,13 +180,17 @@ export function Header() {
             borderRadius: "8px",
             background: "var(--surface-card)",
             border: "1px solid var(--border-pink)",
-            color: "var(--text-main)",
             cursor: "pointer",
             boxShadow: "var(--shadow-sm)",
             padding: 0
           }}
         >
-          {() => (theme() === "dark" ? <Sun size={17} /> : <Moon size={17} />)}
+          <Show
+            when={() => theme() === "dark"}
+            fallback={() => <Moon size={18} color="#818cf8" />}
+          >
+            {() => <Sun size={18} color="#fbbf24" />}
+          </Show>
         </button>
       </nav>
     </header>
