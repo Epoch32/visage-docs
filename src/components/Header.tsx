@@ -1,3 +1,6 @@
+import { Moon, Sun } from "lucide-react";
+import { theme, toggleTheme } from "../theme";
+
 export function Header() {
   return (
     <header
@@ -160,6 +163,29 @@ export function Header() {
           </svg>
           <span>GitHub</span>
         </a>
+
+        {/* Theme Toggle Button (Icon only) */}
+        <button
+          onClick={toggleTheme}
+          aria-label="Toggle dark mode"
+          title="Toggle dark mode"
+          style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            width: "36px",
+            height: "36px",
+            borderRadius: "8px",
+            background: "var(--surface-card)",
+            border: "1px solid var(--border-pink)",
+            color: "var(--text-main)",
+            cursor: "pointer",
+            boxShadow: "var(--shadow-sm)",
+            padding: 0
+          }}
+        >
+          {() => (theme() === "dark" ? <Sun size={17} /> : <Moon size={17} />)}
+        </button>
       </nav>
     </header>
   );
