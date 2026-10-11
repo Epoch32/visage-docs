@@ -33,7 +33,7 @@ function App() {
         <main
           style={{
             flex: 1,
-            padding: "40px 48px",
+            padding: "32px 24px",
             maxWidth: "880px"
           }}
         >

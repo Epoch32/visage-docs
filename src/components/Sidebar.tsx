@@ -75,14 +75,17 @@ export function Sidebar(props: SidebarProps) {
     <aside
       style={{
         width: "270px",
-        height: "calc(100vh - 64px)",
+        height: "calc(100vh - 128px)",
         position: "sticky",
-        top: "64px",
+        top: "84px",
+        margin: "32px 0 32px 24px",
         overflowY: "auto",
-        padding: "24px 16px 40px 24px",
-        background: "var(--surface-sidebar)",
-        backdropFilter: "blur(8px)",
-        borderRight: "1px solid var(--border-pink)"
+        padding: "24px 16px 32px 20px",
+        background: "var(--surface-card)",
+        borderRadius: "16px",
+        border: "1px solid var(--border-pink)",
+        boxShadow: "var(--shadow-card)",
+        backdropFilter: "blur(12px)"
       }}
     >
       <div style={{ display: "flex", flexDirection: "column", gap: "24px" }}>
