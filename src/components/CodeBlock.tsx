@@ -1,4 +1,4 @@
-import { createSignal } from "@epoch32/visage/signals";
+import { createSignal } from "@epoch32/visage";
 import { codeToHtml } from "shiki";
 
 interface CodeBlockProps {
@@ -70,15 +70,10 @@ export function CodeBlock(props: CodeBlockProps) {
       </div>
 
       <div
-        ref={(el) => {
-          if (el && html()) {
-            el.innerHTML = html();
-          }
-        }}
         dangerouslySetInnerHTML={() => ({
           __html:
             html() ||
-            `<pre style="padding: 18px 20px; margin: 0; font-family: var(--font-mono); font-size: 13px; color: #e0def4;"><code>${props.code.trim()}</code></pre>`
+            `<pre class="shiki" style="background-color: #232136; color: #e0def4;"><code>${props.code.trim()}</code></pre>`
         })}
       />
     </div>
