@@ -29,9 +29,10 @@ export function Header() {
         >
           <span
             style={{
-              fontSize: "19px",
-              fontWeight: 800,
-              letterSpacing: "-0.03em",
+              fontFamily: "var(--font-heading)",
+              fontSize: "21px",
+              fontWeight: 700,
+              letterSpacing: "-0.01em",
               color: "var(--text-main)"
             }}
           >

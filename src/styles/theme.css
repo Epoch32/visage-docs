@@ -39,6 +39,11 @@
   --code-inline-bg: rgba(244, 114, 182, 0.1);
   --code-inline-text: #db2777;
   
+  /* Cute Rounded Typography */
+  --font-heading: "Quicksand", "Nunito", -apple-system, sans-serif;
+  --font-body: "Nunito", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+
   /* Shadows */
   --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
   --shadow-card: 0 4px 20px -2px rgba(0, 0, 0, 0.05), 0 2px 6px -1px rgba(244, 167, 187, 0.15);
@@ -53,7 +58,7 @@
 
 html, body {
   min-height: 100%;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  font-family: var(--font-body);
   color: var(--text-body);
   background-color: var(--bg-canvas);
   background-image: radial-gradient(circle, var(--bg-dots) 1.25px, transparent 1.25px);
@@ -62,6 +67,10 @@ html, body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   line-height: 1.6;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-heading);
 }
 
 /* Custom scrollbars with pink thumb */
