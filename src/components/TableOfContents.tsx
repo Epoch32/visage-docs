@@ -33,9 +33,15 @@ export function TableOfContents(props: TableOfContentsProps) {
 									class="toc-link"
 									onClick={(e) => {
 										e.preventDefault();
+										if (item.id === "overview") {
+											window.scrollTo({ top: 0, behavior: "smooth" });
+											return;
+										}
 										const target = document.getElementById(item.id);
 										if (target) {
 											target.scrollIntoView({ behavior: "smooth", block: "start" });
+										} else {
+											window.scrollTo({ top: 0, behavior: "smooth" });
 										}
 									}}
 								>

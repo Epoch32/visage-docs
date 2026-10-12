@@ -23,7 +23,21 @@ for (const path in tsxModules) {
 // MDX docs override or complement TSX docs
 for (const path in mdxModules) {
 	const key = path.replace(/^\.\//, "").replace(/\.mdx$/, "");
-	docsRegistry[key] = mdxModules[path]!;
+	const mod = mdxModules[path] as any;
+	let toc: TocItem[] = mod.toc ?? [];
+
+	if (mod.__autoToc) {
+		try {
+			toc = typeof mod.__autoToc === "string" ? JSON.parse(mod.__autoToc) : mod.__autoToc;
+		} catch {
+			// fallback to mod.toc
+		}
+	}
+
+	docsRegistry[key] = {
+		...mod,
+		toc,
+	};
 }
 
 export function getDocPage(id: string): DocModule | undefined {

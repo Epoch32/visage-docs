@@ -36,9 +36,15 @@ export function MobileNav(props: MobileNavProps) {
 
 	const handleTocClick = (id: string) => {
 		closeAll();
+		if (id === "overview") {
+			window.scrollTo({ top: 0, behavior: "smooth" });
+			return;
+		}
 		const target = document.getElementById(id);
 		if (target) {
 			target.scrollIntoView({ behavior: "smooth", block: "start" });
+		} else {
+			window.scrollTo({ top: 0, behavior: "smooth" });
 		}
 	};
 
