@@ -1,0 +1,236 @@
+import { DirtyLoadingSimulator } from "../components/DirtyLoadingSimulator";
+import { CodeBlock } from "../components/CodeBlock";
+import { Brain, Cpu, Sparkles } from "lucide-react";
+
+export const title = "Derived State (computed)";
+export const breadcrumb = "Documentation / Reactivity";
+
+export const toc = [
+  { id: "overview", title: "Overview", level: 2 },
+  { id: "dirty-loading", title: "How Dirty Loading Works", level: 2 },
+  { id: "interactive-demo", title: "Interactive Subscriber Simulator", level: 2 },
+  { id: "syntax", title: "Basic Syntax & Usage", level: 2 },
+  { id: "subscriber-tree", title: "The Subscriber Tree", level: 2 },
+  { id: "memoization", title: "Memoization & Deduplication", level: 2 },
+  { id: "dynamic-dependencies", title: "Dynamic Dependency Pruning", level: 2 },
+  { id: "api-reference", title: "API Reference", level: 2 },
+];
+
+A computed node is a derived reactive container calculated from the values of one or more signals. Computed nodes cannot be written to manually; they exist strictly as pure transformations of upstream state.
+
+<div className="doc-features-grid">
+  <div className="doc-feature-card">
+    <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "6px" }}>
+      <Cpu size={16} color="var(--pink-500)" />
+      <div className="doc-feature-title">Dirty Loading Architecture</div>
+    </div>
+    <div className="doc-feature-desc">
+      When upstream signals change, computed nodes do not recalculate. They simply mark themselves dirty. Zero CPU cycles are spent until a subscriber explicitly reads the value.
+    </div>
+  </div>
+
+  <div className="doc-feature-card">
+    <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "6px" }}>
+      <Brain size={16} color="var(--pink-500)" />
+      <div className="doc-feature-title">Automatic Memoization</div>
+    </div>
+    <div className="doc-feature-desc">
+      If an upstream signal hasn't changed, reading a computed node 100 times returns the cached value in sub-nanoseconds without re-executing the derivation callback.
+    </div>
+  </div>
+</div>
+
+## How Dirty Loading Works
+
+In naive reactive systems, updating a signal immediately triggers an eager recalculation of every derived calculation connected to it. If you have a network of calculations that are currently offscreen, hidden in a collapsed accordion, or not currently rendered, that is wasted CPU time.
+
+Visage solves this with **Dirty Loading**:
+
+<div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "12px", marginBottom: "28px" }}>
+  <div style={{ padding: "16px", background: "var(--surface-card)", borderRadius: "12px", border: "1px solid var(--border-pink)" }}>
+    <div style={{ fontSize: "12px", fontWeight: 700, color: "var(--pink-600)", marginBottom: "4px" }}>
+      1. Upstream Signal Changes
+    </div>
+    <div style={{ fontSize: "13px", color: "var(--text-body)" }}>
+      Signal <code>A</code> updates from <code>0</code> to <code>1</code>. Signal <code>A</code> notifies its subscriber tree that a change occurred.
+    </div>
+  </div>
+
+  <div style={{ padding: "16px", background: "var(--surface-card)", borderRadius: "12px", border: "1px solid var(--border-pink)" }}>
+    <div style={{ fontSize: "12px", fontWeight: 700, color: "var(--pink-600)", marginBottom: "4px" }}>
+      2. Mark as Dirty
+    </div>
+    <div style={{ fontSize: "13px", color: "var(--text-body)" }}>
+      Computed node <code>Z</code> is <strong>not</strong> calculated yet. Instead, it marks its internal state as <code>DIRTY</code>.
+    </div>
+  </div>
+
+  <div style={{ padding: "16px", background: "var(--surface-card)", borderRadius: "12px", border: "1px solid var(--border-pink)" }}>
+    <div style={{ fontSize: "12px", fontWeight: 700, color: "var(--pink-600)", marginBottom: "4px" }}>
+      3. Compute On Read
+    </div>
+    <div style={{ fontSize: "13px", color: "var(--text-body)" }}>
+      When someone reads <code>Z()</code>, Visage sees that <code>Z</code> is dirty, performs the calculation using <code>A</code>'s latest value, caches it, and marks it <code>CLEAN</code>.
+    </div>
+  </div>
+</div>
+
+## Interactive Subscriber Simulator
+
+Try incrementing Signal `A` below. Notice that Compute Node `Z` flips to <span style={{ color: "#f59e0b", fontWeight: 700 }}>DIRTY</span>, but its cached value does not update and the calculation does not run until you click **"Read Compute Node Z"**:
+
+<DirtyLoadingSimulator />
+
+## Basic Syntax & Usage
+
+To create a computed node, import `computed` from `@epoch32/visage` and pass a pure computation function. It returns a read-only signal accessor:
+
+<CodeBlock
+  filename="computed-basic.ts"
+  lang="ts"
+  code={`import { createSignal, computed } from "@epoch32/visage";
+
+const [count, setCount] = createSignal(2);
+
+// 1. Declare derived computed node
+const double = computed(() => count() * 2);
+
+// 2. Read the computed value by invoking it
+console.log(double()); // -> 4
+
+// 3. Update upstream signal
+setCount(5);
+
+// double is NOT calculated yet! It will calculate on next read:
+console.log(double()); // -> 10`}
+/>
+
+## The Subscriber Tree
+
+Every signal maintains an internal subscriber set of all nodes watching it. When a signal changes, it notifies each subscriber in its tree to mark itself dirty.
+
+This dirtiness propagates recursively down the entire graph:
+
+<CodeBlock
+  filename="subscriber-tree.ts"
+  lang="ts"
+  code={`const [a, setA] = createSignal(1);
+const b = computed(() => a() * 2);      // Depends on A
+const c = computed(() => b() + 10);     // Depends on B
+const d = computed(() => c() ** 2);     // Depends on C
+
+// When A changes, A notifies B, B notifies C, and C notifies D.
+// None of them run any math until someone reads d().`}
+/>
+
+## Memoization & Deduplication
+
+Once computed, a node caches its output. Subsequent reads return the cached value directly without calling your function:
+
+<div className="doc-callout">
+  <div className="doc-callout-icon">
+    <Sparkles size={18} color="var(--pink-500)" />
+  </div>
+  <div className="doc-callout-body">
+    <div className="doc-callout-title">Glitch-Free Guarantee</div>
+    If a computed node depends on multiple signals that change within the same microtask batch, Visage topological versioning ensures the computed value never executes against an inconsistent intermediate state.
+  </div>
+</div>
+
+## Dynamic Dependency Pruning
+
+Dependencies are not static. During each execution, Visage tracks precisely which signals were read during that specific run. Branches that were not taken unsubscribe automatically:
+
+<CodeBlock
+  filename="dynamic-dependencies.ts"
+  lang="ts"
+  code={`const [showAdmin, setShowAdmin] = createSignal(false);
+const [userStats, setUserStats] = createSignal({ visits: 42 });
+const [adminStats, setAdminStats] = createSignal({ revenue: 9999 });
+
+const dashboardData = computed(() => {
+  if (showAdmin()) {
+    return adminStats(); // Subscribes to adminStats
+  }
+  return userStats();   // Subscribes to userStats
+});
+
+// While showAdmin() is false, changing adminStats() will NOT mark dashboardData dirty!`}
+/>
+
+## API Reference
+
+<div className="doc-api-section">
+  <div className="doc-fn-card">
+    <div className="doc-fn-header">
+      <div className="doc-fn-meta">
+        <span className="doc-fn-kind">Function</span>
+      </div>
+      <div className="doc-fn-signature">
+        computed&lt;T&gt;(fn: () =&gt; T, options?: ComputedOptions): ReadonlySignal&lt;T&gt;
+      </div>
+    </div>
+
+    <div className="doc-fn-body">
+      <div className="doc-fn-desc">
+        Creates a lazy, memoized, glitch-free derived reactive signal. Recalculates on demand only when accessed after an upstream dependency has marked it dirty.
+      </div>
+
+      <div>
+        <div className="doc-fn-subheading">Parameters</div>
+        <div className="doc-params-list">
+          <div className="doc-param-row">
+            <div className="doc-param-meta">
+              <span className="doc-param-name">fn</span>
+              <span className="doc-param-type">() =&gt; T</span>
+              <span className="doc-param-badge required">Required</span>
+            </div>
+            <div className="doc-param-desc">
+              The pure reactive computation function whose return value is derived and cached.
+            </div>
+          </div>
+
+          <div className="doc-param-row">
+            <div className="doc-param-meta">
+              <span className="doc-param-name">options.name</span>
+              <span className="doc-param-type">string</span>
+              <span className="doc-param-badge optional">Optional</span>
+            </div>
+            <div className="doc-param-desc">
+              Optional debug name displayed in the Visage DAG DevTools graph.
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <div className="doc-fn-subheading">Returns</div>
+        <div className="doc-returns-card">
+          <div className="doc-returns-header">
+            <span className="doc-returns-type">ReadonlySignal&lt;T&gt;</span>
+          </div>
+          <div className="doc-param-desc">
+            A read-only accessor function <code>() =&gt; T</code> with <code>.value</code> property getter support.
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div className="doc-fn-card">
+    <div className="doc-fn-header">
+      <div className="doc-fn-meta">
+        <span className="doc-fn-kind">Alias</span>
+      </div>
+      <div className="doc-fn-signature">
+        createMemo&lt;T&gt;(fn: () =&gt; T, options?: ComputedOptions): ReadonlySignal&lt;T&gt;
+      </div>
+    </div>
+
+    <div className="doc-fn-body">
+      <div className="doc-fn-desc">
+        A drop-in, Solid-compatible alias for <code>computed</code>. Identical in performance, semantics, and behavior.
+      </div>
+    </div>
+  </div>
+</div>

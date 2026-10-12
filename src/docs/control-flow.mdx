@@ -1,0 +1,283 @@
+import { ControlFlowSandbox } from "../components/ControlFlowSandbox";
+import { CodeBlock } from "../components/CodeBlock";
+import { ListOrdered, Sparkles, Split } from "lucide-react";
+
+export const title = "Control Flow (<Show> & <For>)";
+export const breadcrumb = "Documentation / DOM & Control Flow";
+
+export const toc = [
+  { id: "overview", title: "Overview", level: 2 },
+  { id: "show-primitive", title: "Conditional Rendering (<Show>)", level: 2 },
+  { id: "for-primitive", title: "Keyed List Reconciliation (<For>)", level: 2 },
+  { id: "interactive-demo", title: "Interactive Control Flow Sandbox", level: 2 },
+  { id: "type-narrowing", title: "Type Narrowing with Accessor Children", level: 2 },
+  { id: "why-not-map-ternaries", title: "Why Not Ternaries or .map()?", level: 2 },
+  { id: "api-reference", title: "API Reference", level: 2 },
+];
+
+Because Visage components execute **exactly once** at mount time, traditional JavaScript expressions like ternary operators `condition ? <A /> : <B />` and `items.map()` do not automatically re-evaluate when signals change. Instead, Visage provides reactive control flow primitives: `<Show>` and `<For>`.
+
+<div className="doc-features-grid">
+  <div className="doc-feature-card">
+    <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "6px" }}>
+      <Split size={16} color="var(--pink-500)" />
+      <div className="doc-feature-title">Fine-Grained DOM Splicing</div>
+    </div>
+    <div className="doc-feature-desc">
+      <code>&lt;Show&gt;</code> and <code>&lt;For&gt;</code> insert DOM comment markers to splice nodes in place, cleanly disposing internal reactive scopes when branches hide or items are removed.
+    </div>
+  </div>
+
+  <div className="doc-feature-card">
+    <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "6px" }}>
+      <ListOrdered size={16} color="var(--pink-500)" />
+      <div className="doc-feature-title">Keyed Item Reuse</div>
+    </div>
+    <div className="doc-feature-desc">
+      <code>&lt;For&gt;</code> reuses existing DOM elements across array reorders and mutations. When an item moves or the array is sorted, existing DOM nodes simply reposition rather than re-creating.
+    </div>
+  </div>
+</div>
+
+## Conditional Rendering (&lt;Show&gt;)
+
+The `<Show>` component conditionally renders its children based on the truthiness of the `when` prop. It supports an optional `fallback` prop for falsey states:
+
+<CodeBlock
+  filename="ShowExample.tsx"
+  lang="tsx"
+  code={`import { Show, createSignal } from "@epoch32/visage";
+
+function Profile() {
+  const [user, setUser] = createSignal<{ name: string } | null>(null);
+
+  return (
+    <Show
+      when={user}
+      fallback={<button onClick={() => setUser({ name: "Alice" })}>Log In</button>}
+    >
+      {(item) => <div>Welcome back, {item().name}!</div>}
+    </Show>
+  );
+}`}
+/>
+
+## Keyed List Reconciliation (&lt;For&gt;)
+
+The `<For>` component renders a list of items with fine-grained referential stability. The children render callback receives the item along with a reactive `index` accessor function:
+
+<CodeBlock
+  filename="ForExample.tsx"
+  lang="tsx"
+  code={`import { For, createSignal } from "@epoch32/visage";
+
+function FruitList() {
+  const [fruits, setFruits] = createSignal(["Apple", "Banana", "Cherry"]);
+
+  return (
+    <ul>
+      <For each={fruits} fallback={<li>No fruits available</li>}>
+        {(fruit, index) => (
+          <li>
+            #{index() + 1}: {fruit}
+          </li>
+        )}
+      </For>
+    </ul>
+  );
+}`}
+/>
+
+## Interactive Control Flow Sandbox
+
+This live task dashboard demonstrates both `<Show>` and `<For>` in action with dynamic filtering, toggling, and disposal:
+
+<ControlFlowSandbox />
+
+## Type Narrowing with Accessor Children
+
+In TypeScript, if your `when` condition evaluates a nullable object (such as `User | null`), you can pass a callback as the child. Visage supplies a narrowed accessor `() => User` where `null` and `undefined` are guaranteed to be filtered out:
+
+<CodeBlock
+  filename="type-narrowing.tsx"
+  lang="tsx"
+  code={`interface User {
+  id: string;
+  name: string;
+  email: string;
+}
+
+const [currentUser, setCurrentUser] = createSignal<User | null>(null);
+
+<Show when={currentUser} fallback={<div>Guest User</div>}>
+  {/* 'user' is guaranteed to be an Accessor<User> (non-null!) */}
+  {(user) => (
+    <div>
+      <h3>{user().name}</h3>
+      <p>{user().email}</p>
+    </div>
+  )}
+</Show>`}
+/>
+
+## Why Not Ternaries or .map()?
+
+Developers coming from React often wonder why standard JavaScript loops and conditionals are discouraged in Visage JSX:
+
+<div className="doc-table-wrapper">
+  <table className="doc-table">
+    <thead>
+      <tr>
+        <th>Pattern</th>
+        <th>React (Virtual DOM)</th>
+        <th>Visage (Fine-Grained DOM)</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><code>items.map()</code></td>
+        <td>Re-runs on every render; diffs entire array</td>
+        <td>Only runs once on mount; does not track changes</td>
+      </tr>
+      <tr>
+        <td><code>&lt;For each=&#123;items&#125;&gt;</code></td>
+        <td>Not standard</td>
+        <td>Reuses existing DOM nodes; updates indices surgically</td>
+      </tr>
+      <tr>
+        <td><code>condition ? &lt;A /&gt; : &lt;B /&gt;</code></td>
+        <td>Re-evaluated on every component re-render</td>
+        <td>Runs once; static unless wrapped in a function</td>
+      </tr>
+      <tr>
+        <td><code>&lt;Show when=&#123;c&#125;&gt;</code></td>
+        <td>Not standard</td>
+        <td>Creates comment markers; disposes inactive scopes</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<div className="doc-callout">
+  <div className="doc-callout-icon">
+    <Sparkles size={18} color="var(--pink-500)" />
+  </div>
+  <div className="doc-callout-body">
+    <div className="doc-callout-title">The Scope Disposal Guarantee</div>
+    When a <code>&lt;Show&gt;</code> flips to false or an item is removed from <code>&lt;For&gt;</code>, Visage automatically disposes all effects and signal subscriptions created inside that subtree. You never have to worry about detached DOM nodes listening to global signals in the background.
+  </div>
+</div>
+
+## API Reference
+
+<div className="doc-api-section">
+  <div className="doc-fn-card">
+    <div className="doc-fn-header">
+      <div className="doc-fn-meta">
+        <span className="doc-fn-kind">Component</span>
+      </div>
+      <div className="doc-fn-signature">
+        &lt;Show&lt;T&gt; when=&#123;ReactiveValue&lt;T&gt;&#125; fallback=&#123;Child&#125;&gt;&#123;children&#125;&lt;/Show&gt;
+      </div>
+    </div>
+
+    <div className="doc-fn-body">
+      <div className="doc-fn-desc">
+        Conditionally mounts JSX children when the <code>when</code> condition evaluates to a truthy value. Manages fine-grained scope disposal when switching branches.
+      </div>
+
+      <div>
+        <div className="doc-fn-subheading">Props</div>
+        <div className="doc-params-list">
+          <div className="doc-param-row">
+            <div className="doc-param-meta">
+              <span className="doc-param-name">when</span>
+              <span className="doc-param-type">ReactiveValue&lt;T | false | null | undefined&gt;</span>
+              <span className="doc-param-badge required">Required</span>
+            </div>
+            <div className="doc-param-desc">
+              The reactive condition signal or accessor to observe.
+            </div>
+          </div>
+
+          <div className="doc-param-row">
+            <div className="doc-param-meta">
+              <span className="doc-param-name">fallback</span>
+              <span className="doc-param-type">Child</span>
+              <span className="doc-param-badge optional">Optional</span>
+            </div>
+            <div className="doc-param-desc">
+              Fallback JSX rendered when the condition is falsy.
+            </div>
+          </div>
+
+          <div className="doc-param-row">
+            <div className="doc-param-meta">
+              <span className="doc-param-name">children</span>
+              <span className="doc-param-type">Child | ((item: () =&gt; T) =&gt; Child)</span>
+              <span className="doc-param-badge required">Required</span>
+            </div>
+            <div className="doc-param-desc">
+              Child nodes to render, or a function accepting a narrowed accessor for non-null items.
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div className="doc-fn-card">
+    <div className="doc-fn-header">
+      <div className="doc-fn-meta">
+        <span className="doc-fn-kind">Component</span>
+      </div>
+      <div className="doc-fn-signature">
+        &lt;For&lt;T&gt; each=&#123;ReactiveValue&lt;readonly T[]&gt;&#125; fallback=&#123;Child&#125;&gt;&#123;(item, index) =&gt; Child&#125;&lt;/For&gt;
+      </div>
+    </div>
+
+    <div className="doc-fn-body">
+      <div className="doc-fn-desc">
+        Keyed list renderer that maps an array of items to DOM elements with referential stability, reusing existing elements on updates and reorders.
+      </div>
+
+      <div>
+        <div className="doc-fn-subheading">Props</div>
+        <div className="doc-params-list">
+          <div className="doc-param-row">
+            <div className="doc-param-meta">
+              <span className="doc-param-name">each</span>
+              <span className="doc-param-type">ReactiveValue&lt;readonly T[]&gt;</span>
+              <span className="doc-param-badge required">Required</span>
+            </div>
+            <div className="doc-param-desc">
+              The reactive array signal or getter to render.
+            </div>
+          </div>
+
+          <div className="doc-param-row">
+            <div className="doc-param-meta">
+              <span className="doc-param-name">fallback</span>
+              <span className="doc-param-type">Child</span>
+              <span className="doc-param-badge optional">Optional</span>
+            </div>
+            <div className="doc-param-desc">
+              Fallback JSX rendered when the array is empty or null.
+            </div>
+          </div>
+
+          <div className="doc-param-row">
+            <div className="doc-param-meta">
+              <span className="doc-param-name">children</span>
+              <span className="doc-param-type">(item: T, index: () =&gt; number) =&gt; Child</span>
+              <span className="doc-param-badge required">Required</span>
+            </div>
+            <div className="doc-param-desc">
+              Render function called once per item, providing the raw item and a reactive index getter.
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

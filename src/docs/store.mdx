@@ -1,0 +1,276 @@
+import { StoreSandbox } from "../components/StoreSandbox";
+import { CodeBlock } from "../components/CodeBlock";
+import { FolderTree, PenTool } from "lucide-react";
+
+export const title = "Deep State (createStore)";
+export const breadcrumb = "Documentation / Reactivity";
+
+export const toc = [
+  { id: "overview", title: "Overview", level: 2 },
+  { id: "interactive-demo", title: "Interactive Store Sandbox", level: 2 },
+  { id: "how-stores-work", title: "How Stores Work: Proxy Architecture", level: 2 },
+  { id: "mutation-patterns", title: "Direct Mutation & Arrays", level: 2 },
+  { id: "batched-mutations", title: "Batched Updates with mutateStore", level: 2 },
+  { id: "unwrapping", title: "Unwrapping Raw Objects", level: 2 },
+  { id: "api-reference", title: "API Reference", level: 2 },
+];
+
+While signals manage primitive and discrete values, `createStore` provides deeply reactive proxy trees for objects and arrays. Visage stores enable natural, direct mutations while maintaining surgical per-property signal subscriptions behind the scenes.
+
+<div className="doc-features-grid">
+  <div className="doc-feature-card">
+    <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "6px" }}>
+      <FolderTree size={16} color="var(--pink-500)" />
+      <div className="doc-feature-title">Per-Property Signals</div>
+    </div>
+    <div className="doc-feature-desc">
+      Modifying <code>store.user.name</code> only notifies subscribers listening specifically to <code>name</code>. The rest of the object tree remains untouched with zero re-rendering overhead.
+    </div>
+  </div>
+
+  <div className="doc-feature-card">
+    <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "6px" }}>
+      <PenTool size={16} color="var(--pink-500)" />
+      <div className="doc-feature-title">Natural Direct Mutation</div>
+    </div>
+    <div className="doc-feature-desc">
+      No spread operators, immutability helpers, or draft boilerplate. Direct assignments like <code>store.count++</code> or <code>store.items.push(item)</code> trigger precise reactive updates.
+    </div>
+  </div>
+</div>
+
+## Interactive Store Sandbox
+
+Try modifying individual nested fields below. Notice how changing the user's name does not trigger or dirty the commits counter:
+
+<StoreSandbox />
+
+## How Stores Work: Proxy Architecture
+
+In traditional frameworks, updating a deeply nested object requires creating copies of every parent object along the tree:
+
+<CodeBlock
+  filename="comparison.ts"
+  lang="ts"
+  code={`// The React / Immutable way (spread copies every level):
+setUser(prev => ({
+  ...prev,
+  profile: {
+    ...prev.profile,
+    address: {
+      ...prev.profile.address,
+      city: "Austin"
+    }
+  }
+}));
+
+// The Visage way (direct mutation with surgical proxy interception):
+user.profile.address.city = "Austin";`}
+/>
+
+Visage achieves this through a lazy proxy system:
+
+- **Lazy Proxy Wrapping:** Nested objects are not wrapped up front; they are wrapped on demand as you traverse properties.
+- **Property-Level Signals:** When a property like `store.user.name` is read inside a computation or JSX expression, Visage generates an internal atomic signal for that specific property key and registers the subscription.
+- **Deduplicated Writes:** If you assign an identical value (`store.user.name = store.user.name`), Visage uses `Object.is` equality to prevent redundant downstream notifications.
+
+## Direct Mutation & Arrays
+
+Visage stores seamlessly support standard JavaScript array mutation methods. Mutating an array automatically updates both individual index subscribers and length subscribers:
+
+<CodeBlock
+  filename="arrays.ts"
+  lang="ts"
+  code={`import { createStore } from "@epoch32/visage";
+
+const store = createStore({
+  todos: [
+    { id: 1, title: "Build fine-grained UI", done: true },
+    { id: 2, title: "Deploy to Cloudflare", done: false }
+  ]
+});
+
+// Mutate items directly:
+store.todos[1].done = true;
+
+// Standard array methods work automatically:
+store.todos.push({ id: 3, title: "Write documentation", done: false });
+store.todos.splice(0, 1);`}
+/>
+
+## Batched Updates with mutateStore
+
+When performing multiple related mutations at once, use `mutateStore`. It wraps all mutations in a synchronous `batch()`, ensuring effects and subscribers only notify once after all mutations complete:
+
+<CodeBlock
+  filename="batched-mutation.ts"
+  lang="ts"
+  code={`import { createStore, mutateStore } from "@epoch32/visage";
+
+const store = createStore({
+  counter: 0,
+  step: 1,
+  status: "idle"
+});
+
+// All mutations inside the callback run in a single atomic batch:
+mutateStore(store, (draft) => {
+  draft.counter += 10;
+  draft.step = 5;
+  draft.status = "updated";
+});`}
+/>
+
+## Unwrapping Raw Objects
+
+Sometimes you need to pass a clean, un-proxied JavaScript object to an external library, web worker, or serialization pipeline. Use `unwrapStore` to retrieve the raw underlying object:
+
+<CodeBlock
+  filename="unwrap.ts"
+  lang="ts"
+  code={`import { createStore, unwrapStore } from "@epoch32/visage";
+
+const store = createStore({
+  config: { theme: "dark", retries: 3 }
+});
+
+// Returns the underlying plain JavaScript object without proxy traps:
+const rawObject = unwrapStore(store);
+
+// Ideal for structured cloning or posting to Web Workers:
+window.postMessage(unwrapStore(store.config), "*");`}
+/>
+
+## API Reference
+
+<div className="doc-api-section">
+  <div className="doc-fn-card">
+    <div className="doc-fn-header">
+      <div className="doc-fn-meta">
+        <span className="doc-fn-kind">Function</span>
+      </div>
+      <div className="doc-fn-signature">
+        createStore&lt;T extends object&gt;(initialState: T): Store&lt;T&gt;
+      </div>
+    </div>
+
+    <div className="doc-fn-body">
+      <div className="doc-fn-desc">
+        Creates a deeply reactive proxy store with per-property signal tracking. Supports direct assignments, nested objects, and array mutations.
+      </div>
+
+      <div>
+        <div className="doc-fn-subheading">Parameters</div>
+        <div className="doc-params-list">
+          <div className="doc-param-row">
+            <div className="doc-param-meta">
+              <span className="doc-param-name">initialState</span>
+              <span className="doc-param-type">T extends object</span>
+              <span className="doc-param-badge required">Required</span>
+            </div>
+            <div className="doc-param-desc">
+              An object or array representing the initial state tree.
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <div className="doc-fn-subheading">Returns</div>
+        <div className="doc-returns-card">
+          <div className="doc-returns-header">
+            <span className="doc-returns-type">Store&lt;T&gt;</span>
+          </div>
+          <div className="doc-param-desc">
+            A reactive proxy wrapping the state tree. Reading properties subscribes to them; writing properties triggers fine-grained notifications.
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div className="doc-fn-card">
+    <div className="doc-fn-header">
+      <div className="doc-fn-meta">
+        <span className="doc-fn-kind">Utility Function</span>
+      </div>
+      <div className="doc-fn-signature">
+        mutateStore&lt;T extends object&gt;(store: Store&lt;T&gt;, mutator: (draft: T) =&gt; void): void
+      </div>
+    </div>
+
+    <div className="doc-fn-body">
+      <div className="doc-fn-desc">
+        Executes a mutator callback inside an atomic synchronous batch, preventing intermediate updates and triggering subscribers once.
+      </div>
+
+      <div>
+        <div className="doc-fn-subheading">Parameters</div>
+        <div className="doc-params-list">
+          <div className="doc-param-row">
+            <div className="doc-param-meta">
+              <span className="doc-param-name">store</span>
+              <span className="doc-param-type">Store&lt;T&gt;</span>
+              <span className="doc-param-badge required">Required</span>
+            </div>
+            <div className="doc-param-desc">The store to mutate.</div>
+          </div>
+
+          <div className="doc-param-row">
+            <div className="doc-param-meta">
+              <span className="doc-param-name">mutator</span>
+              <span className="doc-param-type">(draft: T) =&gt; void</span>
+              <span className="doc-param-badge required">Required</span>
+            </div>
+            <div className="doc-param-desc">
+              Synchronous callback receiving the store to perform multiple mutations.
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div className="doc-fn-card">
+    <div className="doc-fn-header">
+      <div className="doc-fn-meta">
+        <span className="doc-fn-kind">Utility Function</span>
+      </div>
+      <div className="doc-fn-signature">
+        unwrapStore&lt;T&gt;(store: T): T
+      </div>
+    </div>
+
+    <div className="doc-fn-body">
+      <div className="doc-fn-desc">
+        Unwraps a reactive store proxy to access the underlying raw, un-proxied JavaScript object. Useful for serialization, cloning, or third-party libraries.
+      </div>
+
+      <div>
+        <div className="doc-fn-subheading">Parameters</div>
+        <div className="doc-params-list">
+          <div className="doc-param-row">
+            <div className="doc-param-meta">
+              <span className="doc-param-name">store</span>
+              <span className="doc-param-type">T</span>
+              <span className="doc-param-badge required">Required</span>
+            </div>
+            <div className="doc-param-desc">The store proxy to unwrap.</div>
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <div className="doc-fn-subheading">Returns</div>
+        <div className="doc-returns-card">
+          <div className="doc-returns-header">
+            <span className="doc-returns-type">T</span>
+          </div>
+          <div className="doc-param-desc">
+            The raw underlying JavaScript object.
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

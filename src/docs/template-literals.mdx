@@ -1,0 +1,44 @@
+import { CodeBlock } from "../components/CodeBlock";
+
+export const title = "HTML Template Literals";
+export const breadcrumb = "Documentation / DOM & Control Flow";
+
+export const toc = [
+  { id: "overview", title: "Overview", level: 2 },
+  { id: "syntax", title: "The html Tagged Template", level: 2 },
+  { id: "fine-grained-interpolation", title: "Fine-Grained Interpolation", level: 2 },
+  { id: "when-to-use", title: "When to Use html vs JSX", level: 2 },
+];
+
+# HTML Template Literals
+
+Visage provides a first-class, zero-build `html` tagged template literal engine. You can write reactive, fine-grained components in pure JavaScript or TypeScript without needing Babel, SWC, or a JSX compiler.
+
+## The html Tagged Template
+
+Import `html` directly from `@epoch32/visage/template`:
+
+```ts
+import { html } from "@epoch32/visage/template";
+import { createSignal } from "@epoch32/visage";
+
+function Counter() {
+  const [count, setCount] = createSignal(0);
+
+  return html`
+    <button onClick=${() => setCount(c => c + 1)}>
+      Clicked ${count} times
+    </button>
+  `;
+}
+```
+
+## Fine-Grained Interpolation
+
+Just like Visage JSX, template literals compile to native `<template>` elements. Dynamic expressions `${count}` bind directly to precise DOM text nodes or attributes without Virtual DOM diffing.
+
+## When to Use html vs JSX
+
+- **Buildless Environments**: Prototyping in browsers via ES modules or CDN.
+- **Micro-Frontends**: Embedding small reactive widgets inside legacy non-build apps.
+- **SSR Script Templates**: Generating reactive templates on the fly in Cloudflare Workers or server scripts.

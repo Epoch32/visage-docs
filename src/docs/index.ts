@@ -8,14 +8,22 @@ export interface DocModule {
 	default: () => Child;
 }
 
-// Vite auto-discovers all doc page files in this directory
-const docModules = import.meta.glob<DocModule>("./*.tsx", { eager: true });
+// Vite auto-discovers both .mdx and .tsx doc page files in this directory
+const tsxModules = import.meta.glob<DocModule>("./*.tsx", { eager: true });
+const mdxModules = import.meta.glob<DocModule>("./*.mdx", { eager: true });
 
 export const docsRegistry: Record<string, DocModule> = {};
 
-for (const path in docModules) {
+// Register TSX docs first
+for (const path in tsxModules) {
 	const key = path.replace(/^\.\//, "").replace(/\.tsx$/, "");
-	docsRegistry[key] = docModules[path];
+	docsRegistry[key] = tsxModules[path]!;
+}
+
+// MDX docs override or complement TSX docs
+for (const path in mdxModules) {
+	const key = path.replace(/^\.\//, "").replace(/\.mdx$/, "");
+	docsRegistry[key] = mdxModules[path]!;
 }
 
 export function getDocPage(id: string): DocModule | undefined {

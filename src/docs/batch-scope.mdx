@@ -1,0 +1,270 @@
+import { BatchSimulator } from "../components/BatchSimulator";
+import { CodeBlock } from "../components/CodeBlock";
+import { Layers, Zap } from "lucide-react";
+
+export const title = "Batching & Scopes";
+export const breadcrumb = "Documentation / Reactivity";
+
+export const toc = [
+  { id: "overview", title: "Overview", level: 2 },
+  { id: "batching", title: "Atomic Updates with batch()", level: 2 },
+  { id: "interactive-demo", title: "Interactive Batching Simulator", level: 2 },
+  { id: "scopes-memory", title: "Reactive Scopes & Automatic Memory Cleanup", level: 2 },
+  { id: "createroot", title: "Isolated Roots with createRoot()", level: 2 },
+  { id: "untracking", title: "Reading Without Tracking (untrack)", level: 2 },
+  { id: "api-reference", title: "API Reference", level: 2 },
+];
+
+High-performance reactive systems must prevent intermediate glitch states and eliminate memory leaks. Visage provides `batch()` to group multiple state mutations into an atomic update, and hierarchical `Scope` trees to manage subscriber lifecycles automatically.
+
+<div className="doc-features-grid">
+  <div className="doc-feature-card">
+    <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "6px" }}>
+      <Zap size={16} color="var(--pink-500)" />
+      <div className="doc-feature-title">Glitch-Free Batching</div>
+    </div>
+    <div className="doc-feature-desc">
+      Mutating multiple signals inside <code>batch()</code> queues pending effects and flushes them in a single synchronous pass once the batch depth returns to zero.
+    </div>
+  </div>
+
+  <div className="doc-feature-card">
+    <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "6px" }}>
+      <Layers size={16} color="var(--pink-500)" />
+      <div className="doc-feature-title">Hierarchical Scopes</div>
+    </div>
+    <div className="doc-feature-desc">
+      Every component, <code>&lt;Show&gt;</code> branch, and <code>createRoot</code> owns a <code>Scope</code>. When parent scopes dispose, all child computeds, effects, and listeners teardown automatically.
+    </div>
+  </div>
+</div>
+
+## Atomic Updates with batch()
+
+When you update multiple signals that share downstream subscribers, updating them sequentially without batching causes those subscribers to execute multiple times. In complex graphs, this can lead to temporary invalid states (known as *glitches*):
+
+<CodeBlock
+  filename="batch-example.ts"
+  lang="ts"
+  code={`import { createSignal, effect, batch } from "@epoch32/visage";
+
+const [width, setWidth] = createSignal(10);
+const [height, setHeight] = createSignal(20);
+
+// Subscriber observing both:
+effect(() => {
+  console.log("Area:", width() * height());
+});
+
+// Without batch():
+// setWidth(30);  -> logs Area: 600
+// setHeight(40); -> logs Area: 1200 (executed twice!)
+
+// With batch():
+batch(() => {
+  setWidth(30);
+  setHeight(40);
+});
+// Logs Area: 1200 exactly ONCE at the end of the batch!`}
+/>
+
+## Interactive Batching Simulator
+
+Compare what happens when mutating two signals with and without `batch()`. Observe how the unbatched update triggers multiple dispatches, while the batched update triggers only once:
+
+<BatchSimulator />
+
+## Reactive Scopes & Automatic Memory Cleanup
+
+In long-running client applications, event listeners and reactive computations can easily create memory leaks if not properly destroyed. Visage organizes reactivity into a tree of `Scope` instances:
+
+- **Parent-Child Ownership:** When an effect or component creates child computeds or effects, those children belong to the parent scope.
+- **Cascading Disposal:** When a scope disposes (e.g., when a component unmounts or a `<Show>` branch hides), it recursively disposes all child scopes and executes every registered `onCleanup` callback.
+- **Zero Lingering Listeners:** All signal subscriptions are pruned from dependencies, leaving zero memory footprint.
+
+## Isolated Roots with createRoot()
+
+Sometimes you want to create a reactive computation that lives outside of any component lifecycle, such as a global state manager, a service worker bridge, or a plugin. Use `createRoot` to create an isolated scope that outlives current execution:
+
+<CodeBlock
+  filename="create-root.ts"
+  lang="ts"
+  code={`import { createRoot, createSignal, effect } from "@epoch32/visage";
+
+// Create an isolated reactive root:
+const dispose = createRoot((dispose) => {
+  const [count, setCount] = createSignal(0);
+
+  effect(() => {
+    console.log("Global counter:", count());
+  });
+
+  // Return the manual disposal handle
+  return dispose;
+});
+
+// Later, when you want to teardown this entire reactive universe:
+dispose();`}
+/>
+
+## Reading Without Tracking (untrack)
+
+If you need to read a signal's value inside an effect or computed without making that calculation re-run when the signal changes, wrap the read in `untrack()`:
+
+<CodeBlock
+  filename="untrack.ts"
+  lang="ts"
+  code={`import { createSignal, effect, untrack } from "@epoch32/visage";
+
+const [pageId, setPageId] = createSignal("home");
+const [analyticsId, setAnalyticsId] = createSignal(101);
+
+effect(() => {
+  // pageId() IS tracked: effect re-runs when pageId changes
+  const page = pageId();
+
+  // analyticsId() is NOT tracked: changing it will not trigger this effect
+  const user = untrack(() => analyticsId());
+
+  console.log(\`Logging view for page \${page} by user \${user}\`);
+});`}
+/>
+
+## API Reference
+
+<div className="doc-api-section">
+  <div className="doc-fn-card">
+    <div className="doc-fn-header">
+      <div className="doc-fn-meta">
+        <span className="doc-fn-kind">Function</span>
+      </div>
+      <div className="doc-fn-signature">
+        batch&lt;T&gt;(fn: () =&gt; T): T
+      </div>
+    </div>
+
+    <div className="doc-fn-body">
+      <div className="doc-fn-desc">
+        Executes multiple signal mutations synchronously in an atomic batch. Delays pending effects until the outer batch boundary finishes.
+      </div>
+
+      <div>
+        <div className="doc-fn-subheading">Parameters</div>
+        <div className="doc-params-list">
+          <div className="doc-param-row">
+            <div className="doc-param-meta">
+              <span className="doc-param-name">fn</span>
+              <span className="doc-param-type">() =&gt; T</span>
+              <span className="doc-param-badge required">Required</span>
+            </div>
+            <div className="doc-param-desc">
+              Synchronous function performing signal mutations.
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <div className="doc-fn-subheading">Returns</div>
+        <div className="doc-returns-card">
+          <div className="doc-returns-header">
+            <span className="doc-returns-type">T</span>
+          </div>
+          <div className="doc-param-desc">
+            The synchronous return value of <code>fn()</code>.
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div className="doc-fn-card">
+    <div className="doc-fn-header">
+      <div className="doc-fn-meta">
+        <span className="doc-fn-kind">Function</span>
+      </div>
+      <div className="doc-fn-signature">
+        createRoot&lt;T&gt;(fn: (dispose: () =&gt; void) =&gt; T): T
+      </div>
+    </div>
+
+    <div className="doc-fn-body">
+      <div className="doc-fn-desc">
+        Creates an isolated, top-level reactive scope that does not bind to any active parent context. Persists until explicitly disposed.
+      </div>
+
+      <div>
+        <div className="doc-fn-subheading">Parameters</div>
+        <div className="doc-params-list">
+          <div className="doc-param-row">
+            <div className="doc-param-meta">
+              <span className="doc-param-name">fn</span>
+              <span className="doc-param-type">(dispose: () =&gt; void) =&gt; T</span>
+              <span className="doc-param-badge required">Required</span>
+            </div>
+            <div className="doc-param-desc">
+              Factory function receiving the manual disposal callback.
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <div className="doc-fn-subheading">Returns</div>
+        <div className="doc-returns-card">
+          <div className="doc-returns-header">
+            <span className="doc-returns-type">T</span>
+          </div>
+          <div className="doc-param-desc">
+            The return value of <code>fn</code>.
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div className="doc-fn-card">
+    <div className="doc-fn-header">
+      <div className="doc-fn-meta">
+        <span className="doc-fn-kind">Function</span>
+      </div>
+      <div className="doc-fn-signature">
+        untrack&lt;T&gt;(fn: () =&gt; T): T
+      </div>
+    </div>
+
+    <div className="doc-fn-body">
+      <div className="doc-fn-desc">
+        Runs a function in an untracked context, preventing any signals read within it from registering as dependencies of the active effect or computed.
+      </div>
+
+      <div>
+        <div className="doc-fn-subheading">Parameters</div>
+        <div className="doc-params-list">
+          <div className="doc-param-row">
+            <div className="doc-param-meta">
+              <span className="doc-param-name">fn</span>
+              <span className="doc-param-type">() =&gt; T</span>
+              <span className="doc-param-badge required">Required</span>
+            </div>
+            <div className="doc-param-desc">
+              Function to run without reactive dependency tracking.
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <div className="doc-fn-subheading">Returns</div>
+        <div className="doc-returns-card">
+          <div className="doc-returns-header">
+            <span className="doc-returns-type">T</span>
+          </div>
+          <div className="doc-param-desc">
+            The synchronous return value of <code>fn()</code>.
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
