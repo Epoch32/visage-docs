@@ -1,6 +1,6 @@
 import { createSignal, effect, toast } from "@epoch32/visage";
 import { Check, Copy } from "lucide-react";
-import { codeToHtml } from "shiki";
+import { highlightCode } from "../lib/highlighter";
 import "../styles/codeblock.css";
 
 interface CodeBlockProps {
@@ -15,10 +15,7 @@ export function CodeBlock(props: CodeBlockProps) {
 
 	const lang = props.lang ?? "tsx";
 
-	codeToHtml(props.code.trim(), {
-		lang,
-		theme: "rose-pine-moon",
-	})
+	highlightCode(props.code.trim(), lang)
 		.then((res) => {
 			setHtml(res);
 		})
