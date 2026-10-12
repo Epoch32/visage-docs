@@ -1,6 +1,7 @@
 import { computed, createSignal, effect, render, ToastViewport } from "@epoch32/visage";
 import { DocContent } from "./components/DocContent";
 import { Header } from "./components/Header";
+import { MobileNav } from "./components/MobileNav";
 import { Sidebar } from "./components/Sidebar";
 import { TableOfContents } from "./components/TableOfContents";
 import { getDocPage } from "./docs";
@@ -67,6 +68,12 @@ function App() {
 
 				<TableOfContents items={currentToc} />
 			</div>
+
+			<MobileNav
+				activeId={activeSection}
+				onSelect={(id) => setActiveSection(id)}
+				toc={currentToc}
+			/>
 
 			<ToastViewport class="visage-toast-viewport" />
 		</div>
