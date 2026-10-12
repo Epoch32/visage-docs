@@ -6,7 +6,9 @@
 	"scripts": {
 		"dev": "bun --bun vite",
 		"build": "bun --bun vite build",
-		"preview": "bun --bun vite preview"
+		"preview": "bun --bun vite preview",
+		"deploy": "bun run build && wrangler deploy",
+		"cf:dev": "bun run build && wrangler dev"
 	},
 	"dependencies": {
 		"@epoch32/visage": "^1.1.4",
@@ -15,6 +17,7 @@
 	},
 	"devDependencies": {
 		"typescript": "^7.0.2",
-		"vite": "^8.3.4"
+		"vite": "^8.3.4",
+		"wrangler": "^4.149.0"
 	}
 }
