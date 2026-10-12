@@ -1,5 +1,7 @@
 import {
 	computed,
+	createSignal,
+	onCleanup,
 	render,
 	Router,
 	ToastViewport,
@@ -9,6 +11,7 @@ import {
 import { DocContent } from "./components/DocContent";
 import { Header } from "./components/Header";
 import { MobileNav } from "./components/MobileNav";
+import { SearchModal } from "./components/SearchModal";
 import { Sidebar } from "./components/Sidebar";
 import { TableOfContents } from "./components/TableOfContents";
 import { getDocPage } from "./docs";
@@ -18,6 +21,21 @@ import "./styles/toast.css";
 function DocsApp() {
 	const location = useLocation();
 	const navigate = useNavigate();
+	const [searchOpen, setSearchOpen] = createSignal(false);
+
+	// Global Command+K / Ctrl+K keyboard shortcut
+	if (typeof window !== "undefined") {
+		const handleGlobalKeyDown = (e: KeyboardEvent) => {
+			if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "k") {
+				e.preventDefault();
+				setSearchOpen((prev) => !prev);
+			}
+		};
+		window.addEventListener("keydown", handleGlobalKeyDown);
+		onCleanup(() => {
+			window.removeEventListener("keydown", handleGlobalKeyDown);
+		});
+	}
 
 	// Resolve active section from current URL pathname (e.g. "/signals" or "/docs/signals")
 	const activeSection = computed(() => {
@@ -55,7 +73,7 @@ function DocsApp() {
 
 	return (
 		<div className="app-shell">
-			<Header />
+			<Header onOpenSearch={() => setSearchOpen(true)} />
 
 			<div className="app-layout">
 				<Sidebar
@@ -74,6 +92,12 @@ function DocsApp() {
 				activeId={activeSection}
 				onSelect={handleSelectSection}
 				toc={currentToc}
+				onOpenSearch={() => setSearchOpen(true)}
+			/>
+
+			<SearchModal
+				open={searchOpen}
+				onOpenChange={setSearchOpen}
 			/>
 
 			<ToastViewport class="visage-toast-viewport" />

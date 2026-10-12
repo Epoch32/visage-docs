@@ -3,7 +3,11 @@ import { Moon, Sun } from "lucide-react";
 import { theme, toggleTheme } from "../theme";
 import "../styles/header-transitions.css";
 
-export function Header() {
+interface HeaderProps {
+	onOpenSearch?: () => void;
+}
+
+export function Header(props: HeaderProps) {
 	return (
 		<header
 			className="app-header"
@@ -30,7 +34,13 @@ export function Header() {
 			</div>
 
 			{/* Center Search Bar */}
-			<div className="header-search">
+			<div
+				className="header-search"
+				onClick={() => props.onOpenSearch?.()}
+				role="button"
+				tabIndex={0}
+				aria-label="Open search documentation"
+			>
 				<svg
 					className="header-search-icon"
 					aria-hidden="true"

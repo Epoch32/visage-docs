@@ -8,7 +8,7 @@ import {
 	BottomBarAction,
 	BottomBarItem,
 } from "@epoch32/visage/ui";
-import { BookOpen, ChevronRight, Layers, ListTree, Menu, X, Zap } from "lucide-react";
+import { BookOpen, ChevronRight, Layers, ListTree, Menu, Search, X, Zap } from "lucide-react";
 import { navigationSections } from "./Sidebar";
 import type { TocItem } from "./TableOfContents";
 import "../styles/mobile-nav.css";
@@ -17,6 +17,7 @@ interface MobileNavProps {
 	activeId: () => string;
 	onSelect: (id: string) => void;
 	toc: () => TocItem[];
+	onOpenSearch?: () => void;
 }
 
 export function MobileNav(props: MobileNavProps) {
@@ -124,14 +125,28 @@ export function MobileNav(props: MobileNavProps) {
 				<div class="mobile-drawer-handle" />
 				<div class="mobile-drawer-header">
 					<span class="mobile-drawer-title">Documentation Menu</span>
-					<button
-						type="button"
-						class="mobile-drawer-close"
-						onClick={closeAll}
-						aria-label="Close menu"
-					>
-						<X size={18} />
-					</button>
+					<div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+						<button
+							type="button"
+							class="mobile-drawer-close"
+							onClick={() => {
+								closeAll();
+								props.onOpenSearch?.();
+							}}
+							aria-label="Search documentation"
+							title="Search documentation"
+						>
+							<Search size={18} />
+						</button>
+						<button
+							type="button"
+							class="mobile-drawer-close"
+							onClick={closeAll}
+							aria-label="Close menu"
+						>
+							<X size={18} />
+						</button>
+					</div>
 				</div>
 
 				<div class="mobile-drawer-content">
