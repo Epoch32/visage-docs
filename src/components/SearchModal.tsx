@@ -21,11 +21,10 @@ export function SearchModal(props: SearchModalProps) {
 	const [query, setQuery] = createSignal("");
 	const [activeIndex, setActiveIndex] = createSignal(0);
 
-	let allItems: SearchResultItem[] = [];
+	const allItems = buildSearchIndex();
 
 	effect(() => {
 		if (props.open()) {
-			allItems = buildSearchIndex();
 			setQuery("");
 			setActiveIndex(0);
 		}
@@ -130,26 +129,26 @@ export function SearchModal(props: SearchModalProps) {
 											`search-command-item ${isSelected() ? "selected" : ""}`
 										}
 										aria-selected={isSelected}
-										onClick={() => handleSelect(item())}
+										onClick={() => handleSelect(item)}
 										onMouseEnter={() => setActiveIndex(idx())}
 									>
 										<div class="search-command-item-main">
-											{item().type === "page" ? (
+											{item.type === "page" ? (
 												<BookOpen size={16} class="search-command-item-icon" />
 											) : (
 												<Hash size={16} class="search-command-item-icon" />
 											)}
 											<div class="search-command-item-text">
 												<span class="search-command-item-title">
-													{item().title}
+													{item.title}
 												</span>
 												<span class="search-command-item-subtitle">
-													{item().subtitle}
+													{item.subtitle}
 												</span>
 											</div>
 										</div>
 										<span class="search-command-item-badge">
-											{item().category}
+											{item.category}
 										</span>
 									</div>
 								);
