@@ -28,7 +28,17 @@ export function TableOfContents(props: TableOfContentsProps) {
 					<For each={getItems}>
 						{(item) => (
 							<li style={{ paddingLeft: `${(item.level - 2) * 10}px` }}>
-								<a href={`#${item.id}`} class="toc-link">
+								<a
+									href={`#${item.id}`}
+									class="toc-link"
+									onClick={(e) => {
+										e.preventDefault();
+										const target = document.getElementById(item.id);
+										if (target) {
+											target.scrollIntoView({ behavior: "smooth", block: "start" });
+										}
+									}}
+								>
 									{item.title}
 								</a>
 							</li>

@@ -16,7 +16,7 @@ export default function IntroductionDoc() {
 			<p className="doc-lead">
 				Visage is a lightning-fast, zero-VDOM, fine-grained reactive UI library
 				for TypeScript. Components run exactly once to build a surgical DOM
-				dependency graph—subsequent state changes update precise text nodes and
+				dependency graph; subsequent state changes update precise text nodes and
 				attributes directly with microsecond latency.
 			</p>
 
