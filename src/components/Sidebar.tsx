@@ -55,6 +55,7 @@ export const navigationSections: NavSection[] = [
 		title: "Headless UI & Charts",
 		items: [
 			{ id: "ui-primitives", title: "Accessible UI Components" },
+			{ id: "io-primitives", title: "IO & Drag-and-Drop" },
 			{ id: "charts", title: "Reactive SVG Charts" },
 			{ id: "virtual-lists", title: "Virtualizer (100k+ Rows)" },
 		],

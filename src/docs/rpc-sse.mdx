@@ -8,7 +8,7 @@ export const toc = [
   { id: "overview", title: "Overview", level: 2 },
   { id: "defining-router", title: "Defining an RPC Router (createRouter)", level: 2 },
   { id: "server-handler", title: "Server Fetch Handler (createFetchHandler)", level: 2 },
-  { id: "client-sdk", title: "Typed Client & Query Batching (createClient)", level: 2 },
+  { id: "client-sdk", title: "Typed Client & Query Integration (createClient)", level: 2 },
   { id: "sse-subscriptions", title: "Real-Time Streaming Subscriptions", level: 2 },
   { id: "error-handling", title: "Error Handling (RPCError)", level: 2 },
   { id: "api-reference", title: "API Reference", level: 2 },
@@ -49,31 +49,53 @@ Define your API procedures using `createRouter`, `query`, `mutation`, and `subsc
 
 export const appRouter = createRouter({
   // 1. Read query
-  getUser: query()
-    .input(v.object({ id: v.string() }))
-    .handler(async ({ input }) => {
+  getUser: query({
+    input: v.object({ id: v.string() }),
+    resolve: async ({ input }) => {
       return { id: input.id, name: "Alice", tier: "pro" };
-    }),
+    },
+  }),
 
   // 2. Mutation
-  createPost: mutation()
-    .input(v.object({ title: v.string(), content: v.string() }))
-    .handler(async ({ input }) => {
+  createPost: mutation({
+    input: v.object({ title: v.string(), content: v.string() }),
+    resolve: async ({ input }) => {
       return { postId: "post-99", title: input.title };
-    }),
+    },
+  }),
 
-  // 3. SSE subscription
-  liveMetrics: subscription()
-    .input(v.object({ intervalMs: v.number().default(1000) }))
-    .handler(async function* ({ input }) {
+  // 3. SSE subscription (Async Generator)
+  liveMetrics: subscription({
+    input: v.object({ intervalMs: v.number().optional() }),
+    resolve: async function* ({ input }) {
+      const intervalMs = input.intervalMs ?? 1000;
       while (true) {
-        await new Promise((r) => setTimeout(r, input.intervalMs));
+        await new Promise((r) => setTimeout(r, intervalMs));
         yield { timestamp: Date.now(), cpu: Math.random() * 100 };
       }
-    }),
+    },
+  }),
 });
 
 export type AppRouter = typeof appRouter;`}
+/>
+
+Alternatively, procedures can be registered fluidly with method chaining:
+
+<CodeBlock
+  filename="server/chained-router.ts"
+  lang="ts"
+  code={`import { createRouter, v } from "@epoch32/visage/rpc";
+
+export const appRouter = createRouter()
+  .query("getUser", {
+    input: v.object({ id: v.string() }),
+    resolve: async ({ input }) => ({ id: input.id, name: "Alice" }),
+  })
+  .mutation("createPost", {
+    input: v.object({ title: v.string() }),
+    resolve: async ({ input }) => ({ postId: "post-99", title: input.title }),
+  });`}
 />
 
 ## Server Fetch Handler (createFetchHandler)
@@ -103,7 +125,7 @@ export default {
 };`}
 />
 
-## Typed Client & Query Batching (createClient)
+## Typed Client & Query Integration (createClient)
 
 Initialize the client with your server's router type:
 
@@ -114,29 +136,27 @@ Initialize the client with your server's router type:
 import type { AppRouter } from "../server/router";
 
 export const rpc = createClient<AppRouter>({
-  url: "/api/rpc",
+  baseUrl: "/api/rpc",
   headers: () => ({
     Authorization: \`Bearer \${localStorage.getItem("token") ?? ""}\`,
   }),
 });`}
 />
 
-### Automatic Batching in Action
+### Direct Invocation and Reactive Signals
 
-When multiple components mount simultaneously and request data:
+You can call procedures directly or generate fine-grained Visage query signals:
 
 <CodeBlock
-  filename="batching-demo.ts"
+  filename="client-usage.ts"
   lang="ts"
-  code={`// In Component A:
-const userPromise = rpc.getUser({ id: "1" });
+  code={`// Direct asynchronous RPC calls:
+const user = await rpc.getUser.query({ id: "1" });
+const newPost = await rpc.createPost.mutate({ title: "Hello", content: "Visage RPC" });
 
-// In Component B (same event loop tick):
-const metricsPromise = rpc.getUser({ id: "2" });
-
-// Visage automatically combines both into a single HTTP POST:
-// POST /api/rpc -> [ { procedure: "getUser", input: { id: "1" } }, { procedure: "getUser", input: { id: "2" } } ]
-const [user1, user2] = await Promise.all([userPromise, metricsPromise]);`}
+// Reactive Visage query integration with fine-grained signals:
+const userQuery = rpc.getUser.createQuery(() => ({ id: "1" }));
+// userQuery.data(), userQuery.isLoading(), userQuery.error()`}
 />
 
 ## Real-Time Streaming Subscriptions
@@ -245,7 +265,7 @@ Available error codes:
         <div className="doc-params-list">
           <div className="doc-param-row">
             <div className="doc-param-meta">
-              <span className="doc-param-name">url</span>
+              <span className="doc-param-name">baseUrl</span>
               <span className="doc-param-type">string</span>
               <span className="doc-param-badge required">Required</span>
             </div>

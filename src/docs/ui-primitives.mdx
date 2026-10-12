@@ -7,6 +7,8 @@ export const breadcrumb = "Documentation / Headless UI & Charts";
 export const toc = [
   { id: "overview", title: "Overview", level: 2 },
   { id: "dialog-primitive", title: "Dialog / Modal (<Dialog>)", level: 2 },
+  { id: "select-primitive", title: "Select (<Select>)", level: 2 },
+  { id: "slider-primitive", title: "Slider (<Slider>)", level: 2 },
   { id: "popover-primitive", title: "Popover (<Popover>)", level: 2 },
   { id: "dropdown-primitive", title: "Dropdown Menu (<DropdownMenu>)", level: 2 },
   { id: "command-primitive", title: "Command Palette (<Command>)", level: 2 },
@@ -79,6 +81,60 @@ export function ConfirmDeleteDialog() {
         </DialogContent>
       </DialogPortal>
     </Dialog>
+  );
+}`}
+/>
+
+## Select (&lt;Select&gt;)
+
+The Select primitive provides an accessible, keyboard-navigable combobox/select dropdown with auto-anchoring, option highlighting, and full type safety:
+
+<CodeBlock
+  filename="SelectExample.tsx"
+  lang="tsx"
+  code={`import { Select, createSignal } from "@epoch32/visage";
+
+export function ThemePicker() {
+  const [theme, setTheme] = createSignal("dark");
+
+  return (
+    <Select
+      value={theme}
+      onValueChange={setTheme}
+      options={[
+        { label: "Light", value: "light" },
+        { label: "Dark", value: "dark" },
+        { label: "System", value: "system" },
+      ]}
+      placeholder="Select theme..."
+    />
+  );
+}`}
+/>
+
+## Slider (&lt;Slider&gt;)
+
+The Slider primitive renders an accessible continuous range slider with keyboard navigation (ArrowLeft, ArrowRight, PageUp, PageDown, Home, End) and touch/mouse dragging:
+
+<CodeBlock
+  filename="SliderExample.tsx"
+  lang="tsx"
+  code={`import { Slider, createSignal } from "@epoch32/visage";
+
+export function VolumeSlider() {
+  const [volume, setVolume] = createSignal(75);
+
+  return (
+    <div style={{ width: "240px" }}>
+      <label>Volume: {volume}%</label>
+      <Slider
+        value={volume}
+        onValueChange={setVolume}
+        min={0}
+        max={100}
+        step={1}
+      />
+    </div>
   );
 }`}
 />
