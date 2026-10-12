@@ -36,7 +36,7 @@ export const navigationSections: NavSection[] = [
 		title: "DOM & Control Flow",
 		items: [
 			{ id: "rendering", title: "Fine-Grained DOM (render)" },
-			{ id: "control-flow", title: "<Show>, <For>, <Switch>" },
+			{ id: "control-flow", title: "<Show> & <For>" },
 			{ id: "portals-suspense", title: "<Portal> & <Suspense>" },
 			{ id: "template-literals", title: "HTML Template Literals" },
 		],
