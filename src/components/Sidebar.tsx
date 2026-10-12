@@ -65,6 +65,7 @@ export const navigationSections: NavSection[] = [
 		items: [
 			{ id: "file-api", title: "Opinionated File-Based API" },
 			{ id: "rpc-sse", title: "End-to-End Typed RPC & SSE" },
+			{ id: "i18n", title: "I18n & Community Sync" },
 			{ id: "devtools", title: "Live DAG Graph DevTools" },
 			{ id: "vite-plugin", title: "Vite Plugin & Fast HMR" },
 		],

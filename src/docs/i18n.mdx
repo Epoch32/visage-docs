@@ -1,0 +1,274 @@
+import { CodeBlock } from "../components/CodeBlock";
+import { Globe, Languages, RefreshCw, Sparkles, Users, Zap } from "lucide-react";
+
+export const title = "Fine-Grained I18n & Localization";
+export const breadcrumb = "Documentation / Full-Stack & Tools";
+
+export const toc = [
+  { id: "overview", title: "Overview", level: 2 },
+  { id: "setup", title: "Quickstart (createI18n)", level: 2 },
+  { id: "fine-grained-reactivity", title: "Fine-Grained Reactive Translations", level: 2 },
+  { id: "pluralization", title: "CLDR Standard Pluralization", level: 2 },
+  { id: "community-tools", title: "Crowdin & Weblate Community Integration", level: 2 },
+  { id: "dynamic-loader", title: "Dynamic / OTA Async Dictionaries", level: 2 },
+  { id: "in-context", title: "In-Context Visual Editing", level: 2 },
+  { id: "intl-formatting", title: "Native Intl Date & Number Formatting", level: 2 },
+  { id: "api-reference", title: "API Reference", level: 2 },
+];
+
+Visage I18n (`visage/i18n`) provides a zero-dependency, ultra-lightweight localization engine designed specifically for fine-grained reactive applications. Unlike traditional i18n libraries that force full virtual DOM component re-renders, Visage updates **only the targeted text nodes** when the active locale changes.
+
+<div className="doc-features-grid">
+  <div className="doc-feature-card">
+    <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "6px" }}>
+      <Zap size={16} color="var(--pink-500)" />
+      <div className="doc-feature-title">Zero Component Re-renders</div>
+    </div>
+    <div className="doc-feature-desc">
+      Translations bind directly to signal subscribers. Switching languages updates on-screen text instantly without re-mounting components or re-running setup logic.
+    </div>
+  </div>
+
+  <div className="doc-feature-card">
+    <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "6px" }}>
+      <Users size={16} color="var(--pink-500)" />
+      <div className="doc-feature-title">Native Crowdin & Weblate Sync</div>
+    </div>
+    <div className="doc-feature-desc">
+      Accepts standard JSON key-value and nested dictionaries produced by community translation platforms, with in-context live visual editing tags.
+    </div>
+  </div>
+</div>
+
+## Quickstart (createI18n)
+
+Initialize your translation engine with preloaded dictionaries or dynamic loaders:
+
+<CodeBlock
+  filename="src/i18n.ts"
+  lang="ts"
+  code={`import { createI18n } from "@epoch32/visage";
+
+export const i18n = createI18n({
+  defaultLocale: "en",
+  fallbackLocale: "en",
+  translations: {
+    en: {
+      nav: { home: "Home", docs: "Documentation" },
+      welcome: "Welcome, {{name}}!",
+      items: {
+        zero: "No items",
+        one: "1 item",
+        other: "{{count}} items"
+      }
+    },
+    es: {
+      nav: { home: "Inicio", docs: "Documentación" },
+      welcome: "¡Bienvenido, {{name}}!",
+      items: {
+        zero: "Ningún artículo",
+        one: "1 artículo",
+        other: "{{count}} artículos"
+      }
+    }
+  }
+});
+
+export const { t, locale, setLocale, formatNumber, formatDate } = i18n;`}
+/>
+
+## Fine-Grained Reactive Translations
+
+Use `t(...)` inside reactive JSX bindings. When `setLocale("es")` is called, only the text node is updated in place:
+
+<CodeBlock
+  filename="Header.tsx"
+  lang="tsx"
+  code={`import { t, locale, setLocale } from "./i18n";
+
+export function Header() {
+  return (
+    <header>
+      <h1>{() => t("welcome", { name: "Alice" })}</h1>
+      <p>{() => t("nav.docs")}</p>
+
+      <div class="lang-switcher">
+        <button
+          type="button"
+          class={() => (locale() === "en" ? "active" : "")}
+          onClick={() => setLocale("en")}
+        >
+          English
+        </button>
+        <button
+          type="button"
+          class={() => (locale() === "es" ? "active" : "")}
+          onClick={() => setLocale("es")}
+        >
+          Español
+        </button>
+      </div>
+    </header>
+  );
+}`}
+/>
+
+## CLDR Standard Pluralization
+
+Pluralization rules vary drastically between languages (e.g. Arabic has 6 plural forms, Slavic languages have 3, English has 2). Visage utilizes the browser's native `Intl.PluralRules` to select the exact grammatical form:
+
+<CodeBlock
+  filename="CartSummary.tsx"
+  lang="tsx"
+  code={`// Definition in translation JSON:
+// "items": {
+//   "zero": "No items in cart",
+//   "one": "{{count}} item in cart",
+//   "few": "{{count}} items in cart",
+//   "many": "{{count}} items in cart",
+//   "other": "{{count}} items in cart"
+// }
+
+export function CartBadge({ count }: { count: () => number }) {
+  return <span>{() => t("items", { count: count() })}</span>;
+}`}
+/>
+
+## Crowdin & Weblate Community Integration
+
+Community localization workflows sync translation files straight to your GitHub repository or stream them over-the-air:
+
+### 1. Git-Based Sync (Crowdin / Weblate PRs)
+Store translation files in a standard `locales/` directory:
+```
+locales/
+  ├── en.json       <-- Source strings committed with your code
+  ├── es.json       <-- Auto-committed / PR'd by community translators
+  ├── de.json
+  └── ja.json
+```
+Import or load them directly into Visage with zero conversion.
+
+### 2. Dynamic / OTA Async Dictionaries (Crowdin OTA / CDN)
+For large applications or over-the-air translation updates without deploying a new app version, supply an asynchronous `loader`:
+
+<CodeBlock
+  filename="i18n-loader.ts"
+  lang="ts"
+  code={`import { createI18n } from "@epoch32/visage";
+
+export const i18n = createI18n({
+  defaultLocale: "en",
+  fallbackLocale: "en",
+  async loader(locale) {
+    // 1. Fetch live from Crowdin Over-The-Air CDN or API
+    const res = await fetch(\`https://distributions.crowdin.net/your-project/\${locale}.json\`);
+    if (res.ok) return await res.json();
+
+    // 2. Fall back to bundled local JSON
+    return import(\`./locales/\${locale}.json\`);
+  }
+});`}
+/>
+
+### 3. In-Context Visual Editing
+
+Crowdin and Weblate provide In-Context editing modes where translators view your live app and edit strings in a popup modal. Enable `inContext: true` to wrap strings in standard translation tags:
+
+<CodeBlock
+  filename="in-context-config.ts"
+  lang="ts"
+  code={`export const i18n = createI18n({
+  defaultLocale: "en",
+  // In dev / preview mode: wraps output with <!-- crwdns:key -->text<!-- /crwdns -->
+  inContext: process.env.NODE_ENV === "development"
+});`}
+/>
+
+## Native Intl Date & Number Formatting
+
+Visage includes cached helpers for browser-native formatting tied directly to the active locale signal:
+
+<CodeBlock
+  filename="FormatExamples.ts"
+  lang="ts"
+  code={`import { formatNumber, formatDate, formatRelativeTime } from "./i18n";
+
+// Currency formatting
+formatNumber(12500.5, { style: "currency", currency: "USD" }); // "$12,500.50"
+
+// Date formatting
+formatDate(new Date(), { dateStyle: "long" }); // "October 12, 2026"
+
+// Relative time formatting
+formatRelativeTime(-1, "day", { numeric: "auto" }); // "yesterday"`}
+/>
+
+## API Reference
+
+<div className="doc-api-section">
+  <div className="doc-fn-card">
+    <div className="doc-fn-header">
+      <div className="doc-fn-meta">
+        <span className="doc-fn-kind">Function</span>
+      </div>
+      <div className="doc-fn-signature">
+        createI18n(options?: CreateI18nOptions): I18nInstance
+      </div>
+    </div>
+    <div className="doc-fn-body">
+      <div className="doc-fn-desc">
+        Creates a fine-grained reactive internationalization instance.
+      </div>
+
+      <div>
+        <div className="doc-fn-subheading">Options</div>
+        <div className="doc-params-list">
+          <div className="doc-param-row">
+            <div className="doc-param-meta">
+              <span className="doc-param-name">defaultLocale</span>
+              <span className="doc-param-type">string</span>
+              <span className="doc-param-badge optional">Optional</span>
+            </div>
+            <div className="doc-param-desc">
+              Initial active locale. Defaults to <code>"en"</code>.
+            </div>
+          </div>
+
+          <div className="doc-param-row">
+            <div className="doc-param-meta">
+              <span className="doc-param-name">fallbackLocale</span>
+              <span className="doc-param-type">string</span>
+              <span className="doc-param-badge optional">Optional</span>
+            </div>
+            <div className="doc-param-desc">
+              Fallback locale when a key is missing. Defaults to <code>"en"</code>.
+            </div>
+          </div>
+
+          <div className="doc-param-row">
+            <div className="doc-param-meta">
+              <span className="doc-param-name">translations</span>
+              <span className="doc-param-type">TranslationsDict</span>
+              <span className="doc-param-badge optional">Optional</span>
+            </div>
+            <div className="doc-param-desc">
+              Preloaded locale translation dictionaries.
+            </div>
+          </div>
+
+          <div className="doc-param-row">
+            <div className="doc-param-meta">
+              <span className="doc-param-name">loader</span>
+              <span className="doc-param-type">(locale: string) =&gt; Promise&lt;TranslationRecord&gt;</span>
+              <span className="doc-param-badge optional">Optional</span>
+            </div>
+            <div className="doc-param-desc">
+              Asynchronous dynamic dictionary loader for code splitting or OTA CDN loading.
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
