@@ -1,4 +1,5 @@
 import { CodeBlock } from "../components/CodeBlock";
+import { Code2, Cpu, Zap } from "lucide-react";
 
 export const title = "HTML Template Literals";
 export const breadcrumb = "Documentation / DOM & Control Flow";
@@ -10,35 +11,74 @@ export const toc = [
   { id: "when-to-use", title: "When to Use html vs JSX", level: 2 },
 ];
 
-# HTML Template Literals
-
 Visage provides a first-class, zero-build `html` tagged template literal engine. You can write reactive, fine-grained components in pure JavaScript or TypeScript without needing Babel, SWC, or a JSX compiler.
+
+<div className="doc-features-grid">
+  <div className="doc-feature-card">
+    <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "6px" }}>
+      <Zap size={16} color="var(--pink-500)" />
+      <div className="doc-feature-title">Zero Compiler Required</div>
+    </div>
+    <div className="doc-feature-desc">
+      Write native reactive components in standard JavaScript/TypeScript template literals without Babel or SWC build pipelines.
+    </div>
+  </div>
+
+  <div className="doc-feature-card">
+    <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "6px" }}>
+      <Cpu size={16} color="var(--pink-500)" />
+      <div className="doc-feature-title">Direct DOM Cloning</div>
+    </div>
+    <div className="doc-feature-desc">
+      Templates parse into native <code>&lt;template&gt;</code> elements once and clone in microseconds without virtual DOM diffing.
+    </div>
+  </div>
+</div>
 
 ## The html Tagged Template
 
 Import `html` directly from `@epoch32/visage/template`:
 
-```ts
-import { html } from "@epoch32/visage/template";
+<CodeBlock
+  filename="Counter.ts"
+  lang="ts"
+  code={`import { html } from "@epoch32/visage/template";
 import { createSignal } from "@epoch32/visage";
 
-function Counter() {
+export function Counter() {
   const [count, setCount] = createSignal(0);
 
-  return html`
-    <button onClick=${() => setCount(c => c + 1)}>
-      Clicked ${count} times
+  return html\`
+    <button onClick=\${() => setCount(c => c + 1)}>
+      Clicked \${count} times
     </button>
-  `;
-}
-```
+  \`;
+}`}
+/>
 
 ## Fine-Grained Interpolation
 
 Just like Visage JSX, template literals compile to native `<template>` elements. Dynamic expressions `${count}` bind directly to precise DOM text nodes or attributes without Virtual DOM diffing.
 
+<CodeBlock
+  filename="DynamicAttributes.ts"
+  lang="ts"
+  code={`import { html } from "@epoch32/visage/template";
+import { createSignal } from "@epoch32/visage";
+
+export function UserBadge() {
+  const [active, setActive] = createSignal(true);
+
+  return html\`
+    <div class=\${() => (active() ? "badge active" : "badge")}>
+      <span>Status: \${() => (active() ? "Online" : "Offline")}</span>
+    </div>
+  \`;
+}`}
+/>
+
 ## When to Use html vs JSX
 
-- **Buildless Environments**: Prototyping in browsers via ES modules or CDN.
+- **Buildless Environments**: Prototyping directly in browsers via ES modules or CDN.
 - **Micro-Frontends**: Embedding small reactive widgets inside legacy non-build apps.
 - **SSR Script Templates**: Generating reactive templates on the fly in Cloudflare Workers or server scripts.
