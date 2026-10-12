@@ -1,8 +1,9 @@
-import { createSignal, render } from "@epoch32/visage";
+import { createSignal, render, ToastViewport } from "@epoch32/visage";
 import { Header } from "./components/Header";
 import { Sidebar } from "./components/Sidebar";
 import { TableOfContents } from "./components/TableOfContents";
 import { CodeBlock } from "./components/CodeBlock";
+import "./styles/toast.css";
 
 function App() {
   const [activeSection, setActiveSection] = createSignal("introduction");
@@ -187,6 +188,8 @@ render(() => <Counter />, document.getElementById("app")!);`}
         {/* Right Table of Contents */}
         <TableOfContents items={sampleToc} />
       </div>
+
+      <ToastViewport class="visage-toast-viewport" />
     </div>
   );
 }

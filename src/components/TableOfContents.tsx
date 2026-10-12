@@ -1,4 +1,5 @@
 import { Edit } from "lucide-react";
+import "../styles/toc.css";
 
 export interface TocItem {
   id: string;
@@ -12,103 +13,29 @@ interface TableOfContentsProps {
 
 export function TableOfContents(props: TableOfContentsProps) {
   return (
-    <aside
-      style={{
-        width: "240px",
-        position: "sticky",
-        top: "84px",
-        height: "fit-content",
-        margin: "32px 24px 32px 0"
-      }}
-    >
-      <div
-        style={{
-          background: "var(--surface-card)",
-          borderRadius: "16px",
-          padding: "24px 20px",
-          border: "1px solid var(--border-pink)",
-          boxShadow: "var(--shadow-card)",
-          backdropFilter: "blur(12px)"
-        }}
-      >
-        <div
-          style={{
-            fontSize: "11px",
-            fontWeight: 700,
-            textTransform: "uppercase",
-            letterSpacing: "0.08em",
-            color: "var(--text-muted)",
-            marginBottom: "14px",
-            display: "flex",
-            alignItems: "center",
-            gap: "6px"
-          }}
-        >
-          <span
-            style={{
-              width: "6px",
-              height: "6px",
-              borderRadius: "50%",
-              background: "var(--pink-400)"
-            }}
-          />
+    <aside className="toc-container">
+      <div className="toc-card">
+        <div className="toc-header">
+          <span className="toc-header-dot" />
           <span>On This Page</span>
         </div>
 
-        <ul style={{ listStyle: "none", display: "flex", flexDirection: "column", gap: "8px" }}>
+        <ul className="toc-list">
           {props.items.map((item) => (
             <li key={item.id} style={{ paddingLeft: `${(item.level - 2) * 10}px` }}>
-              <a
-                href={`#${item.id}`}
-                style={{
-                  color: "var(--text-muted)",
-                  textDecoration: "none",
-                  display: "block",
-                  fontSize: "13px",
-                  lineHeight: 1.4,
-                  fontWeight: 500,
-                  transition: "all 0.15s ease"
-                }}
-                onMouseEnter={(e) => {
-                  const el = e.currentTarget as HTMLElement;
-                  el.style.color = "var(--pink-600)";
-                  el.style.paddingLeft = "4px";
-                }}
-                onMouseLeave={(e) => {
-                  const el = e.currentTarget as HTMLElement;
-                  el.style.color = "var(--text-muted)";
-                  el.style.paddingLeft = "0px";
-                }}
-              >
+              <a href={`#${item.id}`} className="toc-link">
                 {item.title}
               </a>
             </li>
           ))}
         </ul>
 
-        <div
-          style={{
-            marginTop: "20px",
-            paddingTop: "14px",
-            borderTop: "1px solid var(--border-subtle)"
-          }}
-        >
+        <div className="toc-footer">
           <a
             href="https://github.com/Epoch32/visage-docs/issues/new"
             target="_blank"
             rel="noreferrer"
-            style={{
-              fontSize: "12px",
-              color: "var(--text-muted)",
-              textDecoration: "none",
-              display: "flex",
-              alignItems: "center",
-              gap: "6px",
-              fontWeight: 500,
-              transition: "color 0.15s ease"
-            }}
-            onMouseEnter={(e) => ((e.currentTarget as HTMLElement).style.color = "var(--pink-600)")}
-            onMouseLeave={(e) => ((e.currentTarget as HTMLElement).style.color = "var(--text-muted)")}
+            className="toc-github-edit"
           >
             <Edit size={12} />
             <span>Edit on GitHub</span>

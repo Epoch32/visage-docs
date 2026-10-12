@@ -1,5 +1,7 @@
-import { createSignal, effect } from "@epoch32/visage";
+import { createSignal, effect, toast } from "@epoch32/visage";
+import { Check, Copy } from "lucide-react";
 import { codeToHtml } from "shiki";
+import "../styles/codeblock.css";
 
 interface CodeBlockProps {
   code: string;
@@ -27,49 +29,39 @@ export function CodeBlock(props: CodeBlockProps) {
   const handleCopy = () => {
     navigator.clipboard.writeText(props.code.trim());
     setCopied(true);
+
+    toast.success("Copied to clipboard!", {
+      description: props.filename ?? `${lang} snippet`,
+      duration: 2500
+    });
+
     setTimeout(() => setCopied(false), 2000);
   };
 
   return (
-    <div
-      style={{
-        borderRadius: "12px",
-        overflow: "hidden",
-        border: "1px solid var(--border-pink)",
-        boxShadow: "var(--shadow-sm)",
-        margin: "20px 0",
-        background: "#232136"
-      }}
-    >
-      <div
-        style={{
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "space-between",
-          padding: "10px 16px",
-          background: "rgba(35, 33, 54, 0.95)",
-          borderBottom: "1px solid rgba(244, 167, 187, 0.15)",
-          fontSize: "12px",
-          fontFamily: "var(--font-mono)",
-          color: "var(--pink-300)"
-        }}
-      >
-        <span style={{ fontWeight: 600 }}>{props.filename ?? lang}</span>
+    <div className="codeblock-container">
+      <div className="codeblock-header">
+        <span className="codeblock-filename">{props.filename ?? lang}</span>
         <button
+          type="button"
           onClick={handleCopy}
-          style={{
-            background: "rgba(255, 255, 255, 0.08)",
-            border: "1px solid rgba(244, 167, 187, 0.2)",
-            borderRadius: "6px",
-            color: "var(--pink-200)",
-            padding: "4px 10px",
-            fontSize: "11px",
-            fontFamily: "var(--font-body)",
-            cursor: "pointer",
-            fontWeight: 600
-          }}
+          className={() => `code-copy-btn ${copied() ? "copied" : ""}`}
+          aria-label="Copy code"
+          title="Copy code to clipboard"
         >
-          {() => (copied() ? "Copied!" : "Copy")}
+          {() =>
+            copied() ? (
+              <span className="code-copy-inner">
+                <Check size={12} className="code-copy-icon" />
+                <span>Copied!</span>
+              </span>
+            ) : (
+              <span className="code-copy-inner">
+                <Copy size={12} className="code-copy-icon" />
+                <span>Copy</span>
+              </span>
+            )
+          }
         </button>
       </div>
 

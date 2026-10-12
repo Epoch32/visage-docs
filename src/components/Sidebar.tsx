@@ -1,3 +1,5 @@
+import "../styles/sidebar.css";
+
 export interface NavItem {
   id: string;
   title: string;
@@ -72,111 +74,42 @@ interface SidebarProps {
 
 export function Sidebar(props: SidebarProps) {
   return (
-    <aside
-      style={{
-        width: "270px",
-        height: "calc(100vh - 120px)",
-        position: "sticky",
-        top: "88px",
-        margin: "24px 0 24px 24px",
-        background: "var(--surface-card)",
-        borderRadius: "16px",
-        border: "1px solid var(--border-pink)",
-        boxShadow: "var(--shadow-card)",
-        backdropFilter: "blur(12px)",
-        overflow: "hidden",
-        display: "flex",
-        flexDirection: "column"
-      }}
-    >
-      <div
-        class="sidebar-scroll"
-        style={{
-          flex: 1,
-          overflowY: "auto",
-          padding: "20px 14px 24px 18px"
-        }}
-      >
-        <div style={{ display: "flex", flexDirection: "column", gap: "24px" }}>
-        {navigationSections.map((section) => (
-          <div key={section.title}>
-            <div
-              style={{
-                fontSize: "11px",
-                fontWeight: 700,
-                textTransform: "uppercase",
-                letterSpacing: "0.08em",
-                color: "var(--text-muted)",
-                marginBottom: "8px",
-                paddingLeft: "10px"
-              }}
-            >
-              {section.title}
-            </div>
+    <aside className="sidebar-container">
+      <div className="sidebar-scroll sidebar-scroll-wrapper">
+        <div className="sidebar-sections">
+          {navigationSections.map((section) => (
+            <div key={section.title}>
+              <div className="sidebar-section-title">
+                {section.title}
+              </div>
 
-            <nav style={{ display: "flex", flexDirection: "column", gap: "2px" }}>
-              {section.items.map((item) => {
-                const isActive = () => props.activeId() === item.id;
+              <nav className="sidebar-nav-list">
+                {section.items.map((item) => {
+                  const isActive = () => props.activeId() === item.id;
 
-                return (
-                  <button
-                    key={item.id}
-                    type="button"
-                    onClick={() => props.onSelect(item.id)}
-                    style={{
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "space-between",
-                      width: "100%",
-                      textAlign: "left",
-                      padding: "7px 12px",
-                      borderRadius: "8px",
-                      fontSize: "13.5px",
-                      fontWeight: isActive() ? 600 : 500,
-                      color: isActive() ? "#be185d" : "var(--text-body)",
-                      background: isActive() ? "var(--pink-badge-bg)" : "transparent",
-                      border: isActive() ? "1px solid var(--pink-200)" : "1px solid transparent",
-                      cursor: "pointer",
-                      transition: "all 0.15s ease",
-                      outline: "none"
-                    }}
-                  >
-                    <span style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-                      {isActive() && (
-                        <span
-                          style={{
-                            width: "6px",
-                            height: "6px",
-                            borderRadius: "50%",
-                            background: "var(--pink-500)",
-                            boxShadow: "0 0 8px rgba(236, 72, 153, 0.8)"
-                          }}
-                        />
-                      )}
-                      <span>{item.title}</span>
-                    </span>
-
-                    {item.badge && (
-                      <span
-                        style={{
-                          fontSize: "10px",
-                          fontWeight: 700,
-                          padding: "1px 6px",
-                          borderRadius: "9999px",
-                          background: "var(--pink-100)",
-                          color: "var(--pink-600)",
-                          border: "1px solid var(--pink-200)"
-                        }}
-                      >
-                        {item.badge}
+                  return (
+                    <button
+                      key={item.id}
+                      type="button"
+                      onClick={() => props.onSelect(item.id)}
+                      className={`sidebar-nav-item ${isActive() ? "active" : ""}`}
+                    >
+                      <span style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                        {isActive() && <span className="sidebar-active-dot" />}
+                        <span>{item.title}</span>
                       </span>
-                    )}
-                  </button>
-                );
-              })}
-            </nav>
-          </div>
-        ))}
+
+                      {item.badge && (
+                        <span className="sidebar-badge">
+                          {item.badge}
+                        </span>
+                      )}
+                    </button>
+                  );
+                })}
+              </nav>
+            </div>
+          ))}
         </div>
       </div>
     </aside>
