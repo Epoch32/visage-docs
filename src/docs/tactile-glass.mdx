@@ -1,0 +1,241 @@
+import { CodeBlock } from "../components/CodeBlock";
+import { Eye, Layers, Shield, Sparkles, Sun } from "lucide-react";
+
+export const title = "Tactile Glass & Shadows";
+export const breadcrumb = "Documentation / Spatial & Styles";
+
+export const toc = [
+  { id: "overview", title: "Overview", level: 2 },
+  { id: "glassmorphism", title: "Tactile Glass (glass)", level: 2 },
+  { id: "shadow-tokens", title: "Optical Depth Shadows (shadow)", level: 2 },
+  { id: "radius-tokens", title: "Curvature Radii (radius)", level: 2 },
+  { id: "composition-example", title: "Composing Modern UI Cards", level: 2 },
+  { id: "api-reference", title: "API Reference", level: 2 },
+];
+
+Visage provides modern visual tokens designed for tactile depth, high-contrast readability, and frosted glassmorphism without manual CSS vendor prefixing.
+
+<div className="doc-features-grid">
+  <div className="doc-feature-card">
+    <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "6px" }}>
+      <Eye size={16} color="var(--pink-500)" />
+      <div className="doc-feature-title">Frosted Glass Helper</div>
+    </div>
+    <div className="doc-feature-desc">
+      <code>glass()</code> generates cross-browser backdrop filter blurs, translucent tinting, and crisp border reflections.
+    </div>
+  </div>
+
+  <div className="doc-feature-card">
+    <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "6px" }}>
+      <Layers size={16} color="var(--pink-500)" />
+      <div className="doc-feature-title">Optical Depth Shadows</div>
+    </div>
+    <div className="doc-feature-desc">
+      Hand-tuned multi-layer shadows (<code>sm</code> through <code>xl</code>, plus <code>soft</code> and <code>glow</code>) give floating surfaces natural visual elevation.
+    </div>
+  </div>
+</div>
+
+## Tactile Glass (glass)
+
+The `glass()` helper generates modern frosted glass styling. It applies `backdropFilter`, WebKit prefixes, background tint, and subtle border highlights:
+
+<CodeBlock
+  filename="GlassExample.tsx"
+  lang="tsx"
+  code={`import { glass, Stack } from "@epoch32/visage";
+
+export function FloatingDock() {
+  return (
+    <Stack
+      p={3}
+      style={{
+        ...glass({ blur: 16, tint: "rgba(255, 255, 255, 0.7)" }),
+        borderRadius: "16px",
+        boxShadow: "0 20px 25px -5px rgba(0, 0, 0, 0.1)",
+      }}
+    >
+      <div class="dock-content">Dock Navigation</div>
+    </Stack>
+  );
+}`}
+/>
+
+Options for `glass()`:
+- `blur`: Blur radius in pixels or CSS string (default `"20px"`).
+- `tint`: Background fill color (default `"rgba(255, 255, 255, 0.65)"`).
+- `border`: Border stroke (default `"1px solid rgba(255, 255, 255, 0.75)"`).
+
+## Optical Depth Shadows (shadow)
+
+Visage includes calibrated shadow tokens that simulate real physical light dispersion across layers:
+
+<CodeBlock
+  filename="ShadowTokens.ts"
+  lang="ts"
+  code={`import { shadow } from "@epoch32/visage";
+
+shadow("sm");   // "0 1px 2px 0 rgba(0, 0, 0, 0.05)"
+shadow("md");   // "0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1)"
+shadow("lg");   // "0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1)"
+shadow("xl");   // "0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1)"
+shadow("soft"); // "0 8px 30px rgba(0, 0, 0, 0.06)" (ambient diffused card shadow)
+shadow("glow"); // "0 0 24px rgba(168, 85, 247, 0.35)" (accent neon glow)
+shadow("inner");// "inset 0 2px 4px 0 rgba(0, 0, 0, 0.06)"`}
+/>
+
+## Curvature Radii (radius)
+
+Consistent border radii create visual harmony across nested cards, buttons, and popovers:
+
+<CodeBlock
+  filename="RadiusTokens.ts"
+  lang="ts"
+  code={`import { radius } from "@epoch32/visage";
+
+radius("sm");  // "4px"
+radius("md");  // "8px"
+radius("lg");  // "12px"
+radius("xl");  // "16px"
+radius("2xl"); // "20px"
+radius("3xl"); // "24px"
+radius("full");// "9999px" (pill buttons & circular avatars)
+
+// Explicit numbers map directly to pixels:
+radius(10);    // "10px"`}
+/>
+
+## Composing Modern UI Cards
+
+Combine `glass()`, `shadow()`, and `radius()` with Visage layout primitives to create polished interfaces:
+
+<CodeBlock
+  filename="ElevatedCard.tsx"
+  lang="tsx"
+  code={`import { glass, shadow, radius, Stack, Row, Spacer } from "@epoch32/visage";
+
+export function PremiumFeatureCard() {
+  return (
+    <Stack
+      p={6}
+      gap={4}
+      style={{
+        ...glass({ blur: 24, tint: "rgba(15, 23, 42, 0.75)", border: "1px solid rgba(255, 255, 255, 0.1)" }),
+        boxShadow: shadow("xl"),
+        borderRadius: radius("2xl"),
+        color: "#ffffff",
+      }}
+    >
+      <Row justify="between">
+        <span style={{ fontWeight: 600 }}>Enterprise Plan</span>
+        <span style={{ padding: "4px 8px", background: "var(--pink-500)", borderRadius: radius("full") }}>
+          Active
+        </span>
+      </Row>
+
+      <p style={{ opacity: 0.8 }}>
+        Real-time telemetry, dedicated clusters, and fine-grained reactive state inspector.
+      </p>
+
+      <Row>
+        <Spacer />
+        <button class="btn btn-primary">Manage Billing</button>
+      </Row>
+    </Stack>
+  );
+}`}
+/>
+
+## API Reference
+
+<div className="doc-api-section">
+  <div className="doc-fn-card">
+    <div className="doc-fn-header">
+      <div className="doc-fn-meta">
+        <span className="doc-fn-kind">Function</span>
+      </div>
+      <div className="doc-fn-signature">
+        glass(options?: GlassOptions): Record&lt;string, string&gt;
+      </div>
+    </div>
+
+    <div className="doc-fn-body">
+      <div className="doc-fn-desc">
+        Generates tactile frosted glass styles with cross-browser backdrop filter blurs, background tinting, and light-reflective border accents.
+      </div>
+
+      <div>
+        <div className="doc-fn-subheading">Options</div>
+        <div className="doc-params-list">
+          <div className="doc-param-row">
+            <div className="doc-param-meta">
+              <span className="doc-param-name">blur</span>
+              <span className="doc-param-type">number | string</span>
+              <span className="doc-param-badge optional">Optional</span>
+            </div>
+            <div className="doc-param-desc">
+              Backdrop blur radius in pixels or CSS measurement. Defaults to <code>"20px"</code>.
+            </div>
+          </div>
+
+          <div className="doc-param-row">
+            <div className="doc-param-meta">
+              <span className="doc-param-name">tint</span>
+              <span className="doc-param-type">string</span>
+              <span className="doc-param-badge optional">Optional</span>
+            </div>
+            <div className="doc-param-desc">
+              Translucent background fill color. Defaults to <code>"rgba(255, 255, 255, 0.65)"</code>.
+            </div>
+          </div>
+
+          <div className="doc-param-row">
+            <div className="doc-param-meta">
+              <span className="doc-param-name">border</span>
+              <span className="doc-param-type">string</span>
+              <span className="doc-param-badge optional">Optional</span>
+            </div>
+            <div className="doc-param-desc">
+              Border stroke CSS string. Defaults to <code>"1px solid rgba(255, 255, 255, 0.75)"</code>.
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div className="doc-fn-card">
+    <div className="doc-fn-header">
+      <div className="doc-fn-meta">
+        <span className="doc-fn-kind">Function</span>
+      </div>
+      <div className="doc-fn-signature">
+        shadow(variant: ShadowVariant | string): string
+      </div>
+    </div>
+
+    <div className="doc-fn-body">
+      <div className="doc-fn-desc">
+        Returns calibrated multi-layer box shadows designed for optical depth (<code>sm, md, lg, xl, soft, glow, inner</code>).
+      </div>
+    </div>
+  </div>
+
+  <div className="doc-fn-card">
+    <div className="doc-fn-header">
+      <div className="doc-fn-meta">
+        <span className="doc-fn-kind">Function</span>
+      </div>
+      <div className="doc-fn-signature">
+        radius(variant: RadiusVariant): string
+      </div>
+    </div>
+
+    <div className="doc-fn-body">
+      <div className="doc-fn-desc">
+        Returns standardized curvature radii (<code>sm, md, lg, xl, 2xl, 3xl, full</code> or explicit numbers in pixels).
+      </div>
+    </div>
+  </div>
+</div>

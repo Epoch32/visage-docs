@@ -1,0 +1,417 @@
+import { CodeBlock } from "../components/CodeBlock";
+import { CheckSquare, Command as CmdIcon, Layers, MessageSquare, Sliders, Sparkles } from "lucide-react";
+
+export const title = "Accessible UI Components";
+export const breadcrumb = "Documentation / Headless UI & Charts";
+
+export const toc = [
+  { id: "overview", title: "Overview", level: 2 },
+  { id: "dialog-primitive", title: "Dialog / Modal (<Dialog>)", level: 2 },
+  { id: "popover-primitive", title: "Popover (<Popover>)", level: 2 },
+  { id: "dropdown-primitive", title: "Dropdown Menu (<DropdownMenu>)", level: 2 },
+  { id: "command-primitive", title: "Command Palette (<Command>)", level: 2 },
+  { id: "tabs-accordion", title: "Tabs & Accordions (<Tabs>, <Accordion>)", level: 2 },
+  { id: "bottom-bar-primitive", title: "Floating Bottom Bar (<BottomBar>)", level: 2 },
+  { id: "toasts-primitive", title: "Reactive Toasts (toast)", level: 2 },
+  { id: "dismiss-primitive", title: "Headless Dismiss (useDismiss)", level: 2 },
+  { id: "api-reference", title: "API Reference", level: 2 },
+];
+
+Visage provides a complete suite of WAI-ARIA compliant, headless and composable UI primitives. They manage focus trapping, keyboard navigation, click-outside detection, ARIA attributes, and portals without imposing rigid opinionated CSS styling.
+
+<div className="doc-features-grid">
+  <div className="doc-feature-card">
+    <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "6px" }}>
+      <CheckSquare size={16} color="var(--pink-500)" />
+      <div className="doc-feature-title">Fully Accessible (WAI-ARIA)</div>
+    </div>
+    <div className="doc-feature-desc">
+      Built-in focus trapping, Escape key dismissal, ARIA expanded/controls wiring, and keyboard roving tabindex navigation.
+    </div>
+  </div>
+
+  <div className="doc-feature-card">
+    <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "6px" }}>
+      <Sliders size={16} color="var(--pink-500)" />
+      <div className="doc-feature-title">Controlled & Uncontrolled</div>
+    </div>
+    <div className="doc-feature-desc">
+      Supports both internal state management or external signal binding via <code>value</code>/<code>open</code> and <code>onValueChange</code>/<code>onOpenChange</code>.
+    </div>
+  </div>
+</div>
+
+## Dialog / Modal (&lt;Dialog&gt;)
+
+The Dialog primitive renders accessible modal dialogs with backdrop overlay, focus trapping, and Escape key dismissal:
+
+<CodeBlock
+  filename="DialogExample.tsx"
+  lang="tsx"
+  code={`import {
+  Dialog,
+  DialogTrigger,
+  DialogPortal,
+  DialogOverlay,
+  DialogContent,
+  DialogTitle,
+  DialogDescription,
+  DialogClose,
+} from "@epoch32/visage";
+
+export function ConfirmDeleteDialog() {
+  return (
+    <Dialog>
+      <DialogTrigger class="btn btn-danger">Delete Project</DialogTrigger>
+
+      <DialogPortal>
+        <DialogOverlay class="dialog-overlay" />
+        <DialogContent class="dialog-content">
+          <DialogTitle>Are you absolutely sure?</DialogTitle>
+          <DialogDescription>
+            This action cannot be undone. This will permanently delete your workspace repository.
+          </DialogDescription>
+
+          <div style={{ display: "flex", justifyContent: "flex-end", gap: "8px", marginTop: "16px" }}>
+            <DialogClose class="btn">Cancel</DialogClose>
+            <button class="btn btn-danger">Confirm Delete</button>
+          </div>
+        </DialogContent>
+      </DialogPortal>
+    </Dialog>
+  );
+}`}
+/>
+
+## Popover (&lt;Popover&gt;)
+
+The Popover primitive positions non-modal floating content with click-outside and Escape key dismissal:
+
+<CodeBlock
+  filename="PopoverExample.tsx"
+  lang="tsx"
+  code={`import {
+  Popover,
+  PopoverTrigger,
+  PopoverPortal,
+  PopoverContent,
+  PopoverClose,
+} from "@epoch32/visage";
+
+export function SettingsPopover() {
+  return (
+    <Popover>
+      <PopoverTrigger class="btn">Filters</PopoverTrigger>
+
+      <PopoverPortal>
+        <PopoverContent class="popover-card">
+          <h4>Filter Results</h4>
+          <label>
+            <input type="checkbox" /> Include Archived
+          </label>
+          <PopoverClose class="btn btn-sm">Done</PopoverClose>
+        </PopoverContent>
+      </PopoverPortal>
+    </Popover>
+  );
+}`}
+/>
+
+## Dropdown Menu (&lt;DropdownMenu&gt;)
+
+Dropdown menus provide roving keyboard navigation (ArrowUp, ArrowDown, Home, End) and selection triggers:
+
+<CodeBlock
+  filename="DropdownExample.tsx"
+  lang="tsx"
+  code={`import {
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuPortal,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+} from "@epoch32/visage";
+
+export function UserMenu() {
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger class="btn">My Account</DropdownMenuTrigger>
+
+      <DropdownMenuPortal>
+        <DropdownMenuContent class="menu-dropdown">
+          <DropdownMenuItem onSelect={() => console.log("Profile")}>
+            Profile
+          </DropdownMenuItem>
+          <DropdownMenuItem onSelect={() => console.log("Billing")}>
+            Billing & Invoices
+          </DropdownMenuItem>
+          <DropdownMenuSeparator />
+          <DropdownMenuItem onSelect={() => console.log("Log Out")}>
+            Sign Out
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenuPortal>
+    </DropdownMenu>
+  );
+}`}
+/>
+
+## Command Palette (&lt;Command&gt;)
+
+Visage includes a high-performance command palette for fuzzy search and keyboard action bars:
+
+<CodeBlock
+  filename="CommandExample.tsx"
+  lang="tsx"
+  code={`import {
+  CommandDialog,
+  CommandInput,
+  CommandList,
+  CommandEmpty,
+  CommandGroup,
+  CommandItem,
+  createSignal,
+} from "@epoch32/visage";
+
+export function QuickCommand() {
+  const [open, setOpen] = createSignal(false);
+
+  return (
+    <div>
+      <button onClick={() => setOpen(true)}>Press Cmd+K</button>
+
+      <CommandDialog open={open} onOpenChange={setOpen}>
+        <CommandInput placeholder="Search commands, docs, or files..." />
+        <CommandList>
+          <CommandEmpty>No matches found.</CommandEmpty>
+
+          <CommandGroup heading="Navigation">
+            <CommandItem onSelect={() => { setOpen(false); }}>
+              Go to Dashboard
+            </CommandItem>
+            <CommandItem onSelect={() => { setOpen(false); }}>
+              Open Documentation
+            </CommandItem>
+          </CommandGroup>
+        </CommandList>
+      </CommandDialog>
+    </div>
+  );
+}`}
+/>
+
+## Tabs & Accordions (&lt;Tabs&gt;, &lt;Accordion&gt;)
+
+Organize content with keyboard-navigable tab lists and collapsible accordions:
+
+<CodeBlock
+  filename="TabsExample.tsx"
+  lang="tsx"
+  code={`import { Tabs, TabsList, TabsTrigger, TabsContent } from "@epoch32/visage";
+
+export function SettingsTabs() {
+  return (
+    <Tabs defaultValue="account">
+      <TabsList>
+        <TabsTrigger value="account">Account</TabsTrigger>
+        <TabsTrigger value="password">Password</TabsTrigger>
+      </TabsList>
+
+      <TabsContent value="account">
+        <h3>Account Settings</h3>
+      </TabsContent>
+
+      <TabsContent value="password">
+        <h3>Change Password</h3>
+      </TabsContent>
+    </Tabs>
+  );
+}`}
+/>
+
+## Floating Bottom Bar (&lt;BottomBar&gt;)
+
+Create mobile floating bottom bars or docked action sheets:
+
+<CodeBlock
+  filename="BottomBarExample.tsx"
+  lang="tsx"
+  code={`import { BottomBar, BottomBarItem, BottomBarAction } from "@epoch32/visage";
+
+export function MobileNavigation() {
+  return (
+    <BottomBar variant="floating">
+      <BottomBarItem id="home" label="Home" active />
+      <BottomBarItem id="search" label="Search" />
+      <BottomBarAction label="New Post" onClick={() => console.log("New")} />
+      <BottomBarItem id="profile" label="Profile" />
+    </BottomBar>
+  );
+}`}
+/>
+
+## Reactive Toasts (toast)
+
+Trigger fine-grained toast notifications imperatively from anywhere in your application:
+
+<CodeBlock
+  filename="ToastUsage.tsx"
+  lang="tsx"
+  code={`import { toast } from "@epoch32/visage";
+
+// 1. Success notification
+toast.success("File saved successfully!");
+
+// 2. Error alert
+toast.error("Network error: Failed to connect to server");
+
+// 3. Information toast
+toast.info("A new release is available.");
+
+// 4. Async promise notification
+toast.promise(
+  fetch("/api/deploy", { method: "POST" }),
+  {
+    loading: "Deploying build...",
+    success: "Deployment completed!",
+    error: "Deployment failed.",
+  }
+);`}
+/>
+
+Place the `<ToastViewport />` at the root of your application shell to render active toast stacks.
+
+## Headless Dismiss (useDismiss)
+
+Visage exports the shared `useDismiss` hook for building custom overlay primitives:
+
+<CodeBlock
+  filename="useDismissCustom.ts"
+  lang="ts"
+  code={`import { useDismiss } from "@epoch32/visage";
+
+const dismiss = useDismiss(() => containerRef.current, {
+  enabled: () => isOpen(),
+  onDismiss: () => setIsOpen(false),
+  escapeKey: true,
+  outsidePointer: true,
+  trapFocus: true,
+  closeSelector: "[data-close-button]",
+});`}
+/>
+
+## API Reference
+
+<div className="doc-api-section">
+  <div className="doc-fn-card">
+    <div className="doc-fn-header">
+      <div className="doc-fn-meta">
+        <span className="doc-fn-kind">Component</span>
+      </div>
+      <div className="doc-fn-signature">
+        &lt;Dialog open=&#123;ReadonlySignal&lt;boolean&gt;&#125; onOpenChange=&#123;(open: boolean) =&gt; void&#125;&gt;&#123;children&#125;&lt;/Dialog&gt;
+      </div>
+    </div>
+
+    <div className="doc-fn-body">
+      <div className="doc-fn-desc">
+        Root dialog state provider supporting controlled or uncontrolled modal states, ARIA modal attributes, and focus restore.
+      </div>
+    </div>
+  </div>
+
+  <div className="doc-fn-card">
+    <div className="doc-fn-header">
+      <div className="doc-fn-meta">
+        <span className="doc-fn-kind">Component</span>
+      </div>
+      <div className="doc-fn-signature">
+        &lt;Popover open=&#123;ReadonlySignal&lt;boolean&gt;&#125; onOpenChange=&#123;(open: boolean) =&gt; void&#125;&gt;&#123;children&#125;&lt;/Popover&gt;
+      </div>
+    </div>
+
+    <div className="doc-fn-body">
+      <div className="doc-fn-desc">
+        Non-modal floating content primitive with automatic click-outside and Escape key dismissal.
+      </div>
+    </div>
+  </div>
+
+  <div className="doc-fn-card">
+    <div className="doc-fn-header">
+      <div className="doc-fn-meta">
+        <span className="doc-fn-kind">Hook</span>
+      </div>
+      <div className="doc-fn-signature">
+        useDismiss(target: () =&gt; HTMLElement | null, options: UseDismissOptions)
+      </div>
+    </div>
+
+    <div className="doc-fn-body">
+      <div className="doc-fn-desc">
+        Headless dismiss primitive unifying Escape key listening, pointer click-outside detection, focus trapping, and close selector delegation.
+      </div>
+
+      <div>
+        <div className="doc-fn-subheading">Options</div>
+        <div className="doc-params-list">
+          <div className="doc-param-row">
+            <div className="doc-param-meta">
+              <span className="doc-param-name">enabled</span>
+              <span className="doc-param-type">boolean | (() =&gt; boolean)</span>
+              <span className="doc-param-badge optional">Optional</span>
+            </div>
+            <div className="doc-param-desc">
+              Whether dismiss listeners are active. Defaults to <code>true</code>.
+            </div>
+          </div>
+
+          <div className="doc-param-row">
+            <div className="doc-param-meta">
+              <span className="doc-param-name">onDismiss</span>
+              <span className="doc-param-type">() =&gt; void</span>
+              <span className="doc-param-badge required">Required</span>
+            </div>
+            <div className="doc-param-desc">
+              Callback invoked when Escape or click-outside occurs.
+            </div>
+          </div>
+
+          <div className="doc-param-row">
+            <div className="doc-param-meta">
+              <span className="doc-param-name">escapeKey</span>
+              <span className="doc-param-type">boolean</span>
+              <span className="doc-param-badge optional">Optional</span>
+            </div>
+            <div className="doc-param-desc">
+              Dismiss on Escape key press. Defaults to <code>true</code>.
+            </div>
+          </div>
+
+          <div className="doc-param-row">
+            <div className="doc-param-meta">
+              <span className="doc-param-name">outsidePointer</span>
+              <span className="doc-param-type">boolean</span>
+              <span className="doc-param-badge optional">Optional</span>
+            </div>
+            <div className="doc-param-desc">
+              Dismiss on pointer clicks outside the target element. Defaults to <code>true</code>.
+            </div>
+          </div>
+
+          <div className="doc-param-row">
+            <div className="doc-param-meta">
+              <span className="doc-param-name">trapFocus</span>
+              <span className="doc-param-type">boolean</span>
+              <span className="doc-param-badge optional">Optional</span>
+            </div>
+            <div className="doc-param-desc">
+              Confines Tab focus cycles within target children. Defaults to <code>false</code>.
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

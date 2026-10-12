@@ -1,0 +1,172 @@
+import { CodeBlock } from "../components/CodeBlock";
+import { Cpu, Layers, Sparkles, Zap, ShieldCheck } from "lucide-react";
+
+export const title = "Zero-VDOM Architecture";
+export const breadcrumb = "Documentation / Getting Started";
+
+export const toc = [
+  { id: "overview", title: "Why Zero-VDOM?", level: 2 },
+  { id: "vdom-overhead", title: "The Problem with Virtual DOM", level: 2 },
+  { id: "visage-model", title: "The Visage Execution Model", level: 2 },
+  { id: "point-to-point", title: "Point-to-Point DOM Binding", level: 2 },
+  { id: "topological-graph", title: "Topological Dependency Graph", level: 2 },
+  { id: "memory-profile", title: "Memory & Garbage Collection", level: 2 },
+  { id: "comparison", title: "Architecture Comparison", level: 2 },
+];
+
+Visage is built on a simple premise: **the fastest Virtual DOM is no Virtual DOM at all**. Instead of creating disposable JavaScript trees on every keystroke and reconciling them against previous snapshots, Visage connects reactive signals directly to living DOM nodes.
+
+<div className="doc-features-grid">
+  <div className="doc-feature-card">
+    <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "6px" }}>
+      <Zap size={16} color="var(--pink-500)" />
+      <div className="doc-feature-title">Runs Exactly Once</div>
+    </div>
+    <div className="doc-feature-desc">
+      Component functions execute once during initial mount. They construct the DOM elements, register reactive subscriptions, and never re-run.
+    </div>
+  </div>
+
+  <div className="doc-feature-card">
+    <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "6px" }}>
+      <Cpu size={16} color="var(--pink-500)" />
+      <div className="doc-feature-title">Direct Micro-Updates</div>
+    </div>
+    <div className="doc-feature-desc">
+      Updating a signal mutates only the exact Text node or element attribute that references it. The surrounding tree is completely untouched.
+    </div>
+  </div>
+</div>
+
+## The Problem with Virtual DOM
+
+Virtual DOM frameworks revolutionized developer experience by allowing declarative UI templates. However, that declarative simplicity came with an invisible architectural tax:
+
+1. **Double Representation**: Every DOM node is mirrored as a JavaScript VNode object (Fiber, VElement, etc.).
+2. **Whole-Tree Re-executions**: When state changes near the root or in a parent component, child component functions re-evaluate to produce new VNode trees.
+3. **Reconciliation Cost**: The framework diffs the newly allocated VNode tree against the old tree to calculate DOM patches.
+4. **Garbage Collection Pressure**: Allocating thousands of temporary objects per second triggers GC pauses, causing dropped frames during complex animations or fast typing.
+
+## The Visage Execution Model
+
+Visage solves this by separating **component execution** from **reactive updates**:
+
+<CodeBlock
+  filename="ZeroVDOMConcept.tsx"
+  lang="tsx"
+  code={`import { createSignal } from "@epoch32/visage";
+
+function Counter() {
+  // 1. This function runs EXACTLY ONCE on mount
+  console.log("Counter component initialized!");
+
+  const [count, setCount] = createSignal(0);
+
+  return (
+    <div class="card">
+      {/* 2. count is bound directly to this Text node */}
+      <span>Count: {count}</span>
+
+      {/* 3. Button click updates ONLY the text node above */}
+      <button onClick={() => setCount((c) => c + 1)}>Increment</button>
+    </div>
+  );
+}`}
+/>
+
+When the user clicks the button:
+1. `setCount` updates the internal signal value.
+2. The signal notifies only the discrete text node subscription.
+3. `textNode.data = String(newCount)` executes in sub-microsecond time.
+4. The `Counter` function itself is **not** called again. No children are re-rendered, and zero VNodes are allocated.
+
+## Point-to-Point DOM Binding
+
+Behind the scenes, Visage's JSX transformer compiles JSX elements directly into native browser DOM elements (`document.createElement`). Signal interpolations become direct subscribers:
+
+<CodeBlock
+  filename="under-the-hood.ts"
+  lang="ts"
+  code={`import { effect } from "@epoch32/visage";
+
+// Conceptual representation of how Visage binds reactive text:
+const textNode = document.createTextNode("");
+
+effect(() => {
+  // Whenever count() changes, only this one DOM operation executes:
+  textNode.data = String(count());
+});`}
+/>
+
+Because there is no intermediate tree diffing layer, updates run with near-zero latency and minimal CPU overhead.
+
+## Topological Dependency Graph
+
+Visage uses a synchronous, glitch-free reactive graph with topological dependency sorting. If a signal feeds into multiple computed values that converge on the same UI element (the classic "diamond dependency" problem), Visage evaluates dependencies in topological order so intermediate stale values are never rendered to the DOM:
+
+<CodeBlock
+  filename="glitch-free.ts"
+  lang="ts"
+  code={`import { createSignal, computed } from "@epoch32/visage";
+
+const [count, setCount] = createSignal(1);
+const double = computed(() => count() * 2);
+const quadruple = computed(() => double() * 2);
+
+// Visage guarantees quadruple always reflects the exact latest count:
+// No temporary mismatched frames, no glitch states.`}
+/>
+
+## Memory & Garbage Collection
+
+Because Visage components don't re-render:
+- **No transient VNode allocations** during user interactions.
+- **Stable DOM instances**: Event listeners, focus states, and CSS transitions remain undisturbed.
+- **Predictable 60fps / 120fps UI**: Scrolling and high-frequency animations run without GC stutters.
+
+## Architecture Comparison
+
+<div className="doc-table-wrapper">
+  <table className="doc-table">
+    <thead>
+      <tr>
+        <th>Metric / Capability</th>
+        <th>React (Virtual DOM)</th>
+        <th>Solid / Svelte 5</th>
+        <th>Visage</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>Component Lifecycle</strong></td>
+        <td>Re-runs on state change</td>
+        <td>Runs once</td>
+        <td><strong>Runs once</strong></td>
+      </tr>
+      <tr>
+        <td><strong>Update Granularity</strong></td>
+        <td>Component / Fiber tree</td>
+        <td>Point-to-point DOM</td>
+        <td><strong>Point-to-point DOM</strong></td>
+      </tr>
+      <tr>
+        <td><strong>Memory Footprint</strong></td>
+        <td>High (VNode copies)</td>
+        <td>Low</td>
+        <td><strong>Ultra-Low (Native DOM)</strong></td>
+      </tr>
+      <tr>
+        <td><strong>Design System Engine</strong></td>
+        <td>Separate library</td>
+        <td>Separate library</td>
+        <td><strong>Built-in 4px Spatial Grid</strong></td>
+      </tr>
+      <tr>
+        <td><strong>Full-Stack RPC & SSE</strong></td>
+        <td>Next.js / tRPC</td>
+        <td>Community packages</td>
+        <td><strong>Built-in End-to-End Typed</strong></td>
+      </tr>
+    </tbody>
+  </table>
+</div>

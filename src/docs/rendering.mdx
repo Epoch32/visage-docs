@@ -1,0 +1,283 @@
+import { CodeBlock } from "../components/CodeBlock";
+import { CheckCircle, Layers, Play, Sparkles, Terminal } from "lucide-react";
+
+export const title = "Fine-Grained DOM (render)";
+export const breadcrumb = "Documentation / DOM & Control Flow";
+
+export const toc = [
+  { id: "overview", title: "Overview", level: 2 },
+  { id: "mount-app", title: "Mounting with render()", level: 2 },
+  { id: "teardown-cleanup", title: "Teardown & Cleanup", level: 2 },
+  { id: "event-binding", title: "Event Binding & Delegation", level: 2 },
+  { id: "reactive-classes", title: "Dynamic Classes & Styles", level: 2 },
+  { id: "callback-refs", title: "Callback Refs", level: 2 },
+  { id: "api-reference", title: "API Reference", level: 2 },
+];
+
+The `render()` function is the entry point that attaches a Visage component tree to the living browser DOM. It sets up an isolated root reactive scope, mounts native elements, and returns a teardown function.
+
+<div className="doc-features-grid">
+  <div className="doc-feature-card">
+    <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "6px" }}>
+      <Play size={16} color="var(--pink-500)" />
+      <div className="doc-feature-title">Native DOM Mounting</div>
+    </div>
+    <div className="doc-feature-desc">
+      Builds real browser DOM nodes directly using <code>document.createElement</code>. No intermediate virtual trees, diffing engines, or hydration mismatches.
+    </div>
+  </div>
+
+  <div className="doc-feature-card">
+    <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "6px" }}>
+      <CheckCircle size={16} color="var(--pink-500)" />
+      <div className="doc-feature-title">Root Lifecycle Isolation</div>
+    </div>
+    <div className="doc-feature-desc">
+      Automatically isolates reactive subscriptions within a top-level <code>createRoot</code>, preventing memory leaks and providing complete teardown when unmounted.
+    </div>
+  </div>
+</div>
+
+## Mounting with render()
+
+To mount a Visage application, pass a component factory function and a target DOM element container to `render()`:
+
+<CodeBlock
+  filename="main.tsx"
+  lang="tsx"
+  code={`import { render, createSignal } from "@epoch32/visage";
+
+function App() {
+  const [greeting, setGreeting] = createSignal("Hello Visage");
+
+  return (
+    <main class="container">
+      <h1>{greeting}</h1>
+      <button onClick={() => setGreeting("Welcome to Fine-Grained Reactive DOM!")}>
+        Change Greeting
+      </button>
+    </main>
+  );
+}
+
+const root = document.getElementById("app");
+if (root) {
+  render(() => <App />, root);
+}`}
+/>
+
+## Teardown & Cleanup
+
+The `render()` function returns a parameterless cleanup function. Invoking this function disposes the entire reactive scope and removes the mounted nodes from the DOM:
+
+<CodeBlock
+  filename="teardown.ts"
+  lang="ts"
+  code={`import { render } from "@epoch32/visage";
+import { App } from "./App";
+
+const container = document.getElementById("root")!;
+
+// Mount the application
+const unmount = render(() => <App />, container);
+
+// Later, unmount cleanly when switching views or running tests:
+unmount();`}
+/>
+
+## Event Binding & Delegation
+
+Visage supports standard DOM events and capture-phase listeners via camelCase JSX props:
+
+<CodeBlock
+  filename="EventsExample.tsx"
+  lang="tsx"
+  code={`import type { Child } from "@epoch32/visage";
+
+export function FormHandler(): Child {
+  const handleSubmit = (e: SubmitEvent) => {
+    e.preventDefault();
+    console.log("Submitted!");
+  };
+
+  const handleCapture = (e: MouseEvent) => {
+    console.log("Intercepted in capture phase:", e.target);
+  };
+
+  return (
+    <form onSubmit={handleSubmit} onCaptureClick={handleCapture}>
+      <input type="text" placeholder="Name" />
+      <button type="submit">Save</button>
+    </form>
+  );
+}`}
+/>
+
+- Standard events: `onClick`, `onInput`, `onChange`, `onKeyDown`, `onPointerDown`, etc.
+- Capture phase events: `onCaptureClick`, `onCapturePointerDown`, etc.
+
+## Dynamic Classes & Styles
+
+Visage provides fine-grained reactive bindings for classes and styles:
+
+### Reactive Class Names
+
+The `class` or `className` prop accepts strings, arrays, or objects with boolean getters:
+
+<CodeBlock
+  filename="ClassesExample.tsx"
+  lang="tsx"
+  code={`import { createSignal } from "@epoch32/visage";
+
+function ToggleBadge() {
+  const [isActive, setIsActive] = createSignal(false);
+
+  return (
+    <span
+      class={{
+        "badge": true,
+        "badge-active": () => isActive(),
+        "badge-muted": () => !isActive(),
+      }}
+      onClick={() => setIsActive((v) => !v)}
+    >
+      Status Indicator
+    </span>
+  );
+}`}
+/>
+
+### Reactive Style Objects
+
+Styles can be specified as CSS strings or camelCase objects. Numeric values automatically resolve through Visage's 4px spatial engine:
+
+<CodeBlock
+  filename="StyleExample.tsx"
+  lang="tsx"
+  code={`import { createSignal } from "@epoch32/visage";
+
+function ResizableBox() {
+  const [size, setSize] = createSignal(16); // 16 * 4px = 64px
+
+  return (
+    <div
+      style={{
+        width: () => \`\${size() * 4}px\`,
+        height: () => \`\${size() * 4}px\`,
+        backgroundColor: "var(--pink-500)",
+        borderRadius: "8px",
+        transition: "all 0.2s ease",
+      }}
+      onClick={() => setSize((s) => (s >= 32 ? 16 : s + 4))}
+    />
+  );
+}`}
+/>
+
+## Callback Refs
+
+Callback refs receive the raw browser element immediately upon creation:
+
+<CodeBlock
+  filename="RefExample.tsx"
+  lang="tsx"
+  code={`import type { Child } from "@epoch32/visage";
+
+export function CanvasWidget(): Child {
+  return (
+    <canvas
+      ref={(el: HTMLElement | null) => {
+        if (el instanceof HTMLCanvasElement) {
+          const ctx = el.getContext("2d");
+          if (ctx) {
+            ctx.fillStyle = "#ec4899";
+            ctx.fillRect(10, 10, 80, 80);
+          }
+        }
+      }}
+      width={100}
+      height={100}
+    />
+  );
+}`}
+/>
+
+## API Reference
+
+<div className="doc-api-section">
+  <div className="doc-fn-card">
+    <div className="doc-fn-header">
+      <div className="doc-fn-meta">
+        <span className="doc-fn-kind">Function</span>
+      </div>
+      <div className="doc-fn-signature">
+        render(fn: () =&gt; Child, container: HTMLElement | DocumentFragment): () =&gt; void
+      </div>
+    </div>
+
+    <div className="doc-fn-body">
+      <div className="doc-fn-desc">
+        Mounts a Visage component tree into a DOM container inside an isolated reactive root, returning a cleanup function that disposes all child effects and unmounts the rendered nodes.
+      </div>
+
+      <div>
+        <div className="doc-fn-subheading">Parameters</div>
+        <div className="doc-params-list">
+          <div className="doc-param-row">
+            <div className="doc-param-meta">
+              <span className="doc-param-name">fn</span>
+              <span className="doc-param-type">() =&gt; Child</span>
+              <span className="doc-param-badge required">Required</span>
+            </div>
+            <div className="doc-param-desc">
+              Component factory function returning JSX elements or reactive children.
+            </div>
+          </div>
+
+          <div className="doc-param-row">
+            <div className="doc-param-meta">
+              <span className="doc-param-name">container</span>
+              <span className="doc-param-type">HTMLElement | DocumentFragment</span>
+              <span className="doc-param-badge required">Required</span>
+            </div>
+            <div className="doc-param-desc">
+              Target DOM element to mount within. Existing container textContent is cleared.
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <div className="doc-fn-subheading">Returns</div>
+        <div className="doc-params-list">
+          <div className="doc-param-row">
+            <div className="doc-param-meta">
+              <span className="doc-param-name">dispose</span>
+              <span className="doc-param-type">() =&gt; void</span>
+            </div>
+            <div className="doc-param-desc">
+              Teardown function that disposes root signals/effects and removes mounted elements from the DOM.
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div className="doc-fn-card">
+    <div className="doc-fn-header">
+      <div className="doc-fn-meta">
+        <span className="doc-fn-kind">Prop</span>
+      </div>
+      <div className="doc-fn-signature">
+        ref=&#123;(el: HTMLElement | null) =&gt; void&#125;
+      </div>
+    </div>
+
+    <div className="doc-fn-body">
+      <div className="doc-fn-desc">
+        Direct DOM element ref callback invoked synchronously when the node is instantiated.
+      </div>
+    </div>
+  </div>
+</div>

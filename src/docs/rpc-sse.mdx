@@ -1,0 +1,271 @@
+import { CodeBlock } from "../components/CodeBlock";
+import { ArrowLeftRight, Radio, Server, ShieldAlert, Sparkles, Zap } from "lucide-react";
+
+export const title = "End-to-End Typed RPC & SSE";
+export const breadcrumb = "Documentation / Full-Stack & Tools";
+
+export const toc = [
+  { id: "overview", title: "Overview", level: 2 },
+  { id: "defining-router", title: "Defining an RPC Router (createRouter)", level: 2 },
+  { id: "server-handler", title: "Server Fetch Handler (createFetchHandler)", level: 2 },
+  { id: "client-sdk", title: "Typed Client & Query Batching (createClient)", level: 2 },
+  { id: "sse-subscriptions", title: "Real-Time Streaming Subscriptions", level: 2 },
+  { id: "error-handling", title: "Error Handling (RPCError)", level: 2 },
+  { id: "api-reference", title: "API Reference", level: 2 },
+];
+
+Visage RPC (`visage/rpc`) is a lightweight, zero-boilerplate alternative to tRPC and REST APIs. It provides full end-to-end type safety between client and server, automatic microtask query batching, and real-time Server-Sent Events (SSE) streaming without heavy runtime dependencies.
+
+<div className="doc-features-grid">
+  <div className="doc-feature-card">
+    <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "6px" }}>
+      <Zap size={16} color="var(--pink-500)" />
+      <div className="doc-feature-title">Microtask Query Batching</div>
+    </div>
+    <div className="doc-feature-desc">
+      Multiple concurrent queries triggered across separate components automatically batch into a single HTTP POST request, eliminating network waterfalls.
+    </div>
+  </div>
+
+  <div className="doc-feature-card">
+    <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "6px" }}>
+      <Radio size={16} color="var(--pink-500)" />
+      <div className="doc-feature-title">Native SSE Streaming</div>
+    </div>
+    <div className="doc-feature-desc">
+      First-class <code>subscription()</code> procedures stream real-time events over Server-Sent Events with automatic reconnection and typed data channels.
+    </div>
+  </div>
+</div>
+
+## Defining an RPC Router (createRouter)
+
+Define your API procedures using `createRouter`, `query`, `mutation`, and `subscription`:
+
+<CodeBlock
+  filename="server/router.ts"
+  lang="ts"
+  code={`import { createRouter, query, mutation, subscription, v } from "@epoch32/visage/rpc";
+
+export const appRouter = createRouter({
+  // 1. Read query
+  getUser: query()
+    .input(v.object({ id: v.string() }))
+    .handler(async ({ input }) => {
+      return { id: input.id, name: "Alice", tier: "pro" };
+    }),
+
+  // 2. Mutation
+  createPost: mutation()
+    .input(v.object({ title: v.string(), content: v.string() }))
+    .handler(async ({ input }) => {
+      return { postId: "post-99", title: input.title };
+    }),
+
+  // 3. SSE subscription
+  liveMetrics: subscription()
+    .input(v.object({ intervalMs: v.number().default(1000) }))
+    .handler(async function* ({ input }) {
+      while (true) {
+        await new Promise((r) => setTimeout(r, input.intervalMs));
+        yield { timestamp: Date.now(), cpu: Math.random() * 100 };
+      }
+    }),
+});
+
+export type AppRouter = typeof appRouter;`}
+/>
+
+## Server Fetch Handler (createFetchHandler)
+
+Mount the router on standard Web `fetch` standards (Cloudflare Workers, Bun, Node, Deno, Vite dev server):
+
+<CodeBlock
+  filename="server/index.ts"
+  lang="ts"
+  code={`import { createFetchHandler } from "@epoch32/visage/rpc";
+import { appRouter } from "./router";
+
+const handler = createFetchHandler({
+  router: appRouter,
+  endpoint: "/api/rpc",
+  cors: {
+    origin: "*",
+    methods: ["GET", "POST", "OPTIONS"],
+  },
+});
+
+// Bun / Node / Cloudflare standard export
+export default {
+  fetch(req: Request) {
+    return handler(req);
+  },
+};`}
+/>
+
+## Typed Client & Query Batching (createClient)
+
+Initialize the client with your server's router type:
+
+<CodeBlock
+  filename="src/client.ts"
+  lang="ts"
+  code={`import { createClient } from "@epoch32/visage/rpc";
+import type { AppRouter } from "../server/router";
+
+export const rpc = createClient<AppRouter>({
+  url: "/api/rpc",
+  headers: () => ({
+    Authorization: \`Bearer \${localStorage.getItem("token") ?? ""}\`,
+  }),
+});`}
+/>
+
+### Automatic Batching in Action
+
+When multiple components mount simultaneously and request data:
+
+<CodeBlock
+  filename="batching-demo.ts"
+  lang="ts"
+  code={`// In Component A:
+const userPromise = rpc.getUser({ id: "1" });
+
+// In Component B (same event loop tick):
+const metricsPromise = rpc.getUser({ id: "2" });
+
+// Visage automatically combines both into a single HTTP POST:
+// POST /api/rpc -> [ { procedure: "getUser", input: { id: "1" } }, { procedure: "getUser", input: { id: "2" } } ]
+const [user1, user2] = await Promise.all([userPromise, metricsPromise]);`}
+/>
+
+## Real-Time Streaming Subscriptions
+
+Consume SSE streams with typed event listeners:
+
+<CodeBlock
+  filename="TelemetryFeed.tsx"
+  lang="tsx"
+  code={`import { onCleanup, createSignal } from "@epoch32/visage";
+import { rpc } from "./client";
+
+export function LiveMonitor() {
+  const [load, setLoad] = createSignal(0);
+
+  const sub = rpc.liveMetrics.subscribe(
+    { intervalMs: 1000 },
+    {
+      onData: (data) => setLoad(Math.round(data.cpu)),
+      onError: (err) => console.error("Stream error:", err),
+    }
+  );
+
+  onCleanup(() => sub.unsubscribe());
+
+  return <div>Current CPU Load: {load}%</div>;
+}`}
+/>
+
+## Error Handling (RPCError)
+
+Throw `RPCError` on the server to pass typed, structured errors to the client:
+
+<CodeBlock
+  filename="server-error.ts"
+  lang="ts"
+  code={`import { RPCError } from "@epoch32/visage/rpc";
+
+throw new RPCError("NOT_FOUND", "The requested document was not found", { docId: 404 });`}
+/>
+
+Available error codes:
+- `BAD_REQUEST` (400)
+- `UNAUTHORIZED` (401)
+- `FORBIDDEN` (403)
+- `NOT_FOUND` (404)
+- `METHOD_NOT_ALLOWED` (405)
+- `TIMEOUT` (408)
+- `CONFLICT` (409)
+- `INTERNAL_SERVER_ERROR` (500)
+
+## API Reference
+
+<div className="doc-api-section">
+  <div className="doc-fn-card">
+    <div className="doc-fn-header">
+      <div className="doc-fn-meta">
+        <span className="doc-fn-kind">Function</span>
+      </div>
+      <div className="doc-fn-signature">
+        createRouter(routes: ProcedureRecord): Router
+      </div>
+    </div>
+
+    <div className="doc-fn-body">
+      <div className="doc-fn-desc">
+        Constructs an RPC router collection grouping queries, mutations, and SSE subscriptions.
+      </div>
+    </div>
+  </div>
+
+  <div className="doc-fn-card">
+    <div className="doc-fn-header">
+      <div className="doc-fn-meta">
+        <span className="doc-fn-kind">Function</span>
+      </div>
+      <div className="doc-fn-signature">
+        createFetchHandler(options: FetchHandlerOptions): (req: Request) =&gt; Promise&lt;Response&gt;
+      </div>
+    </div>
+
+    <div className="doc-fn-body">
+      <div className="doc-fn-desc">
+        Standard Web API fetch handler processing single queries, batch arrays, and SSE streams.
+      </div>
+    </div>
+  </div>
+
+  <div className="doc-fn-card">
+    <div className="doc-fn-header">
+      <div className="doc-fn-meta">
+        <span className="doc-fn-kind">Function</span>
+      </div>
+      <div className="doc-fn-signature">
+        createClient&lt;TRouter&gt;(options: ClientOptions): ClientRouter&lt;TRouter&gt;
+      </div>
+    </div>
+
+    <div className="doc-fn-body">
+      <div className="doc-fn-desc">
+        Instantiates an end-to-end typed client proxy with automatic microtask batching and SSE streaming support.
+      </div>
+
+      <div>
+        <div className="doc-fn-subheading">Options</div>
+        <div className="doc-params-list">
+          <div className="doc-param-row">
+            <div className="doc-param-meta">
+              <span className="doc-param-name">url</span>
+              <span className="doc-param-type">string</span>
+              <span className="doc-param-badge required">Required</span>
+            </div>
+            <div className="doc-param-desc">
+              Base URL of the RPC HTTP endpoint.
+            </div>
+          </div>
+
+          <div className="doc-param-row">
+            <div className="doc-param-meta">
+              <span className="doc-param-name">headers</span>
+              <span className="doc-param-type">HeadersInit | (() =&gt; HeadersInit | Promise&lt;HeadersInit&gt;)</span>
+              <span className="doc-param-badge optional">Optional</span>
+            </div>
+            <div className="doc-param-desc">
+              Static or dynamic header generator for auth tokens and telemetry.
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

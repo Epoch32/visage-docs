@@ -1,0 +1,173 @@
+import { CodeBlock } from "../components/CodeBlock";
+import { Activity, Cpu, Eye, GitFork, Sparkles, Terminal } from "lucide-react";
+
+export const title = "Live DAG Graph DevTools";
+export const breadcrumb = "Documentation / Full-Stack & Tools";
+
+export const toc = [
+  { id: "overview", title: "Overview", level: 2 },
+  { id: "mounting-devtools", title: "Mounting the DevTools (<VisageDevTools>)", level: 2 },
+  { id: "signals-tab", title: "Signals & Stores Inspector", level: 2 },
+  { id: "dag-tab", title: "Live DAG Graph Visualization", level: 2 },
+  { id: "queries-rpc-tab", title: "Queries & RPC Network Timeline", level: 2 },
+  { id: "element-highlighter", title: "DOM Element Highlighter", level: 2 },
+  { id: "api-reference", title: "API Reference", level: 2 },
+];
+
+Visage features an in-browser visual debugger (`visage/devtools`). Unlike generic React or Vue DevTools that only show tree hierarchies, Visage visualizes the actual live topological dependency graph (DAG) of signals, computed nodes, queries, and DOM bindings.
+
+<div className="doc-features-grid">
+  <div className="doc-feature-card">
+    <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "6px" }}>
+      <GitFork size={16} color="var(--pink-500)" />
+      <div className="doc-feature-title">Live DAG Graph</div>
+    </div>
+    <div className="doc-feature-desc">
+      Interactive visual graph of your application's reactive nodes. Watch signals flash in real-time when updated and track downstream computed recalculations.
+    </div>
+  </div>
+
+  <div className="doc-feature-card">
+    <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "6px" }}>
+      <Activity size={16} color="var(--pink-500)" />
+      <div className="doc-feature-title">Zero Production Overhead</div>
+    </div>
+    <div className="doc-feature-desc">
+      Completely tree-shaken from production builds. DevTools hooks exist solely in development mode or when explicitly mounted.
+    </div>
+  </div>
+</div>
+
+## Mounting the DevTools (&lt;VisageDevTools&gt;)
+
+In development, the Visage Vite plugin can auto-inject DevTools into your HTML shell. Alternatively, you can render `<VisageDevTools />` explicitly in your root component:
+
+<CodeBlock
+  filename="src/main.tsx"
+  lang="tsx"
+  code={`import { render, createSignal } from "@epoch32/visage";
+import { VisageDevTools } from "@epoch32/visage/devtools";
+
+function App() {
+  const [count, setCount] = createSignal(0, { name: "app.counter" });
+
+  return (
+    <div>
+      <h1>Visage Application</h1>
+      <button onClick={() => setCount((c) => c + 1)}>Increment</button>
+
+      {/* Floating launcher badge in bottom-right corner */}
+      {import.meta.env.DEV && <VisageDevTools position="bottom-right" />}
+    </div>
+  );
+}
+
+render(() => <App />, document.getElementById("app")!);`}
+/>
+
+## Signals & Stores Inspector
+
+The **Signals** tab lists all registered signals and deep stores in your application:
+- **Live Values**: Inspect scalar numbers, strings, and complex nested store objects.
+- **Dependency Count**: See exactly how many DOM elements or computed expressions subscribe to each signal.
+- **Manual Mutation**: Edit signal values directly in the DevTools drawer to test UI edge cases on the fly.
+
+## Live DAG Graph Visualization
+
+The **DAG Graph** tab renders an interactive SVG diagram of the reactive network:
+- **Nodes**: Round nodes represent signals (writable), hexagonal nodes represent computed derivations, and diamond nodes represent effects or DOM text nodes.
+- **Live Pulses**: Nodes flash brightly when updated, letting you identify unnecessary updates or circular dependency chains instantly.
+- **Topological Sorting**: Visualizes dependency depth from root state to UI outputs.
+
+## Queries & RPC Network Timeline
+
+Connect your `QueryClient` to track async cache status:
+
+<CodeBlock
+  filename="src/query-setup.ts"
+  lang="ts"
+  code={`import { QueryClient } from "@epoch32/visage/query";
+import { connectDevTools } from "@epoch32/visage/devtools";
+
+export const queryClient = new QueryClient();
+
+// Connect to DevTools hub in development:
+if (import.meta.env.DEV) {
+  connectDevTools(queryClient);
+}`}
+/>
+
+The **Queries** and **RPC** tabs display:
+- Cache key states (`fresh`, `stale`, `fetching`)
+- Request duration metrics
+- RPC batch payload inspections
+- Manual "Refetch" and "Invalidate" triggers
+
+## DOM Element Highlighter
+
+Hovering over a signal or reactive node in the DevTools panel highlights the associated physical DOM element on the page using a bright overlay, confirming exactly which DOM nodes update when that signal changes.
+
+## API Reference
+
+<div className="doc-api-section">
+  <div className="doc-fn-card">
+    <div className="doc-fn-header">
+      <div className="doc-fn-meta">
+        <span className="doc-fn-kind">Component</span>
+      </div>
+      <div className="doc-fn-signature">
+        &lt;VisageDevTools position=&#123;Position&#125; defaultOpen=&#123;boolean&#125; /&gt;
+      </div>
+    </div>
+
+    <div className="doc-fn-body">
+      <div className="doc-fn-desc">
+        Floating in-browser reactive debugger panel providing Signals inspection, live DAG visualization, and query cache telemetry.
+      </div>
+
+      <div>
+        <div className="doc-fn-subheading">Props</div>
+        <div className="doc-params-list">
+          <div className="doc-param-row">
+            <div className="doc-param-meta">
+              <span className="doc-param-name">position</span>
+              <span className="doc-param-type">"bottom-right" | "bottom-left" | "top-right" | "top-left"</span>
+              <span className="doc-param-badge optional">Optional</span>
+            </div>
+            <div className="doc-param-desc">
+              Screen corner anchor for the floating toggle launcher. Defaults to <code>"bottom-right"</code>.
+            </div>
+          </div>
+
+          <div className="doc-param-row">
+            <div className="doc-param-meta">
+              <span className="doc-param-name">defaultOpen</span>
+              <span className="doc-param-type">boolean</span>
+              <span className="doc-param-badge optional">Optional</span>
+            </div>
+            <div className="doc-param-desc">
+              Whether the inspector drawer starts expanded on initial mount. Defaults to <code>false</code>.
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div className="doc-fn-card">
+    <div className="doc-fn-header">
+      <div className="doc-fn-meta">
+        <span className="doc-fn-kind">Function</span>
+      </div>
+      <div className="doc-fn-signature">
+        connectDevTools(client: QueryClient): void
+      </div>
+    </div>
+
+    <div className="doc-fn-body">
+      <div className="doc-fn-desc">
+        Binds a QueryClient instance to the DevTools telemetry hub to sync cache entries, queries, and mutations.
+      </div>
+    </div>
+  </div>
+</div>

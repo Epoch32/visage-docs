@@ -1,0 +1,251 @@
+import { CodeBlock } from "../components/CodeBlock";
+import { Grid, Maximize2, Move, Ruler, Sparkles } from "lucide-react";
+
+export const title = "4px Spatial Grid Engine";
+export const breadcrumb = "Documentation / Spatial & Styles";
+
+export const toc = [
+  { id: "overview", title: "Overview", level: 2 },
+  { id: "grid-scale", title: "The 4px Engineering Scale", level: 2 },
+  { id: "dimension-intents", title: "Semantic Dimension Keywords", level: 2 },
+  { id: "fluid-typography", title: "Fluid Clamping (fluid)", level: 2 },
+  { id: "unit-helpers", title: "Unit Measurement Helpers", level: 2 },
+  { id: "api-reference", title: "API Reference", level: 2 },
+];
+
+The Visage Spatial Engine eliminates layout bugs, measurement fatigue, and manual viewport calculations. It provides a crisp, mathematical 4px spatial scale, semantic viewport intents (`screen`, `full`, `half`), and zero-math fluid clamping.
+
+<div className="doc-features-grid">
+  <div className="doc-feature-card">
+    <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "6px" }}>
+      <Ruler size={16} color="var(--pink-500)" />
+      <div className="doc-feature-title">4px Grid Discipline</div>
+    </div>
+    <div className="doc-feature-desc">
+      All numbers passed to Visage layout props automatically resolve to the 4px spatial system (e.g., <code>gap={4}</code> resolves to <code>16px</code>).
+    </div>
+  </div>
+
+  <div className="doc-feature-card">
+    <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "6px" }}>
+      <Maximize2 size={16} color="var(--pink-500)" />
+      <div className="doc-feature-title">Dynamic Viewport Units</div>
+    </div>
+    <div className="doc-feature-desc">
+      Viewport dimensions automatically utilize modern <code>dvh</code> / <code>dvw</code> units to prevent mobile browser address bar layout jumps.
+    </div>
+  </div>
+</div>
+
+## The 4px Engineering Scale
+
+In Visage, numbers represent steps on a 4-pixel grid. This produces perfectly aligned visual rhythm and harmonious spacing:
+
+<div className="doc-table-wrapper">
+  <table className="doc-table">
+    <thead>
+      <tr>
+        <th>Scale Step</th>
+        <th>Pixel Output</th>
+        <th>Common Semantic Intent</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><code>1</code></td>
+        <td><code>4px</code></td>
+        <td>Micro-gap, inner button padding, border offset</td>
+      </tr>
+      <tr>
+        <td><code>2</code></td>
+        <td><code>8px</code></td>
+        <td>Compact padding, icon-text gap</td>
+      </tr>
+      <tr>
+        <td><code>3</code></td>
+        <td><code>12px</code></td>
+        <td>Card inner margin, badge padding</td>
+      </tr>
+      <tr>
+        <td><code>4</code></td>
+        <td><code>16px</code></td>
+        <td>Base spatial unit, standard component padding</td>
+      </tr>
+      <tr>
+        <td><code>6</code></td>
+        <td><code>24px</code></td>
+        <td>Section separation, modal interior padding</td>
+      </tr>
+      <tr>
+        <td><code>8</code></td>
+        <td><code>32px</code></td>
+        <td>Page gutter, header margin</td>
+      </tr>
+      <tr>
+        <td><code>12</code></td>
+        <td><code>48px</code></td>
+        <td>Large section dividers, hero spacing</td>
+      </tr>
+      <tr>
+        <td><code>16</code></td>
+        <td><code>64px</code></td>
+        <td>Hero banner padding, layout breaks</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+### Resolving Spatial Values
+
+Use `space()` to programmatically resolve scale values:
+
+<CodeBlock
+  filename="spatial-usage.ts"
+  lang="ts"
+  code={`import { space } from "@epoch32/visage";
+
+space(1);      // "4px"
+space(2);      // "8px"
+space(4);      // "16px"
+space(8);      // "32px"
+space("full"); // "100%"
+space("screen"); // "100dvh"`}
+/>
+
+## Semantic Dimension Keywords
+
+Instead of hardcoding percentages or viewport units, Visage provides semantic strings that resolve consistently across browsers:
+
+<CodeBlock
+  filename="keywords.ts"
+  lang="ts"
+  code={`import { resolveDimension } from "@epoch32/visage";
+
+resolveDimension("screen");       // "100dvh" (dynamic viewport height)
+resolveDimension("screen-w");     // "100dvw" (dynamic viewport width)
+resolveDimension("full");         // "100%"
+resolveDimension("half");         // "50%"
+resolveDimension("third");        // "33.333333%"
+resolveDimension("two-thirds");    // "66.666667%"
+resolveDimension("quarter");       // "25%"
+resolveDimension("three-quarters"); // "75%"
+resolveDimension("fit");          // "fit-content"
+resolveDimension("min");          // "min-content"
+resolveDimension("max");          // "max-content"`}
+/>
+
+<div className="doc-callout">
+  <div className="doc-callout-icon">
+    <Sparkles size={18} color="var(--pink-500)" />
+  </div>
+  <div className="doc-callout-body">
+    <div className="doc-callout-title">Smart Dimension Threshold</div>
+    When passing numbers to width/height props via <code>resolveDimension()</code>:
+    Numbers <code>&lt;= 48</code> multiply by 4px (e.g. <code>w={10}</code> = <code>40px</code>).
+    Numbers <code>&gt; 48</code> are treated as explicit pixel dimensions (e.g. <code>w={320}</code> = <code>320px</code>).
+  </div>
+</div>
+
+## Fluid Clamping (fluid)
+
+Creating responsive typography or spacing that smoothly scales from mobile to desktop without abrupt breakpoint jumps usually requires complex linear slope mathematics.
+
+Visage's `fluid()` function calculates exact `clamp()` expressions automatically:
+
+<CodeBlock
+  filename="fluid-example.ts"
+  lang="ts"
+  code={`import { fluid } from "@epoch32/visage";
+
+// Scales smoothly from 16px at 375px viewport to 32px at 1280px viewport:
+const responsiveTitle = fluid(16, 32);
+// Output: "clamp(16px, 9.38px + 1.77vw, 32px)"
+
+// Custom viewport bounds:
+const heroHeadline = fluid(24, 64, { minVw: 480, maxVw: 1600 });`}
+/>
+
+## Unit Measurement Helpers
+
+Visage exports explicit unit helpers for readable styling code:
+
+<CodeBlock
+  filename="units.ts"
+  lang="ts"
+  code={`import { px, rem, em } from "@epoch32/visage";
+
+px(12);  // "12px"
+rem(1.5); // "1.5rem"
+em(0.85); // "0.85em"`}
+/>
+
+## API Reference
+
+<div className="doc-api-section">
+  <div className="doc-fn-card">
+    <div className="doc-fn-header">
+      <div className="doc-fn-meta">
+        <span className="doc-fn-kind">Function</span>
+      </div>
+      <div className="doc-fn-signature">
+        space(val: number | string | undefined | null): string
+      </div>
+    </div>
+
+    <div className="doc-fn-body">
+      <div className="doc-fn-desc">
+        Resolves a spatial scale step or dimensional intent to a valid CSS measurement string. Numbers map to the 4px engineering grid (<code>1 = 4px, 2 = 8px, 4 = 16px</code>).
+      </div>
+
+      <div>
+        <div className="doc-fn-subheading">Parameters</div>
+        <div className="doc-params-list">
+          <div className="doc-param-row">
+            <div className="doc-param-meta">
+              <span className="doc-param-name">val</span>
+              <span className="doc-param-type">number | string</span>
+              <span className="doc-param-badge required">Required</span>
+            </div>
+            <div className="doc-param-desc">
+              Spatial step number (multiplied by 4px) or dimension keyword (<code>"full", "screen", "half"</code>).
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div className="doc-fn-card">
+    <div className="doc-fn-header">
+      <div className="doc-fn-meta">
+        <span className="doc-fn-kind">Function</span>
+      </div>
+      <div className="doc-fn-signature">
+        resolveDimension(val: number | string | undefined | null): string
+      </div>
+    </div>
+
+    <div className="doc-fn-body">
+      <div className="doc-fn-desc">
+        Resolves width, height, or grid sizing into CSS dimensions. Numbers &le; 48 map to the 4px scale, while numbers &gt; 48 are treated as raw pixels.
+      </div>
+    </div>
+  </div>
+
+  <div className="doc-fn-card">
+    <div className="doc-fn-header">
+      <div className="doc-fn-meta">
+        <span className="doc-fn-kind">Function</span>
+      </div>
+      <div className="doc-fn-signature">
+        fluid(minPx: number, maxPx: number, options?: &#123; minVw?: number; maxVw?: number &#125;): string
+      </div>
+    </div>
+
+    <div className="doc-fn-body">
+      <div className="doc-fn-desc">
+        Calculates an exact CSS <code>clamp()</code> linear interpolation expression between viewport minimums (default 375px) and maximums (default 1280px).
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,212 @@
+import { CodeBlock } from "../components/CodeBlock";
+import { Cpu, Flame, Layers, PackageCheck, Sparkles, Zap } from "lucide-react";
+
+export const title = "Vite Plugin & Fast HMR";
+export const breadcrumb = "Documentation / Full-Stack & Tools";
+
+export const toc = [
+  { id: "overview", title: "Overview", level: 2 },
+  { id: "plugin-configuration", title: "Vite Configuration (vite.config.ts)", level: 2 },
+  { id: "hmr-state-preservation", title: "Signal-Preserving HMR", level: 2 },
+  { id: "lucide-icon-bridge", title: "Lucide Icon Transform (visageLucide)", level: 2 },
+  { id: "fullstack-rpc-middleware", title: "Full-Stack Dev Server RPC", level: 2 },
+  { id: "deduplication", title: "Package Deduplication", level: 2 },
+  { id: "api-reference", title: "API Reference", level: 2 },
+];
+
+The Visage Vite Plugin (`@epoch32/visage/vite`) configures your build toolchain for instant sub-millisecond Hot Module Replacement (HMR), automatic JSX runtime configuration, and development server RPC middleware.
+
+<div className="doc-features-grid">
+  <div className="doc-feature-card">
+    <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "6px" }}>
+      <Flame size={16} color="var(--pink-500)" />
+      <div className="doc-feature-title">State-Preserving HMR</div>
+    </div>
+    <div className="doc-feature-desc">
+      Editing a component hot-swaps DOM elements while preserving running signal state, form inputs, and scroll offsets without reloading the page.
+    </div>
+  </div>
+
+  <div className="doc-feature-card">
+    <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "6px" }}>
+      <PackageCheck size={16} color="var(--pink-500)" />
+      <div className="doc-feature-title">Lucide Icon Transform</div>
+      </div>
+    <div className="doc-feature-desc">
+      <code>visageLucide()</code> automatically transforms <code>lucide-react</code> imports into native Visage JSX SVG nodes without requiring React.
+    </div>
+  </div>
+</div>
+
+## Vite Configuration (vite.config.ts)
+
+Add `visage()` and `visageLucide()` to your Vite plugin array:
+
+<CodeBlock
+  filename="vite.config.ts"
+  lang="ts"
+  code={`import { defineConfig } from "vite";
+import visage, { visageLucide } from "@epoch32/visage/vite";
+
+export default defineConfig({
+  plugins: [
+    visage({
+      devtools: true, // Auto-inject in dev mode
+      hmr: true,      // Fast state-preserving HMR
+    }),
+    visageLucide(),   // Native Lucide SVG icon support
+  ],
+});`}
+/>
+
+## Signal-Preserving HMR
+
+In traditional frameworks, HMR often resets component state back to defaults. Visage's Vite plugin injects fine-grained HMR boundaries that replace component factory functions while keeping signal store instances alive:
+
+<CodeBlock
+  filename="hmr-behavior.ts"
+  lang="ts"
+  code={`// 1. You type text into an input field or increment a counter:
+const [count, setCount] = createSignal(42);
+
+// 2. You change the JSX in your code editor from <h1> to <h2>:
+// 3. Vite pushes the update in < 5ms:
+// The <h2> replaces <h1> in the DOM, and count remains 42!`}
+/>
+
+## Lucide Icon Transform (visageLucide)
+
+Many existing libraries and icon sets target React. Visage's `visageLucide()` plugin intercepts imports from `lucide-react` at compile time and transforms them into native Visage SVG elements:
+
+<CodeBlock
+  filename="IconUsage.tsx"
+  lang="tsx"
+  code={`// Zero react dependency! Transformed automatically to native Visage SVG:
+import { Check, Heart, Sparkles, Terminal } from "lucide-react";
+
+export function IconBar() {
+  return (
+    <div>
+      <Sparkles size={18} color="var(--pink-500)" />
+      <Terminal size={18} />
+      <Heart size={18} />
+    </div>
+  );
+}`}
+/>
+
+## Full-Stack Dev Server RPC
+
+You can attach your server's RPC router directly into the Vite development server so frontend API calls work without running a separate backend server:
+
+<CodeBlock
+  filename="vite.config.ts"
+  lang="ts"
+  code={`import { defineConfig } from "vite";
+import visage from "@epoch32/visage/vite";
+import { appRouter } from "./server/router";
+
+export default defineConfig({
+  plugins: [
+    visage({
+      rpc: {
+        router: appRouter,
+        endpoint: "/api/rpc",
+      },
+    }),
+  ],
+});`}
+/>
+
+Now, client requests to `/api/rpc` are handled directly by your typed server procedures inside Vite!
+
+## Package Deduplication
+
+If you have multiple dependencies in a monorepo or nested `node_modules` that depend on `@epoch32/visage`, the Vite plugin automatically aliases `@epoch32/visage` to a single root instance. This ensures that signals, contexts, and batch queues share one single reactive engine instance.
+
+## API Reference
+
+<div className="doc-api-section">
+  <div className="doc-fn-card">
+    <div className="doc-fn-header">
+      <div className="doc-fn-meta">
+        <span className="doc-fn-kind">Plugin</span>
+      </div>
+      <div className="doc-fn-signature">
+        visage(options?: VisagePluginOptions): VisageVitePlugin
+      </div>
+    </div>
+
+    <div className="doc-fn-body">
+      <div className="doc-fn-desc">
+        Core Vite plugin configuring automatic JSX runtime, signal-preserving HMR boundaries, devtools auto-injection, and RPC dev server middleware.
+      </div>
+
+      <div>
+        <div className="doc-fn-subheading">Options</div>
+        <div className="doc-params-list">
+          <div className="doc-param-row">
+            <div className="doc-param-meta">
+              <span className="doc-param-name">devtools</span>
+              <span className="doc-param-type">boolean</span>
+              <span className="doc-param-badge optional">Optional</span>
+            </div>
+            <div className="doc-param-desc">
+              Automatically injects Visage DevTools into HTML shell in development mode. Defaults to <code>true</code>.
+            </div>
+          </div>
+
+          <div className="doc-param-row">
+            <div className="doc-param-meta">
+              <span className="doc-param-name">hmr</span>
+              <span className="doc-param-type">boolean</span>
+              <span className="doc-param-badge optional">Optional</span>
+            </div>
+            <div className="doc-param-desc">
+              Enables signal state preservation during hot module replacements. Defaults to <code>true</code>.
+            </div>
+          </div>
+
+          <div className="doc-param-row">
+            <div className="doc-param-meta">
+              <span className="doc-param-name">extractCss</span>
+              <span className="doc-param-type">boolean</span>
+              <span className="doc-param-badge optional">Optional</span>
+            </div>
+            <div className="doc-param-desc">
+              Extracts static styles into the production CSS bundle. Defaults to <code>true</code>.
+            </div>
+          </div>
+
+          <div className="doc-param-row">
+            <div className="doc-param-meta">
+              <span className="doc-param-name">rpc</span>
+              <span className="doc-param-type">&#123; router: Router, endpoint?: string &#125;</span>
+              <span className="doc-param-badge optional">Optional</span>
+            </div>
+            <div className="doc-param-desc">
+              Attaches full-stack RPC procedure handling to the Vite development server.
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div className="doc-fn-card">
+    <div className="doc-fn-header">
+      <div className="doc-fn-meta">
+        <span className="doc-fn-kind">Plugin</span>
+      </div>
+      <div className="doc-fn-signature">
+        visageLucide(options?: VisageLucideOptions): VisageVitePlugin
+      </div>
+    </div>
+
+    <div className="doc-fn-body">
+      <div className="doc-fn-desc">
+        Transforms <code>lucide-react</code> imports into native Visage JSX SVG icon elements with zero React runtime overhead.
+      </div>
+    </div>
+  </div>
+</div>

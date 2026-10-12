@@ -1,0 +1,283 @@
+import { CodeBlock } from "../components/CodeBlock";
+import { CheckCheck, FileCode2, Network, ShieldCheck, Sparkles } from "lucide-react";
+
+export const title = "Opinionated File-Based API";
+export const breadcrumb = "Documentation / Full-Stack & Tools";
+
+export const toc = [
+  { id: "overview", title: "Overview", level: 2 },
+  { id: "defining-procedures", title: "Defining Procedures (query & mutation)", level: 2 },
+  { id: "input-validation", title: "Standard Schema v1 Validation", level: 2 },
+  { id: "middleware", title: "Type-Safe Middleware (defineMiddleware)", level: 2 },
+  { id: "file-routing", title: "File-Based Route Convention", level: 2 },
+  { id: "client-calling", title: "Calling APIs from Client", level: 2 },
+  { id: "api-reference", title: "API Reference", level: 2 },
+];
+
+Visage provides an opinionated full-stack file-based API framework (`visage/api`). It combines file system routing with end-to-end typed procedures, Standard Schema v1 validation, and composable middleware pipelines.
+
+<div className="doc-features-grid">
+  <div className="doc-feature-card">
+    <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "6px" }}>
+      <FileCode2 size={16} color="var(--pink-500)" />
+      <div className="doc-feature-title">File-Based Route Convention</div>
+    </div>
+    <div className="doc-feature-desc">
+      Files in your API directory (e.g. <code>api/users/[id].ts</code>) automatically map to RESTful URL endpoints and typed RPC procedures.
+    </div>
+  </div>
+
+  <div className="doc-feature-card">
+    <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "6px" }}>
+      <ShieldCheck size={16} color="var(--pink-500)" />
+      <div className="doc-feature-title">Standard Schema v1</div>
+    </div>
+    <div className="doc-feature-desc">
+      Native support for Standard Schema v1: validate inputs seamlessly with ArkType, Zod, Valibot, or Visage's built-in <code>v</code> validator.
+    </div>
+  </div>
+</div>
+
+## Defining Procedures (query & mutation)
+
+Procedures are defined using the builder pattern with `procedure`, `query()`, and `mutation()`:
+
+<CodeBlock
+  filename="api/users/profile.ts"
+  lang="ts"
+  code={`import { query, mutation, v } from "@epoch32/visage/api";
+
+// 1. Read-only query
+export const getProfile = query()
+  .input(v.object({ userId: v.string() }))
+  .handler(async ({ input }) => {
+    return {
+      id: input.userId,
+      name: "Alice Developer",
+      role: "admin",
+    };
+  });
+
+// 2. Mutation with side effects
+export const updateBio = mutation()
+  .input(v.object({
+    userId: v.string(),
+    bio: v.string().max(280),
+  }))
+  .handler(async ({ input }) => {
+    // Save to database...
+    return { success: true, updatedBio: input.bio };
+  });`}
+/>
+
+## Input Validation
+
+Visage natively supports any schema library adhering to the **Standard Schema v1** specification:
+
+<CodeBlock
+  filename="validation-options.ts"
+  lang="ts"
+  code={`import { mutation, v } from "@epoch32/visage/api";
+import { type } from "arktype"; // ArkType
+import { z } from "zod";         // Zod
+
+// 1. Built-in zero-dependency validator
+const builtInProcedure = mutation()
+  .input(v.object({ email: v.string().email() }));
+
+// 2. ArkType schema
+const arktypeProcedure = mutation()
+  .input(type({ email: "string.email", age: "number>=18" }));
+
+// 3. Zod schema
+const zodProcedure = mutation()
+  .input(z.object({ email: z.string().email(), age: z.number().min(18) }));`}
+/>
+
+If validation fails, Visage automatically halts execution and returns a typed `BAD_REQUEST` error payload with formatted field error messages.
+
+## Type-Safe Middleware (defineMiddleware)
+
+Middleware functions can inspect request headers, authenticate tokens, modify context, or guard endpoints:
+
+<CodeBlock
+  filename="api/_middleware.ts"
+  lang="ts"
+  code={`import { defineMiddleware, RPCError } from "@epoch32/visage/api";
+
+export const authMiddleware = defineMiddleware(async ({ ctx, next }) => {
+  const token = ctx.req.headers.get("authorization");
+
+  if (!token) {
+    throw new RPCError("UNAUTHORIZED", "Missing authorization bearer token");
+  }
+
+  // Extend context for downstream handlers:
+  const user = { id: "user-123", role: "admin" };
+  return next({ ctx: { ...ctx, user } });
+});`}
+/>
+
+Attach middleware to individual procedures using `.use()`:
+
+<CodeBlock
+  filename="api/admin/metrics.ts"
+  lang="ts"
+  code={`import { query } from "@epoch32/visage/api";
+import { authMiddleware } from "../_middleware";
+
+export const getMetrics = query()
+  .use(authMiddleware)
+  .handler(async ({ ctx }) => {
+    // ctx.user is fully typed!
+    return { systemLoad: 0.42, user: ctx.user.id };
+  });`}
+/>
+
+## File-Based Route Convention
+
+When configured with Vite or server handlers, files inside the API root map cleanly to URLs:
+
+<div className="doc-table-wrapper">
+  <table className="doc-table">
+    <thead>
+      <tr>
+        <th>File Path</th>
+        <th>URL Endpoint</th>
+        <th>Route Type</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><code>api/users.ts</code></td>
+        <td><code>/api/users</code></td>
+        <td>Static endpoint</td>
+      </tr>
+      <tr>
+        <td><code>api/users/[id].ts</code></td>
+        <td><code>/api/users/:id</code></td>
+        <td>Dynamic parameter</td>
+      </tr>
+      <tr>
+        <td><code>api/docs/[...slug].ts</code></td>
+        <td><code>/api/docs/*</code></td>
+        <td>Catch-all wildcard</td>
+      </tr>
+      <tr>
+        <td><code>api/_middleware.ts</code></td>
+        <td><em>Applies to directory</em></td>
+        <td>Directory middleware hook</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+## Calling APIs from Client
+
+On the frontend, instantiate the typed client to invoke procedures with full IDE autocomplete:
+
+<CodeBlock
+  filename="client-call.ts"
+  lang="ts"
+  code={`import { createApiClient } from "@epoch32/visage/api";
+import type { AppApi } from "./server";
+
+const api = createApiClient<AppApi>({ baseUrl: "/api" });
+
+// Fully typechecked input and return value
+const profile = await api.users.profile.getProfile({ userId: "101" });
+console.log(profile.name); // "Alice Developer"`}
+/>
+
+## API Reference
+
+<div className="doc-api-section">
+  <div className="doc-fn-card">
+    <div className="doc-fn-header">
+      <div className="doc-fn-meta">
+        <span className="doc-fn-kind">Builder</span>
+      </div>
+      <div className="doc-fn-signature">
+        query(): ProcedureBuilder&lt;TInput, TOutput&gt;
+      </div>
+    </div>
+
+    <div className="doc-fn-body">
+      <div className="doc-fn-desc">
+        Creates a type-safe read-only query procedure builder supporting input schema validation, middleware chaining, and async handlers.
+      </div>
+
+      <div>
+        <div className="doc-fn-subheading">Builder Methods</div>
+        <div className="doc-params-list">
+          <div className="doc-param-row">
+            <div className="doc-param-meta">
+              <span className="doc-param-name">.input(schema)</span>
+              <span className="doc-param-type">StandardSchemaV1</span>
+              <span className="doc-param-badge optional">Optional</span>
+            </div>
+            <div className="doc-param-desc">
+              Validates incoming procedure arguments with Standard Schema v1 (v, ArkType, Zod, Valibot).
+            </div>
+          </div>
+
+          <div className="doc-param-row">
+            <div className="doc-param-meta">
+              <span className="doc-param-name">.use(middleware)</span>
+              <span className="doc-param-type">MiddlewareDefinition</span>
+              <span className="doc-param-badge optional">Optional</span>
+            </div>
+            <div className="doc-param-desc">
+              Attaches authorization or logging middleware functions to the pipeline.
+            </div>
+          </div>
+
+          <div className="doc-param-row">
+            <div className="doc-param-meta">
+              <span className="doc-param-name">.handler(fn)</span>
+              <span className="doc-param-type">(&#123; input, ctx &#125;) =&gt; Promise&lt;TOutput&gt;</span>
+              <span className="doc-param-badge required">Required</span>
+            </div>
+            <div className="doc-param-desc">
+              Async execution logic returning typed output payload.
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div className="doc-fn-card">
+    <div className="doc-fn-header">
+      <div className="doc-fn-meta">
+        <span className="doc-fn-kind">Builder</span>
+      </div>
+      <div className="doc-fn-signature">
+        mutation(): ProcedureBuilder&lt;TInput, TOutput&gt;
+      </div>
+    </div>
+
+    <div className="doc-fn-body">
+      <div className="doc-fn-desc">
+        Creates a side-effect mutation procedure builder executed via HTTP POST.
+      </div>
+    </div>
+  </div>
+
+  <div className="doc-fn-card">
+    <div className="doc-fn-header">
+      <div className="doc-fn-meta">
+        <span className="doc-fn-kind">Function</span>
+      </div>
+      <div className="doc-fn-signature">
+        defineMiddleware(fn: MiddlewareFn): MiddlewareDefinition
+      </div>
+    </div>
+
+    <div className="doc-fn-body">
+      <div className="doc-fn-desc">
+        Defines reusable, type-safe middleware that inspects requests and extends downstream context.
+      </div>
+    </div>
+  </div>
+</div>

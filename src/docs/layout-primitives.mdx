@@ -1,0 +1,326 @@
+import { CodeBlock } from "../components/CodeBlock";
+import { AlignCenter, Columns, Grid3x3, Layout, Rows, Sparkles } from "lucide-react";
+
+export const title = "<Stack>, <Row>, <Grid>";
+export const breadcrumb = "Documentation / Spatial & Styles";
+
+export const toc = [
+  { id: "overview", title: "Overview", level: 2 },
+  { id: "stack-primitive", title: "Vertical Stack (<Stack>)", level: 2 },
+  { id: "row-primitive", title: "Horizontal Row (<Row>)", level: 2 },
+  { id: "grid-primitive", title: "CSS Grid (<Grid>)", level: 2 },
+  { id: "center-primitive", title: "Centering (<Center>)", level: 2 },
+  { id: "spacer-primitive", title: "Elastic Spacers (<Spacer>)", level: 2 },
+  { id: "spatial-props", title: "Shared Spatial Props", level: 2 },
+  { id: "api-reference", title: "API Reference", level: 2 },
+];
+
+Visage provides composable layout primitives that encode spatial consistency directly into JSX. They eliminate margin hacks, flexbox alignment boilerplate, and messy media query breakpoints.
+
+<div className="doc-features-grid">
+  <div className="doc-feature-card">
+    <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "6px" }}>
+      <Rows size={16} color="var(--pink-500)" />
+      <div className="doc-feature-title">Zero Margin Collapse</div>
+    </div>
+    <div className="doc-feature-desc">
+      <code>&lt;Stack&gt;</code> and <code>&lt;Row&gt;</code> rely on standard flex gap, eliminating margin bleed and collapsing bugs between components.
+    </div>
+  </div>
+
+  <div className="doc-feature-card">
+    <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "6px" }}>
+      <Grid3x3 size={16} color="var(--pink-500)" />
+      <div className="doc-feature-title">Auto-Fit Responsive Grids</div>
+    </div>
+    <div className="doc-feature-desc">
+      <code>&lt;Grid minChildWidth=&#123;260&#125;&gt;</code> produces self-wrapping responsive columns without requiring manual CSS media queries.
+    </div>
+  </div>
+</div>
+
+## Vertical Stack (&lt;Stack&gt;)
+
+`<Stack>` organizes children into a vertical column with predictable gap spacing:
+
+<CodeBlock
+  filename="StackExample.tsx"
+  lang="tsx"
+  code={`import { Stack } from "@epoch32/visage";
+
+export function ProfileCard() {
+  return (
+    <Stack gap={3} p={4} style={{ border: "1px solid var(--border)", borderRadius: "8px" }}>
+      <h3>User Profile</h3>
+      <p>Configure your workspace notifications and team access.</p>
+      <button class="btn">Update Preferences</button>
+    </Stack>
+  );
+}`}
+/>
+
+Props:
+- `gap`: Spacing between children (e.g. `3` = `12px`).
+- `align`: Flex cross-axis alignment (`"start" | "center" | "end" | "stretch" | "baseline"`).
+- `justify`: Main-axis distribution (`"start" | "center" | "end" | "between" | "around" | "evenly"`).
+- `reversed`: Renders in reverse column order (`column-reverse`).
+
+## Horizontal Row (&lt;Row&gt;)
+
+`<Row>` arranges children horizontally. By default, it centers children vertically (`align="center"`) for natural icon and label alignment:
+
+<CodeBlock
+  filename="RowExample.tsx"
+  lang="tsx"
+  code={`import { Row, Spacer } from "@epoch32/visage";
+
+export function NavigationHeader() {
+  return (
+    <Row gap={4} px={6} py={3} justify="between">
+      <div class="logo">Visage</div>
+
+      <Row gap={3}>
+        <a href="#docs">Docs</a>
+        <a href="#examples">Examples</a>
+        <button class="btn btn-primary">Sign In</button>
+      </Row>
+    </Row>
+  );
+}`}
+/>
+
+## CSS Grid (&lt;Grid&gt;)
+
+`<Grid>` provides effortless CSS Grid layouts. You can declare fixed columns or use `minChildWidth` for self-responsive fluid wrapping:
+
+<CodeBlock
+  filename="GridExample.tsx"
+  lang="tsx"
+  code={`import { Grid } from "@epoch32/visage";
+
+// 1. Responsive auto-fitting columns (wraps automatically on smaller screens)
+export function ProductGrid() {
+  return (
+    <Grid minChildWidth={280} gap={4}>
+      <div class="card">Item 1</div>
+      <div class="card">Item 2</div>
+      <div class="card">Item 3</div>
+      <div class="card">Item 4</div>
+    </Grid>
+  );
+}
+
+// 2. Explicit fixed column repeat
+export function StatsDashboard() {
+  return (
+    <Grid columns={3} gap={4}>
+      <div class="stat">Revenue</div>
+      <div class="stat">Users</div>
+      <div class="stat">Conversion</div>
+    </Grid>
+  );
+}`}
+/>
+
+## Centering (&lt;Center&gt;)
+
+`<Center>` aligns children horizontally and vertically without flexbox boilerplate or absolute margin hacks:
+
+<CodeBlock
+  filename="CenterExample.tsx"
+  lang="tsx"
+  code={`import { Center } from "@epoch32/visage";
+
+export function LoadingScreen() {
+  return (
+    <Center h="screen">
+      <div class="spinner">Loading Visage Application...</div>
+    </Center>
+  );
+}`}
+/>
+
+## Elastic Spacers (&lt;Spacer&gt;)
+
+`<Spacer>` expands to fill remaining space in a `<Row>` or `<Stack>` (`flex: 1 1 0%`), pushing neighboring items to opposite edges:
+
+<CodeBlock
+  filename="SpacerExample.tsx"
+  lang="tsx"
+  code={`import { Row, Spacer } from "@epoch32/visage";
+
+export function Toolbar() {
+  return (
+    <Row p={2}>
+      <span>Dashboard / Overview</span>
+
+      {/* Pushes actions to the right edge */}
+      <Spacer />
+
+      <button class="btn">Export CSV</button>
+      <button class="btn btn-primary">New Project</button>
+    </Row>
+  );
+}`}
+/>
+
+Pass `size={4}` to `<Spacer>` to render a fixed-dimension spacer block instead of an expanding flex item.
+
+## Shared Spatial Props
+
+All layout primitives support shorthand padding, margin, and dimension props:
+
+<div className="doc-table-wrapper">
+  <table className="doc-table">
+    <thead>
+      <tr>
+        <th>Prop</th>
+        <th>CSS Property</th>
+        <th>Scale Mapping</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><code>p, px, py, pt, pb, pl, pr</code></td>
+        <td><code>padding</code> variants</td>
+        <td>4px spatial scale (e.g. <code>p={4}</code> =&gt; <code>16px</code>)</td>
+      </tr>
+      <tr>
+        <td><code>m, mx, my, mt, mb, ml, mr</code></td>
+        <td><code>margin</code> variants</td>
+        <td>4px spatial scale (e.g. <code>mt={2}</code> =&gt; <code>8px</code>)</td>
+      </tr>
+      <tr>
+        <td><code>w, h</code></td>
+        <td><code>width, height</code></td>
+        <td>Keywords (<code>"screen", "full"</code>) or scale (<code>&lt;= 48</code>) / pixels</td>
+      </tr>
+      <tr>
+        <td><code>minW, maxW, minH, maxH</code></td>
+        <td>Constraint dimensions</td>
+        <td>Keywords or scale / pixels</td>
+      </tr>
+      <tr>
+        <td><code>as</code></td>
+        <td>Tag name override</td>
+        <td>Defaults to <code>"div"</code> (e.g. <code>as="section"</code>)</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+## API Reference
+
+<div className="doc-api-section">
+  <div className="doc-fn-card">
+    <div className="doc-fn-header">
+      <div className="doc-fn-meta">
+        <span className="doc-fn-kind">Component</span>
+      </div>
+      <div className="doc-fn-signature">
+        &lt;Stack gap=&#123;number | string&#125; align=&#123;string&#125; justify=&#123;string&#125;&gt;&#123;children&#125;&lt;/Stack&gt;
+      </div>
+    </div>
+
+    <div className="doc-fn-body">
+      <div className="doc-fn-desc">
+        Vertical flex column container enforcing consistent gap spacing and zero margin collapse.
+      </div>
+
+      <div>
+        <div className="doc-fn-subheading">Props</div>
+        <div className="doc-params-list">
+          <div className="doc-param-row">
+            <div className="doc-param-meta">
+              <span className="doc-param-name">gap</span>
+              <span className="doc-param-type">number | string</span>
+              <span className="doc-param-badge optional">Optional</span>
+            </div>
+            <div className="doc-param-desc">
+              Spacing between items mapped to the 4px spatial scale.
+            </div>
+          </div>
+
+          <div className="doc-param-row">
+            <div className="doc-param-meta">
+              <span className="doc-param-name">align</span>
+              <span className="doc-param-type">"start" | "center" | "end" | "stretch" | "baseline"</span>
+              <span className="doc-param-badge optional">Optional</span>
+            </div>
+            <div className="doc-param-desc">
+              Cross-axis flex item alignment.
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div className="doc-fn-card">
+    <div className="doc-fn-header">
+      <div className="doc-fn-meta">
+        <span className="doc-fn-kind">Component</span>
+      </div>
+      <div className="doc-fn-signature">
+        &lt;Row gap=&#123;number | string&#125; justify=&#123;string&#125; align=&#123;string&#125;&gt;&#123;children&#125;&lt;/Row&gt;
+      </div>
+    </div>
+
+    <div className="doc-fn-body">
+      <div className="doc-fn-desc">
+        Horizontal flex row with default vertical centering (<code>align="center"</code>).
+      </div>
+    </div>
+  </div>
+
+  <div className="doc-fn-card">
+    <div className="doc-fn-header">
+      <div className="doc-fn-meta">
+        <span className="doc-fn-kind">Component</span>
+      </div>
+      <div className="doc-fn-signature">
+        &lt;Grid columns=&#123;number | string&#125; minChildWidth=&#123;number | string&#125; gap=&#123;number&#125;&gt;&#123;children&#125;&lt;/Grid&gt;
+      </div>
+    </div>
+
+    <div className="doc-fn-body">
+      <div className="doc-fn-desc">
+        CSS Grid primitive supporting fixed column counts or responsive self-wrapping <code>minChildWidth</code>.
+      </div>
+    </div>
+  </div>
+
+  <div className="doc-fn-card">
+    <div className="doc-fn-header">
+      <div className="doc-fn-meta">
+        <span className="doc-fn-kind">Component</span>
+      </div>
+      <div className="doc-fn-signature">
+        &lt;Center inline=&#123;boolean&#125;&gt;&#123;children&#125;&lt;/Center&gt;
+      </div>
+    </div>
+
+    <div className="doc-fn-body">
+      <div className="doc-fn-desc">
+        Centers child content horizontally and vertically without CSS boilerplate.
+      </div>
+    </div>
+  </div>
+
+  <div className="doc-fn-card">
+    <div className="doc-fn-header">
+      <div className="doc-fn-meta">
+        <span className="doc-fn-kind">Component</span>
+      </div>
+      <div className="doc-fn-signature">
+        &lt;Spacer size=&#123;number | string&#125; flex=&#123;boolean | number&#125; /&gt;
+      </div>
+    </div>
+
+    <div className="doc-fn-body">
+      <div className="doc-fn-desc">
+        Expanding flex element (<code>flex: 1 1 0%</code>) or fixed dimensional spatial divider block.
+      </div>
+    </div>
+  </div>
+</div>

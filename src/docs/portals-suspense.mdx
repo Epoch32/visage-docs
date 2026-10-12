@@ -1,0 +1,279 @@
+import { CodeBlock } from "../components/CodeBlock";
+import { ExternalLink, Hourglass, Layers, Sparkles, Zap } from "lucide-react";
+
+export const title = "<Portal> & <Suspense>";
+export const breadcrumb = "Documentation / DOM & Control Flow";
+
+export const toc = [
+  { id: "overview", title: "Overview", level: 2 },
+  { id: "portal-primitive", title: "Portals (<Portal>)", level: 2 },
+  { id: "custom-mount-targets", title: "Custom Mount Targets", level: 2 },
+  { id: "suspense-primitive", title: "Async Suspense (<Suspense>)", level: 2 },
+  { id: "create-resource", title: "Async State (createResource)", level: 2 },
+  { id: "code-splitting-lazy", title: "Lazy Code Splitting (lazy)", level: 2 },
+  { id: "api-reference", title: "API Reference", level: 2 },
+];
+
+Visage provides two foundational primitives for orchestrating DOM boundaries and asynchronous execution: `<Portal>` for escaping parent overflow containers into external DOM nodes, and `<Suspense>` for coordinating async data loading.
+
+<div className="doc-features-grid">
+  <div className="doc-feature-card">
+    <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "6px" }}>
+      <ExternalLink size={16} color="var(--pink-500)" />
+      <div className="doc-feature-title">Context-Preserving Portals</div>
+    </div>
+    <div className="doc-feature-desc">
+      <code>&lt;Portal&gt;</code> teleports DOM nodes into <code>document.body</code> or any target element while completely preserving signal ownership and Context scopes.
+    </div>
+  </div>
+
+  <div className="doc-feature-card">
+    <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "6px" }}>
+      <Hourglass size={16} color="var(--pink-500)" />
+      <div className="doc-feature-title">Fine-Grained Suspense</div>
+    </div>
+    <div className="doc-feature-desc">
+      <code>&lt;Suspense&gt;</code> automatically tracks pending promises registered by <code>createResource</code>, <code>lazy</code>, or <code>createQuery</code> without tearing down parent trees.
+    </div>
+  </div>
+</div>
+
+## Portals (&lt;Portal&gt;)
+
+Modals, tooltips, dialogs, and dropdowns frequently need to render outside their parent DOM hierarchy to avoid `overflow: hidden`, `z-index`, or CSS `transform` clipping.
+
+The `<Portal>` component mounts its children into `document.body` by default while maintaining reactive scope linkage:
+
+<CodeBlock
+  filename="ModalPortal.tsx"
+  lang="tsx"
+  code={`import { Portal, createSignal, Show } from "@epoch32/visage";
+
+function ModalExample() {
+  const [isOpen, setIsOpen] = createSignal(false);
+
+  return (
+    <div>
+      <button onClick={() => setIsOpen(true)}>Open Modal</button>
+
+      <Show when={isOpen}>
+        <Portal>
+          <div class="modal-backdrop" onClick={() => setIsOpen(false)}>
+            <div class="modal-card" onClick={(e) => e.stopPropagation()}>
+              <h2>Teleported Dialog</h2>
+              <p>Rendered at the root of document.body with zero CSS clipping!</p>
+              <button onClick={() => setIsOpen(false)}>Close</button>
+            </div>
+          </div>
+        </Portal>
+      </Show>
+    </div>
+  );
+}`}
+/>
+
+## Custom Mount Targets
+
+Pass a target element to the `mount` prop to render into a specific DOM container instead of `document.body`:
+
+<CodeBlock
+  filename="CustomMount.tsx"
+  lang="tsx"
+  code={`import { Portal } from "@epoch32/visage";
+
+function NotificationLayer() {
+  const container = document.getElementById("toast-container");
+
+  return (
+    <Portal mount={container}>
+      <div class="notification-toast">
+        System update completed.
+      </div>
+    </Portal>
+  );
+}`}
+/>
+
+## Async Suspense (&lt;Suspense&gt;)
+
+`<Suspense>` displays a `fallback` UI while child async resources, queries, or lazy-loaded components are pending:
+
+<CodeBlock
+  filename="SuspenseExample.tsx"
+  lang="tsx"
+  code={`import { Suspense } from "@epoch32/visage";
+import { UserProfile } from "./UserProfile";
+
+function Dashboard() {
+  return (
+    <div class="dashboard-layout">
+      <h1>Account Overview</h1>
+
+      <Suspense fallback={<div class="skeleton-loader">Loading profile...</div>}>
+        <UserProfile />
+      </Suspense>
+    </div>
+  );
+}`}
+/>
+
+## Async State (createResource)
+
+Visage's `createResource` coordinates directly with `<Suspense>`. When a resource fetch initiates, it registers the promise with the surrounding Suspense context:
+
+<CodeBlock
+  filename="UserProfile.tsx"
+  lang="tsx"
+  code={`import { createResource } from "@epoch32/visage";
+
+async function fetchUser(): Promise<{ name: string; email: string }> {
+  const res = await fetch("/api/user");
+  return res.json();
+}
+
+export function UserProfile() {
+  const [user, { refetch }] = createResource(fetchUser);
+
+  return (
+    <div class="user-card">
+      <h3>{() => user()?.name}</h3>
+      <p>{() => user()?.email}</p>
+      <button onClick={() => refetch()}>Refresh</button>
+    </div>
+  );
+}`}
+/>
+
+## Lazy Code Splitting (lazy)
+
+Use `lazy()` to dynamically import heavy components on demand. Visage coordinates the module download with `<Suspense>`:
+
+<CodeBlock
+  filename="LazyRoutes.tsx"
+  lang="tsx"
+  code={`import { lazy, Suspense } from "@epoch32/visage";
+
+// Component is downloaded only when rendered
+const HeavyAnalyticsChart = lazy(() => import("./AnalyticsChart"));
+
+export function AnalyticsPage() {
+  return (
+    <section>
+      <h2>Performance Metrics</h2>
+
+      <Suspense fallback={<div>Loading interactive chart...</div>}>
+        <HeavyAnalyticsChart />
+      </Suspense>
+    </section>
+  );
+}`}
+/>
+
+## API Reference
+
+<div className="doc-api-section">
+  <div className="doc-fn-card">
+    <div className="doc-fn-header">
+      <div className="doc-fn-meta">
+        <span className="doc-fn-kind">Component</span>
+      </div>
+      <div className="doc-fn-signature">
+        &lt;Portal mount=&#123;HTMLElement | null&#125;&gt;&#123;children&#125;&lt;/Portal&gt;
+      </div>
+    </div>
+
+    <div className="doc-fn-body">
+      <div className="doc-fn-desc">
+        Teleports child nodes to an external DOM container while preserving internal reactive scopes and context hierarchy.
+      </div>
+
+      <div>
+        <div className="doc-fn-subheading">Props</div>
+        <div className="doc-params-list">
+          <div className="doc-param-row">
+            <div className="doc-param-meta">
+              <span className="doc-param-name">mount</span>
+              <span className="doc-param-type">HTMLElement | null</span>
+              <span className="doc-param-badge optional">Optional</span>
+            </div>
+            <div className="doc-param-desc">
+              Target DOM element to append children into. Defaults to <code>document.body</code>.
+            </div>
+          </div>
+
+          <div className="doc-param-row">
+            <div className="doc-param-meta">
+              <span className="doc-param-name">children</span>
+              <span className="doc-param-type">Child | (() =&gt; Child)</span>
+              <span className="doc-param-badge required">Required</span>
+            </div>
+            <div className="doc-param-desc">
+              Elements or components to render inside the teleported container.
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div className="doc-fn-card">
+    <div className="doc-fn-header">
+      <div className="doc-fn-meta">
+        <span className="doc-fn-kind">Component</span>
+      </div>
+      <div className="doc-fn-signature">
+        &lt;Suspense fallback=&#123;Child&#125;&gt;&#123;children&#125;&lt;/Suspense&gt;
+      </div>
+    </div>
+
+    <div className="doc-fn-body">
+      <div className="doc-fn-desc">
+        Coordinates asynchronous operations across children. Displays fallback UI while registered resources or queries are loading.
+      </div>
+
+      <div>
+        <div className="doc-fn-subheading">Props</div>
+        <div className="doc-params-list">
+          <div className="doc-param-row">
+            <div className="doc-param-meta">
+              <span className="doc-param-name">fallback</span>
+              <span className="doc-param-type">Child</span>
+              <span className="doc-param-badge required">Required</span>
+            </div>
+            <div className="doc-param-desc">
+              Loading placeholder JSX displayed while child promises are pending.
+            </div>
+          </div>
+
+          <div className="doc-param-row">
+            <div className="doc-param-meta">
+              <span className="doc-param-name">children</span>
+              <span className="doc-param-type">Child | (() =&gt; Child)</span>
+              <span className="doc-param-badge required">Required</span>
+            </div>
+            <div className="doc-param-desc">
+              Child components that may initiate asynchronous resources or queries.
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div className="doc-fn-card">
+    <div className="doc-fn-header">
+      <div className="doc-fn-meta">
+        <span className="doc-fn-kind">Function</span>
+      </div>
+      <div className="doc-fn-signature">
+        createResource&lt;T&gt;(fetcher: () =&gt; Promise&lt;T&gt;): [Resource&lt;T&gt;, ResourceActions&lt;T&gt;]
+      </div>
+    </div>
+
+    <div className="doc-fn-body">
+      <div className="doc-fn-desc">
+        Creates a reactive async signal resource that integrates seamlessly with Suspense boundaries.
+      </div>
+    </div>
+  </div>
+</div>

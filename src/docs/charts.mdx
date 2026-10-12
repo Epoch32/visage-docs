@@ -1,0 +1,314 @@
+import { CodeBlock } from "../components/CodeBlock";
+import { Activity, BarChart3, LineChart, PieChart, Sparkles } from "lucide-react";
+
+export const title = "Reactive SVG Charts";
+export const breadcrumb = "Documentation / Headless UI & Charts";
+
+export const toc = [
+  { id: "overview", title: "Overview", level: 2 },
+  { id: "line-chart", title: "Line Charts (<Line>)", level: 2 },
+  { id: "area-chart", title: "Area Charts (<Area>)", level: 2 },
+  { id: "bar-chart", title: "Bar Charts (<Bar>)", level: 2 },
+  { id: "pie-chart", title: "Pie & Donut Charts (<Pie>)", level: 2 },
+  { id: "axes-grid", title: "Axes, Grid & Cursor Tooltips", level: 2 },
+  { id: "math-scales", title: "Mathematical Scales Engine", level: 2 },
+  { id: "api-reference", title: "API Reference", level: 2 },
+];
+
+Visage includes a high-performance SVG chart engine (`visage/charts`). Because Visage bypasses Virtual DOM diffing, SVG path strings, coordinate transformations, and hover cursors react directly to signal updates with smooth 60fps responsiveness.
+
+<div className="doc-features-grid">
+  <div className="doc-feature-card">
+    <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "6px" }}>
+      <Activity size={16} color="var(--pink-500)" />
+      <div className="doc-feature-title">Pure Reactive SVG</div>
+    </div>
+    <div className="doc-feature-desc">
+      Zero canvas/WebGL black boxes or bulky D3 bundles. Pure, crisp, accessible SVG elements styled with standard CSS.
+    </div>
+  </div>
+
+  <div className="doc-feature-card">
+    <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "6px" }}>
+      <LineChart size={16} color="var(--pink-500)" />
+      <div className="doc-feature-title">Live Signal Telemetry</div>
+    </div>
+    <div className="doc-feature-desc">
+      Streaming real-time financial or metrics data updates SVG path attributes directly without re-rendering the surrounding component.
+    </div>
+  </div>
+</div>
+
+## Line Charts (&lt;Line&gt;)
+
+Compose a reactive line chart using `<Chart>`, `<Line>`, `<XAxis>`, and `<YAxis>`:
+
+<CodeBlock
+  filename="LineChartExample.tsx"
+  lang="tsx"
+  code={`import {
+  Chart,
+  Line,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+} from "@epoch32/visage/charts";
+
+const telemetryData = [
+  { time: "10:00", requests: 120 },
+  { time: "10:05", requests: 240 },
+  { time: "10:10", requests: 310 },
+  { time: "10:15", requests: 190 },
+  { time: "10:20", requests: 450 },
+  { time: "10:25", requests: 380 },
+];
+
+export function ServerRequestsChart() {
+  return (
+    <Chart data={telemetryData} xKey="time" yKey="requests" width={600} height={300}>
+      <CartesianGrid strokeDasharray="3 3" />
+      <XAxis />
+      <YAxis />
+      <Tooltip />
+      <Line stroke="#ec4899" strokeWidth={3} smooth dot />
+    </Chart>
+  );
+}`}
+/>
+
+Props for `<Line>`:
+- `stroke`: Color of the line path (e.g. `"#ec4899"`).
+- `strokeWidth`: Stroke thickness in pixels (default `2`).
+- `smooth`: Enables monotonic cubic Bezier spline smoothing.
+- `dot`: Renders interactive data anchor circles on data points.
+
+## Area Charts (&lt;Area&gt;)
+
+`<Area>` closes the path polygon along the bottom baseline for filled area visualizations:
+
+<CodeBlock
+  filename="AreaChartExample.tsx"
+  lang="tsx"
+  code={`import { Chart, Area, XAxis, YAxis, CartesianGrid } from "@epoch32/visage/charts";
+
+export function BandwidthChart({ data }: { data: any[] }) {
+  return (
+    <Chart data={data} xKey="date" yKey="gigabytes" width={600} height={260}>
+      <CartesianGrid />
+      <XAxis />
+      <YAxis />
+      <Area
+        fill="#a855f7"
+        fillOpacity={0.25}
+        stroke="#a855f7"
+        smooth
+      />
+    </Chart>
+  );
+}`}
+/>
+
+## Bar Charts (&lt;Bar&gt;)
+
+`<Bar>` calculates discrete band slots and renders proportional SVG rectangles:
+
+<CodeBlock
+  filename="BarChartExample.tsx"
+  lang="tsx"
+  code={`import { Chart, Bar, XAxis, YAxis, CartesianGrid, Tooltip } from "@epoch32/visage/charts";
+
+const salesData = [
+  { month: "Jan", units: 45 },
+  { month: "Feb", units: 78 },
+  { month: "Mar", units: 62 },
+  { month: "Apr", units: 95 },
+];
+
+export function MonthlySalesChart() {
+  return (
+    <Chart data={salesData} xKey="month" yKey="units" width={500} height={280}>
+      <CartesianGrid />
+      <XAxis />
+      <YAxis />
+      <Tooltip />
+      <Bar fill="#3b82f6" radius={4} />
+    </Chart>
+  );
+}`}
+/>
+
+## Pie & Donut Charts (&lt;Pie&gt;)
+
+`<Pie>` computes radial arc angles and path geometries:
+
+<CodeBlock
+  filename="PieChartExample.tsx"
+  lang="tsx"
+  code={`import { Chart, Pie, Tooltip, Legend } from "@epoch32/visage/charts";
+
+const storageData = [
+  { type: "Documents", size: 40 },
+  { type: "Media", size: 35 },
+  { type: "System", size: 15 },
+  { type: "Free Space", size: 10 },
+];
+
+export function StorageDistribution() {
+  return (
+    <Chart data={storageData} width={350} height={350}>
+      <Pie
+        valueKey="size"
+        labelKey="type"
+        donut
+        innerRadius={60}
+        outerRadius={110}
+        padAngle={0.03}
+        colors={["#ec4899", "#a855f7", "#3b82f6", "#10b981"]}
+      />
+      <Tooltip />
+      <Legend />
+    </Chart>
+  );
+}`}
+/>
+
+## Axes, Grid & Cursor Tooltips
+
+Visage chart sub-components compose cleanly:
+- `<XAxis />` and `<YAxis />`: Format ticks, labels, and coordinate bounds automatically.
+- `<CartesianGrid />`: Draws subtle grid lines across horizontal and vertical tick divisions.
+- `<Cursor />`: Renders an interactive vertical scrub line tracking the mouse cursor position.
+- `<Tooltip />`: Floating reactive popup displaying current x/y key values.
+
+## Mathematical Scales Engine
+
+Under the hood, Visage provides standalone scale functions:
+
+<CodeBlock
+  filename="scales.ts"
+  lang="ts"
+  code={`import { createLinearScale, createBandScale, generateTicks } from "@epoch32/visage/charts";
+
+// 1. Continuous linear scale
+const scaleY = createLinearScale([0, 100], [300, 0]);
+console.log(scaleY(50)); // -> 150 (midpoint)
+
+// Invert pixel position back to data domain
+console.log(scaleY.invert(150)); // -> 50
+
+// 2. Discrete category band scale
+const scaleX = createBandScale(["Jan", "Feb", "Mar"], [0, 600], 0.2);
+console.log(scaleX("Feb")); // -> band slot pixel offset
+console.log(scaleX.bandwidth); // -> width of each bar`}
+/>
+
+## API Reference
+
+<div className="doc-api-section">
+  <div className="doc-fn-card">
+    <div className="doc-fn-header">
+      <div className="doc-fn-meta">
+        <span className="doc-fn-kind">Component</span>
+      </div>
+      <div className="doc-fn-signature">
+        &lt;Chart data=&#123;any[]&#125; width=&#123;number&#125; height=&#123;number&#125; xKey=&#123;string&#125; yKey=&#123;string&#125;&gt;&#123;children&#125;&lt;/Chart&gt;
+      </div>
+    </div>
+
+    <div className="doc-fn-body">
+      <div className="doc-fn-desc">
+        Root SVG chart provider establishing Cartesian coordinate domains, responsive viewBox dimensions, and mouse scrub listeners.
+      </div>
+
+      <div>
+        <div className="doc-fn-subheading">Props</div>
+        <div className="doc-params-list">
+          <div className="doc-param-row">
+            <div className="doc-param-meta">
+              <span className="doc-param-name">data</span>
+              <span className="doc-param-type">any[] | ReadonlySignal&lt;any[]&gt;</span>
+              <span className="doc-param-badge required">Required</span>
+            </div>
+            <div className="doc-param-desc">
+              Array or reactive signal containing dataset records.
+            </div>
+          </div>
+
+          <div className="doc-param-row">
+            <div className="doc-param-meta">
+              <span className="doc-param-name">width</span>
+              <span className="doc-param-type">number</span>
+              <span className="doc-param-badge required">Required</span>
+            </div>
+            <div className="doc-param-desc">
+              SVG viewBox width coordinate space.
+            </div>
+          </div>
+
+          <div className="doc-param-row">
+            <div className="doc-param-meta">
+              <span className="doc-param-name">height</span>
+              <span className="doc-param-type">number</span>
+              <span className="doc-param-badge required">Required</span>
+            </div>
+            <div className="doc-param-desc">
+              SVG viewBox height coordinate space.
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div className="doc-fn-card">
+    <div className="doc-fn-header">
+      <div className="doc-fn-meta">
+        <span className="doc-fn-kind">Component</span>
+      </div>
+      <div className="doc-fn-signature">
+        &lt;Line stroke=&#123;string&#125; strokeWidth=&#123;number&#125; smooth=&#123;boolean&#125; dot=&#123;boolean&#125; /&gt;
+      </div>
+    </div>
+
+    <div className="doc-fn-body">
+      <div className="doc-fn-desc">
+        Renders a continuous SVG path line visualization with optional monotonic cubic Bezier spline smoothing.
+      </div>
+    </div>
+  </div>
+
+  <div className="doc-fn-card">
+    <div className="doc-fn-header">
+      <div className="doc-fn-meta">
+        <span className="doc-fn-kind">Component</span>
+      </div>
+      <div className="doc-fn-signature">
+        &lt;Area fill=&#123;string&#125; fillOpacity=&#123;number&#125; stroke=&#123;string&#125; smooth=&#123;boolean&#125; /&gt;
+      </div>
+    </div>
+
+    <div className="doc-fn-body">
+      <div className="doc-fn-desc">
+        Closed area polygon SVG visualization filled from the data curve to the bottom baseline.
+      </div>
+    </div>
+  </div>
+
+  <div className="doc-fn-card">
+    <div className="doc-fn-header">
+      <div className="doc-fn-meta">
+        <span className="doc-fn-kind">Component</span>
+      </div>
+      <div className="doc-fn-signature">
+        &lt;Pie valueKey=&#123;string&#125; labelKey=&#123;string&#125; donut=&#123;boolean&#125; innerRadius=&#123;number&#125; /&gt;
+      </div>
+    </div>
+
+    <div className="doc-fn-body">
+      <div className="doc-fn-desc">
+        Radial arc pie or donut chart with customizable inner/outer radii and slice padding angles.
+      </div>
+    </div>
+  </div>
+</div>
