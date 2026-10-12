@@ -1,0 +1,289 @@
+import { CodeBlock } from "../components/CodeBlock";
+import { Compass, Globe, Link2, Route as RouteIcon, Sparkles, Zap } from "lucide-react";
+
+export const title = "SPA Router (<Router>)";
+export const breadcrumb = "Documentation / DOM & Control Flow";
+
+export const toc = [
+  { id: "overview", title: "Overview", level: 2 },
+  { id: "basic-setup", title: "Basic Setup (<Router> & <Routes>)", level: 2 },
+  { id: "deferred-children", title: "Deferred Scope Mounts", level: 2 },
+  { id: "link-primitive", title: "Client Navigation (<Link>)", level: 2 },
+  { id: "class-preservation", title: "Class & Active State Preservation", level: 2 },
+  { id: "hooks", title: "Router Hooks (useLocation, useNavigate, useParams)", level: 2 },
+  { id: "api-reference", title: "API Reference", level: 2 },
+];
+
+Visage includes a fine-grained, zero-overhead Single Page Application (SPA) router (`@epoch32/visage/router` or exported from `@epoch32/visage`). It synchronizes browser URL history with reactive signals, eliminating whole-page reloads and bulky external routing dependencies.
+
+<div className="doc-features-grid">
+  <div className="doc-feature-card">
+    <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "6px" }}>
+      <Globe size={16} color="var(--pink-500)" />
+      <div className="doc-feature-title">HTML5 History Mode</div>
+    </div>
+    <div className="doc-feature-desc">
+      Full <code>pushState</code> and <code>popstate</code> synchronization. Direct URL paths (e.g. <code>/signals</code> or <code>/docs/signals</code>) resolve cleanly without messy <code>#hash</code> workarounds.
+    </div>
+  </div>
+
+  <div className="doc-feature-card">
+    <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "6px" }}>
+      <Zap size={16} color="var(--pink-500)" />
+      <div className="doc-feature-title">Signal-Driven Matching</div>
+    </div>
+    <div className="doc-feature-desc">
+      <code>useLocation()</code> and <code>useParams()</code> expose reactive signals that update point-to-point without re-evaluating unchanged parent component trees.
+    </div>
+  </div>
+</div>
+
+## Basic Setup (&lt;Router&gt; & &lt;Routes&gt;)
+
+Wrap your application in `<Router>` (defaults to `mode="history"`):
+
+<CodeBlock
+  filename="src/main.tsx"
+  lang="tsx"
+  code={`import { render, Router, Routes, Route, Link, useParams } from "@epoch32/visage";
+
+function HomePage() {
+  return <h1>Welcome to Visage</h1>;
+}
+
+function DocPage() {
+  const params = useParams<{ slug: string }>();
+  return <h1>Viewing Doc: {() => params().slug}</h1>;
+}
+
+function App() {
+  return (
+    <Router mode="history">
+      {() => (
+        <div class="app-layout">
+          <nav>
+            <Link href="/" class="nav-link">Home</Link>
+            <Link href="/docs/signals" class="nav-link">Signals</Link>
+          </nav>
+
+          <Routes fallback={<div>Page Not Found (404)</div>}>
+            <Route path="/" component={HomePage} />
+            <Route path="/docs/:slug" component={DocPage} />
+          </Routes>
+        </div>
+      )}
+    </Router>
+  );
+}
+
+render(() => <App />, document.getElementById("app")!);`}
+/>
+
+## Deferred Scope Mounts
+
+In Visage's fine-grained execution model, components inside a Context Provider (like `<Router>`) should be passed as a child function:
+
+<CodeBlock
+  filename="scope-pattern.tsx"
+  lang="tsx"
+  code={`// Recommended: Evaluates DocsApp inside the active RouterContext scope
+<Router mode="history">
+  {() => <DocsApp />}
+</Router>`}
+/>
+
+Passing `{() => <DocsApp />}` ensures `DocsApp` executes inside `runInScope` after `RouterContext` has been registered in the scope hierarchy, allowing hooks like `useLocation()` and `useNavigate()` to find the router instance immediately.
+
+## Client Navigation (&lt;Link&gt;)
+
+The `<Link>` component renders an accessible `<a>` tag with automatic `e.preventDefault()` and client-side history navigation:
+
+<CodeBlock
+  filename="LinkExample.tsx"
+  lang="tsx"
+  code={`import { Link } from "@epoch32/visage";
+
+export function HeaderNav() {
+  return (
+    <header class="navbar">
+      <Link href="/introduction" class="header-nav-link" activeClass="active">
+        Documentation
+      </Link>
+      <Link href="/file-api" class="header-nav-link" activeClass="active">
+        API Reference
+      </Link>
+      <Link href="/ui-primitives" class="header-nav-link" activeClass="active">
+        Components
+      </Link>
+    </header>
+  );
+}`}
+/>
+
+## Class & Active State Preservation
+
+Visage's `<Link>` accepts either `class` or `className` and seamlessly preserves base styles alongside the dynamic `activeClass`:
+
+<CodeBlock
+  filename="class-support.tsx"
+  lang="tsx"
+  code={`// Both class and className are fully supported:
+<Link href="/signals" class="header-nav-link" activeClass="is-active">
+  Signals
+</Link>
+
+<Link href="/store" className="header-nav-link">
+  Store
+</Link>`}
+/>
+
+When a route is active (matching `href`), `activeClass` (defaults to `"active"`) is appended to your base class. When inactive, your base class remains intact, preventing links from accidentally dropping their styling or reverting to browser default blue unstyled links.
+
+## Router Hooks
+
+Visage exports fine-grained reactive hooks for URL inspection and navigation:
+
+### useLocation()
+
+Returns reactive signals for the current URL components:
+- `location.pathname()`: Current path (e.g. `"/signals"`).
+- `location.search()`: Query string (e.g. `"?page=2"`).
+- `location.hash()`: Hash fragment (e.g. `"#overview"`).
+
+### useNavigate()
+
+Imperative navigation function for event handlers:
+
+<CodeBlock
+  filename="navigate-usage.ts"
+  lang="ts"
+  code={`import { useNavigate } from "@epoch32/visage";
+
+function LoginForm() {
+  const navigate = useNavigate();
+
+  const handleLogin = async () => {
+    await api.login();
+    // Navigate with pushState:
+    navigate("/dashboard");
+
+    // Or replace history entry:
+    // navigate("/dashboard", { replace: true });
+  };
+
+  return <button onClick={handleLogin}>Log In</button>;
+}`}
+/>
+
+### useParams()
+
+Returns a reactive accessor for dynamic URL pattern parameters:
+
+<CodeBlock
+  filename="params-usage.ts"
+  lang="ts"
+  code={`import { useParams } from "@epoch32/visage";
+
+// For route path="/users/:id":
+const params = useParams<{ id: string }>();
+console.log(params().id); // Reactive accessor`}
+/>
+
+## API Reference
+
+<div className="doc-api-section">
+  <div className="doc-fn-card">
+    <div className="doc-fn-header">
+      <div className="doc-fn-meta">
+        <span className="doc-fn-kind">Component</span>
+      </div>
+      <div className="doc-fn-signature">
+        &lt;Router mode=&#123;"history" | "hash"&#125; base=&#123;string&#125;&gt;&#123;children&#125;&lt;/Router&gt;
+      </div>
+    </div>
+
+    <div className="doc-fn-body">
+      <div className="doc-fn-desc">
+        Root router provider establishing HTML5 history listeners, popstate synchronization, and reactive location context.
+      </div>
+
+      <div>
+        <div className="doc-fn-subheading">Props</div>
+        <div className="doc-params-list">
+          <div className="doc-param-row">
+            <div className="doc-param-meta">
+              <span className="doc-param-name">mode</span>
+              <span className="doc-param-type">"history" | "hash"</span>
+              <span className="doc-param-badge optional">Optional</span>
+            </div>
+            <div className="doc-param-desc">
+              Navigation mode. Defaults to <code>"history"</code> for clean URL paths.
+            </div>
+          </div>
+
+          <div className="doc-param-row">
+            <div className="doc-param-meta">
+              <span className="doc-param-name">base</span>
+              <span className="doc-param-type">string</span>
+              <span className="doc-param-badge optional">Optional</span>
+            </div>
+            <div className="doc-param-desc">
+              Base URL path prefix for sub-path hosted deployments.
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div className="doc-fn-card">
+    <div className="doc-fn-header">
+      <div className="doc-fn-meta">
+        <span className="doc-fn-kind">Component</span>
+      </div>
+      <div className="doc-fn-signature">
+        &lt;Link href=&#123;string&#125; class=&#123;string&#125; activeClass=&#123;string&#125;&gt;&#123;children&#125;&lt;/Link&gt;
+      </div>
+    </div>
+
+    <div className="doc-fn-body">
+      <div className="doc-fn-desc">
+        Client-side navigation link with automatic pushState click interception and active route class toggling. Supports both <code>class</code> and <code>className</code>.
+      </div>
+    </div>
+  </div>
+
+  <div className="doc-fn-card">
+    <div className="doc-fn-header">
+      <div className="doc-fn-meta">
+        <span className="doc-fn-kind">Hook</span>
+      </div>
+      <div className="doc-fn-signature">
+        useLocation(): LocationState
+      </div>
+    </div>
+
+    <div className="doc-fn-body">
+      <div className="doc-fn-desc">
+        Returns reactive signals for current <code>pathname</code>, <code>search</code>, and <code>hash</code>.
+      </div>
+    </div>
+  </div>
+
+  <div className="doc-fn-card">
+    <div className="doc-fn-header">
+      <div className="doc-fn-meta">
+        <span className="doc-fn-kind">Hook</span>
+      </div>
+      <div className="doc-fn-signature">
+        useNavigate(): (to: string, options?: &#123; replace?: boolean &#125;) =&gt; void
+      </div>
+    </div>
+
+    <div className="doc-fn-body">
+      <div className="doc-fn-desc">
+        Returns an imperative navigation function to transition between routes programmatically.
+      </div>
+    </div>
+  </div>
+</div>

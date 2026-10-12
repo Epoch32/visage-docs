@@ -38,6 +38,7 @@ export const navigationSections: NavSection[] = [
 			{ id: "rendering", title: "Fine-Grained DOM (render)" },
 			{ id: "control-flow", title: "<Show> & <For>" },
 			{ id: "portals-suspense", title: "<Portal> & <Suspense>" },
+			{ id: "spa-router", title: "SPA Router (<Router>)" },
 			{ id: "template-literals", title: "HTML Template Literals" },
 		],
 	},

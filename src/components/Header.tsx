@@ -1,4 +1,4 @@
-import { Show } from "@epoch32/visage";
+import { Link, Show } from "@epoch32/visage";
 import { Moon, Sun } from "lucide-react";
 import { theme, toggleTheme } from "../theme";
 import "../styles/header-transitions.css";
@@ -24,9 +24,9 @@ export function Header() {
 		>
 			{/* Brand & Logo */}
 			<div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
-				<a href="/" className="header-brand">
+				<Link href="/introduction" class="header-brand">
 					<span className="header-brand-title">Visage</span>
-				</a>
+				</Link>
 			</div>
 
 			{/* Center Search Bar */}
@@ -53,15 +53,15 @@ export function Header() {
 			{/* Nav Links & Social */}
 			<nav style={{ display: "flex", alignItems: "center", gap: "8px" }}>
 				<div className="header-nav-links">
-					<a href="#docs" className="header-nav-link active">
+					<Link href="/introduction" class="header-nav-link">
 						Documentation
-					</a>
-					<a href="#api" className="header-nav-link">
+					</Link>
+					<Link href="/file-api" class="header-nav-link">
 						API Reference
-					</a>
-					<a href="#showcase" className="header-nav-link">
-						Showcase
-					</a>
+					</Link>
+					<Link href="/ui-primitives" class="header-nav-link">
+						Components
+					</Link>
 				</div>
 
 				<a

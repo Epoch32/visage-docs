@@ -1,4 +1,11 @@
-import { computed, createSignal, effect, render, ToastViewport } from "@epoch32/visage";
+import {
+	computed,
+	render,
+	Router,
+	ToastViewport,
+	useLocation,
+	useNavigate,
+} from "@epoch32/visage";
 import { DocContent } from "./components/DocContent";
 import { Header } from "./components/Header";
 import { MobileNav } from "./components/MobileNav";
@@ -8,44 +15,38 @@ import { getDocPage } from "./docs";
 import "./styles/layout.css";
 import "./styles/toast.css";
 
-function getInitialSection(): string {
-	if (typeof window !== "undefined") {
-		const hash = window.location.hash.replace(/^#\/?/, "").trim();
-		if (hash && getDocPage(hash)) {
-			return hash;
-		}
-	}
-	return "introduction";
-}
+function DocsApp() {
+	const location = useLocation();
+	const navigate = useNavigate();
 
-function App() {
-	const [activeSection, setActiveSection] = createSignal(getInitialSection(), {
-		persist: "visage-active-page",
+	// Resolve active section from current URL pathname (e.g. "/signals" or "/docs/signals")
+	const activeSection = computed(() => {
+		const rawPath = location
+			.pathname()
+			.replace(/^\/docs\/?/, "/")
+			.replace(/^\//, "")
+			.trim();
+
+		if (rawPath && getDocPage(rawPath)) {
+			return rawPath;
+		}
+		return "introduction";
 	});
 
-	// If URL has a valid hash, honor it over persisted state
+	// Migrate legacy hash URLs (e.g., incoming bookmarks to /#signals) to clean URL paths
 	if (typeof window !== "undefined") {
-		const hash = window.location.hash.replace(/^#\/?/, "").trim();
-		if (hash && getDocPage(hash) && hash !== activeSection()) {
-			setActiveSection(hash);
+		const legacyHash = window.location.hash.replace(/^#\/?/, "").trim();
+		if (legacyHash && getDocPage(legacyHash)) {
+			navigate(`/${legacyHash}`, { replace: true });
 		}
-
-		// Keep URL hash in sync with signal
-		effect(() => {
-			const id = activeSection();
-			if (window.location.hash !== `#${id}`) {
-				window.history.replaceState(null, "", `#${id}`);
-			}
-		});
-
-		// Listen for browser back / forward or link clicks
-		window.addEventListener("hashchange", () => {
-			const newHash = window.location.hash.replace(/^#\/?/, "").trim();
-			if (newHash && getDocPage(newHash) && newHash !== activeSection()) {
-				setActiveSection(newHash);
-			}
-		});
 	}
+
+	const handleSelectSection = (id: string) => {
+		navigate(`/${id}`);
+		if (typeof window !== "undefined") {
+			window.scrollTo({ top: 0, behavior: "instant" });
+		}
+	};
 
 	const currentToc = computed(() => {
 		const doc = getDocPage(activeSection());
@@ -59,7 +60,7 @@ function App() {
 			<div className="app-layout">
 				<Sidebar
 					activeId={activeSection}
-					onSelect={(id) => setActiveSection(id)}
+					onSelect={handleSelectSection}
 				/>
 
 				<main className="app-main">
@@ -71,12 +72,20 @@ function App() {
 
 			<MobileNav
 				activeId={activeSection}
-				onSelect={(id) => setActiveSection(id)}
+				onSelect={handleSelectSection}
 				toc={currentToc}
 			/>
 
 			<ToastViewport class="visage-toast-viewport" />
 		</div>
+	);
+}
+
+function App() {
+	return (
+		<Router mode="history">
+			{() => <DocsApp />}
+		</Router>
 	);
 }
 
