@@ -26,8 +26,6 @@ export function Header() {
 				<a href="/" className="header-brand">
 					<span className="header-brand-title">Visage</span>
 				</a>
-
-				<span className="header-badge">v1.0.0</span>
 			</div>
 
 			{/* Center Search Bar */}
