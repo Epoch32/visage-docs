@@ -1,47 +1,53 @@
+import { For } from "@epoch32/visage";
 import { Edit } from "lucide-react";
 import "../styles/toc.css";
 
 export interface TocItem {
-  id: string;
-  title: string;
-  level: number;
+	id: string;
+	title: string;
+	level: number;
 }
 
 interface TableOfContentsProps {
-  items: TocItem[];
+	items: TocItem[] | (() => TocItem[]);
 }
 
 export function TableOfContents(props: TableOfContentsProps) {
-  return (
-    <aside className="toc-container">
-      <div className="toc-card">
-        <div className="toc-header">
-          <span className="toc-header-dot" />
-          <span>On This Page</span>
-        </div>
+	const getItems = () =>
+		typeof props.items === "function" ? props.items() : props.items;
 
-        <ul className="toc-list">
-          {props.items.map((item) => (
-            <li key={item.id} style={{ paddingLeft: `${(item.level - 2) * 10}px` }}>
-              <a href={`#${item.id}`} className="toc-link">
-                {item.title}
-              </a>
-            </li>
-          ))}
-        </ul>
+	return (
+		<aside class="toc-container">
+			<div class="toc-card">
+				<div class="toc-header">
+					<span class="toc-header-dot" />
+					<span>On This Page</span>
+				</div>
 
-        <div className="toc-footer">
-          <a
-            href="https://github.com/Epoch32/visage-docs/issues/new"
-            target="_blank"
-            rel="noreferrer"
-            className="toc-github-edit"
-          >
-            <Edit size={12} />
-            <span>Edit on GitHub</span>
-          </a>
-        </div>
-      </div>
-    </aside>
-  );
+				<ul class="toc-list">
+					<For each={getItems}>
+						{(item) => (
+							<li style={{ paddingLeft: `${(item.level - 2) * 10}px` }}>
+								<a href={`#${item.id}`} class="toc-link">
+									{item.title}
+								</a>
+							</li>
+						)}
+					</For>
+				</ul>
+
+				<div className="toc-footer">
+					<a
+						href="https://github.com/Epoch32/visage-docs/issues/new"
+						target="_blank"
+						rel="noreferrer"
+						className="toc-github-edit"
+					>
+						<Edit size={12} />
+						<span>Edit on GitHub</span>
+					</a>
+				</div>
+			</div>
+		</aside>
+	);
 }

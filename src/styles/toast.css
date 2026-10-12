@@ -1,126 +1,137 @@
 .visage-toast-viewport {
-  position: fixed;
-  bottom: 24px;
-  right: 24px;
-  z-index: 9999;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  max-width: 380px;
-  width: calc(100vw - 48px);
-  pointer-events: none;
-  outline: none;
+	position: fixed;
+	bottom: 24px;
+	right: 24px;
+	z-index: 9999;
+	display: flex;
+	flex-direction: column;
+	gap: 10px;
+	max-width: 380px;
+	width: calc(100vw - 48px);
+	pointer-events: none;
+	outline: none;
 }
 
 .visage-toast {
-  pointer-events: auto;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  padding: 12px 16px;
-  border-radius: 12px;
-  background: var(--surface-card);
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
-  border: 1px solid var(--border-pink);
-  box-shadow: 0 10px 30px -4px rgba(0, 0, 0, 0.12), 0 2px 8px rgba(244, 114, 182, 0.2);
-  translate: 0 0;
-  scale: 1;
-  animation: toast-slide-in 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
-  transition: translate 0.25s ease, scale 0.25s ease, opacity 0.25s ease, box-shadow 0.25s ease;
+	pointer-events: auto;
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 12px;
+	padding: 12px 16px;
+	border-radius: 12px;
+	background: var(--surface-card);
+	backdrop-filter: blur(14px);
+	-webkit-backdrop-filter: blur(14px);
+	border: 1px solid var(--border-pink);
+	box-shadow:
+		0 10px 30px -4px rgba(0, 0, 0, 0.12),
+		0 2px 8px rgba(244, 114, 182, 0.2);
+	translate: 0 0;
+	scale: 1;
+	animation: toast-slide-in 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+	transition:
+		translate 0.25s ease,
+		scale 0.25s ease,
+		opacity 0.25s ease,
+		box-shadow 0.25s ease;
 }
 
 .visage-toast:hover {
-  box-shadow: 0 12px 36px -4px rgba(0, 0, 0, 0.16), 0 4px 14px rgba(244, 114, 182, 0.3);
+	box-shadow:
+		0 12px 36px -4px rgba(0, 0, 0, 0.16),
+		0 4px 14px rgba(244, 114, 182, 0.3);
 }
 
 .visage-toast-content {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-  flex: 1;
+	display: flex;
+	flex-direction: column;
+	gap: 2px;
+	flex: 1;
 }
 
 .visage-toast-title {
-  font-family: var(--font-heading);
-  font-size: 13.5px;
-  font-weight: 700;
-  color: var(--text-main);
-  line-height: 1.3;
+	font-family: var(--font-heading);
+	font-size: 13.5px;
+	font-weight: 700;
+	color: var(--text-main);
+	line-height: 1.3;
 }
 
 .visage-toast-description {
-  font-family: var(--font-body);
-  font-size: 12px;
-  color: var(--text-muted);
-  line-height: 1.4;
+	font-family: var(--font-body);
+	font-size: 12px;
+	color: var(--text-muted);
+	line-height: 1.4;
 }
 
 .visage-toast-close {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 22px;
-  height: 22px;
-  border-radius: 6px;
-  border: none;
-  background: transparent;
-  color: var(--text-muted);
-  cursor: pointer;
-  font-size: 12px;
-  translate: 0 0;
-  scale: 1;
-  transition: color 0.15s ease, background-color 0.15s ease, scale 0.15s ease;
-  padding: 0;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 22px;
+	height: 22px;
+	border-radius: 6px;
+	border: none;
+	background: transparent;
+	color: var(--text-muted);
+	cursor: pointer;
+	font-size: 12px;
+	translate: 0 0;
+	scale: 1;
+	transition:
+		color 0.15s ease,
+		background-color 0.15s ease,
+		scale 0.15s ease;
+	padding: 0;
 }
 
 .visage-toast-close:hover {
-  color: var(--pink-600);
-  background: var(--pink-50);
-  scale: 1.1;
+	color: var(--pink-600);
+	background: var(--pink-50);
+	scale: 1.1;
 }
 
 .visage-toast-close:active {
-  scale: 0.95;
+	scale: 0.95;
 }
 
 .visage-toast[data-variant="success"],
 .visage-toast.toast-success {
-  border-left: 3px solid #10b981;
+	border-left: 3px solid #10b981;
 }
 
 .visage-toast[data-variant="error"],
 .visage-toast.toast-error {
-  border-left: 3px solid #ef4444;
+	border-left: 3px solid #ef4444;
 }
 
 .visage-toast[data-variant="warning"],
 .visage-toast.toast-warning {
-  border-left: 3px solid #f59e0b;
+	border-left: 3px solid #f59e0b;
 }
 
 .visage-toast[data-variant="info"],
 .visage-toast.toast-info {
-  border-left: 3px solid var(--pink-500);
+	border-left: 3px solid var(--pink-500);
 }
 
 @keyframes toast-slide-in {
-  from {
-    opacity: 0;
-    translate: 0 16px;
-    scale: 0.95;
-  }
-  to {
-    opacity: 1;
-    translate: 0 0;
-    scale: 1;
-  }
+	from {
+		opacity: 0;
+		translate: 0 16px;
+		scale: 0.95;
+	}
+	to {
+		opacity: 1;
+		translate: 0 0;
+		scale: 1;
+	}
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .visage-toast {
-    animation: none !important;
-    transition: none !important;
-  }
+	.visage-toast {
+		animation: none !important;
+		transition: none !important;
+	}
 }

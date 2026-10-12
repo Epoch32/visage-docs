@@ -2,67 +2,69 @@
 
 :root[data-theme="dark"],
 [data-theme="dark"] {
-  /* Canvas Background: deep midnight twilight, pastel pink dot grid */
-  --bg-canvas: #15141f;
-  --bg-dots: rgba(244, 167, 187, 0.25);
+	/* Canvas Background: deep midnight twilight, pastel pink dot grid */
+	--bg-canvas: #15141f;
+	--bg-dots: rgba(244, 167, 187, 0.25);
 
-  /* Glass Surfaces & Floating Bento Cards */
-  --surface-card: rgba(26, 24, 38, 0.92);
-  --surface-glass: rgba(33, 30, 48, 0.80);
-  --surface-header: rgba(21, 20, 31, 0.88);
-  --surface-sidebar: rgba(24, 22, 36, 0.75);
+	/* Glass Surfaces & Floating Bento Cards */
+	--surface-card: rgba(26, 24, 38, 0.92);
+	--surface-glass: rgba(33, 30, 48, 0.8);
+	--surface-header: rgba(21, 20, 31, 0.88);
+	--surface-sidebar: rgba(24, 22, 36, 0.75);
 
-  /* Borders */
-  --border-subtle: rgba(255, 255, 255, 0.08);
-  --border-pink: rgba(244, 167, 187, 0.22);
-  --border-active: #f472b6;
+	/* Borders */
+	--border-subtle: rgba(255, 255, 255, 0.08);
+	--border-pink: rgba(244, 167, 187, 0.22);
+	--border-active: #f472b6;
 
-  /* Typography */
-  --text-main: #f5f5f7;       /* Crisp bright headings */
-  --text-body: #d1d1d6;       /* Comfortable reading text */
-  --text-muted: #9c9ca4;      /* Secondary & labels */
-  --text-faint: #636366;      /* Placeholders */
+	/* Typography */
+	--text-main: #f5f5f7; /* Crisp bright headings */
+	--text-body: #d1d1d6; /* Comfortable reading text */
+	--text-muted: #9c9ca4; /* Secondary & labels */
+	--text-faint: #636366; /* Placeholders */
 
-  /* Pastel Pink Accents for Dark Mode */
-  --pink-50: rgba(244, 114, 182, 0.12);
-  --pink-100: rgba(244, 114, 182, 0.18);
-  --pink-200: rgba(244, 114, 182, 0.28);
-  --pink-300: #f472b6;
-  --pink-400: #f472b6;
-  --pink-500: #ec4899;
-  --pink-600: #f472b6;
-  --pink-badge-bg: rgba(244, 114, 182, 0.16);
-  --pink-badge-text: #f9a8d4;
+	/* Pastel Pink Accents for Dark Mode */
+	--pink-50: rgba(244, 114, 182, 0.12);
+	--pink-100: rgba(244, 114, 182, 0.18);
+	--pink-200: rgba(244, 114, 182, 0.28);
+	--pink-300: #f472b6;
+	--pink-400: #f472b6;
+	--pink-500: #ec4899;
+	--pink-600: #f472b6;
+	--pink-badge-bg: rgba(244, 114, 182, 0.16);
+	--pink-badge-text: #f9a8d4;
 
-  /* Code & Pre */
-  --code-bg: #1c1a29;
-  --code-text: #e0def4;
-  --code-inline-bg: rgba(244, 114, 182, 0.15);
-  --code-inline-text: #f9a8d4;
+	/* Code & Pre */
+	--code-bg: #1c1a29;
+	--code-text: #e0def4;
+	--code-inline-bg: rgba(244, 114, 182, 0.15);
+	--code-inline-text: #f9a8d4;
 
-  /* Shadows */
-  --shadow-sm: 0 1px 3px 0 rgba(0, 0, 0, 0.35);
-  --shadow-card: 0 4px 24px -2px rgba(0, 0, 0, 0.45), 0 2px 8px -1px rgba(244, 167, 187, 0.08);
-  --shadow-glass: 0 8px 32px 0 rgba(0, 0, 0, 0.4);
+	/* Shadows */
+	--shadow-sm: 0 1px 3px 0 rgba(0, 0, 0, 0.35);
+	--shadow-card:
+		0 4px 24px -2px rgba(0, 0, 0, 0.45),
+		0 2px 8px -1px rgba(244, 167, 187, 0.08);
+	--shadow-glass: 0 8px 32px 0 rgba(0, 0, 0, 0.4);
 }
 
 [data-theme="dark"] ::-webkit-scrollbar-thumb {
-  background: rgba(244, 167, 187, 0.25);
+	background: rgba(244, 167, 187, 0.25);
 }
 
 [data-theme="dark"] ::-webkit-scrollbar-thumb:hover {
-  background: rgba(244, 167, 187, 0.4);
+	background: rgba(244, 167, 187, 0.4);
 }
 
 [data-theme="dark"] .sidebar-scroll::-webkit-scrollbar-thumb {
-  background-color: rgba(244, 167, 187, 0.35);
+	background-color: rgba(244, 167, 187, 0.35);
 }
 
 [data-theme="dark"] .sidebar-scroll:hover::-webkit-scrollbar-thumb {
-  background-color: var(--pink-400);
+	background-color: var(--pink-400);
 }
 
 [data-theme="dark"] ::selection {
-  background: rgba(244, 114, 182, 0.35);
-  color: #fdf2f8;
+	background: rgba(244, 114, 182, 0.35);
+	color: #fdf2f8;
 }
