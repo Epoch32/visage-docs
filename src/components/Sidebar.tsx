@@ -19,6 +19,7 @@ export const navigationSections: NavSection[] = [
 			{ id: "introduction", title: "Introduction" },
 			{ id: "quickstart", title: "Quickstart" },
 			{ id: "philosophy", title: "Zero-VDOM Architecture" },
+			{ id: "comparison", title: "Framework Comparison" },
 			{ id: "typescript", title: "TypeScript Setup" },
 		],
 	},

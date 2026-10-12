@@ -1,0 +1,134 @@
+import { CodeBlock } from "../components/CodeBlock";
+import { CheckCircle2, Cpu, HelpCircle, Layers, ShieldCheck, Sparkles, Zap, Package, Compass } from "lucide-react";
+
+export const title = "Framework Comparison";
+export const breadcrumb = "Documentation / Getting Started";
+
+Why would you choose Visage over existing solutions like SolidJS, Preact Signals, Svelte, or React?
+
+While fine-grained signals have become the industry standard for UI state, most options on the market are either **isolated rendering libraries** that require stitching together dozens of unaligned third-party packages, or **Virtual DOM abstractions** where signals are retrofitted as partial performance patches.
+
+Visage is architected as an **integrated, full-stack application engine** designed from day one around Zero-VDOM fine-grained reactivity.
+
+<div className="doc-features-grid">
+  <div className="doc-feature-card">
+    <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "6px" }}>
+      <Package size={16} color="var(--pink-500)" />
+      <div className="doc-feature-title">Batteries-Included Cohesion</div>
+    </div>
+    <div className="doc-feature-desc">
+      First-class SVG charts, headless accessible UI primitives, 4px spatial layouts, full-stack typed RPC, forms, devtools, and virtualization built natively for signals.
+    </div>
+  </div>
+
+  <div className="doc-feature-card">
+    <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "6px" }}>
+      <Zap size={16} color="var(--pink-500)" />
+      <div className="doc-feature-title">Zero Virtual DOM Overhead</div>
+    </div>
+    <div className="doc-feature-desc">
+      Components execute once as constructors. Point-to-point reactive bindings mutate living DOM text nodes and attributes in microseconds without VNode allocations.
+    </div>
+  </div>
+</div>
+
+## Quick Comparison Matrix
+
+Here is how Visage compares across core architectural traits:
+
+| Feature / Trait | Visage | SolidJS | Preact Signals | Svelte 5 | React 19 |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| **Rendering Architecture** | **Direct DOM (Zero VDOM)** | Direct DOM (Zero VDOM) | Virtual DOM (Text Fast-path) | Direct DOM (Compiled) | Virtual DOM (Fiber Reconciler) |
+| **Component Execution** | **Runs Once on Mount** | Runs Once on Mount | Re-executes on non-signal state | Re-evaluates on runes | Re-runs on *every* update |
+| **Hook Rules / Dependency Arrays** | **None** | None | Traditional React Hooks Rules | None | Strict Hook Rules (`useMemo`, `useCallback`) |
+| **Built-in Reactive Charts** | **Yes (`@epoch32/visage/charts`)** | No (External wrappers) | No | No | No (Recharts, Chart.js) |
+| **Built-in Headless UI Primitives** | **Yes (`@epoch32/visage/ui`)** | No (Kobalte / Corvu) | No | No (Melt UI) | No (Radix, HeadlessUI) |
+| **Built-in Spatial Layout & Grid** | **Yes (`@epoch32/visage/style`)** | No | No | No | No |
+| **Full-Stack Typed RPC & SSE** | **Yes (`@epoch32/visage/rpc`)** | Needs SolidStart + tRPC | No | Needs SvelteKit + tRPC | Needs Next.js / Server Actions |
+| **In-Browser Reactive DevTools** | **Yes (Built-in DAG Inspector)** | Separate Browser Ext | No | Svelte Inspector | React DevTools Ext |
+| **Template Syntax Flexibility** | **JSX + HTML Tagged Literals** | JSX Only | JSX Only | Proprietary `.svelte` DSL | JSX Only |
+
+## Visage vs SolidJS
+
+Solid is the closest architectural peer to Visage in its fine-grained JSX rendering model. The key difference is **breadth and cohesion**:
+
+### 1. Minimal View Library vs. Full Application Engine
+- **SolidJS**: Consciously limits its scope to the reactive core and JSX transform. To build production SaaS applications, teams must assemble a patchwork of external libraries for charts, headless modals, form validation, virtualization, devtools, and RPC. These third-party libraries often lag behind Solid releases or differ in API conventions.
+- **Visage**: Ships a unified, end-to-end framework. `@epoch32/visage/charts`, `@epoch32/visage/ui`, `@epoch32/visage/form`, `@epoch32/visage/virtual`, and `@epoch32/visage/rpc` share identical reactive conventions, design tokens, and error-handling semantics.
+
+### 2. Dual Paradigm: JSX and Tagged Template Literals
+In Solid, you are strictly bound to JSX compilation. Visage supports both **JSX** and native browser **`html` tagged template literals** without build steps:
+
+<CodeBlock
+  filename="ZeroBuildExample.ts"
+  lang="ts"
+  code={`import { html, render, createSignal } from "@epoch32/visage";
+
+const [count, setCount] = createSignal(0);
+
+// Pre-cloned template fragment with direct signal binding:
+const element = html\`
+  <button onClick=\${() => setCount(c => c + 1)}>
+    Clicks: \${count}
+  </button>
+\`;
+
+render(() => element, document.body);`}
+/>
+
+### 3. Integrated Live DAG DevTools
+Visage includes an in-browser devtools drawer (`@epoch32/visage/devtools`) out of the box with zero browser extension installation. It visualizes the active push-pull DAG topological linkages, tracks live store mutations, and logs RPC SSE streams in real time.
+
+## Visage vs Preact Signals
+
+Preact Signals introduced fine-grained state to the Preact and React ecosystems. However, its core execution model remains fundamentally tied to the Virtual DOM:
+
+### 1. The Virtual DOM Re-render Tax
+Preact Signals provides a fast-path optimization for text nodes that receive a signal directly. But as soon as props, component children, or non-signal dependencies change:
+- Preact must re-execute the component function.
+- It allocates new VNode fiber structures.
+- It runs the diffing and reconciliation algorithm across child trees.
+
+Visage eliminates the Virtual DOM entirely. Component functions **never re-run after mount**. When a signal updates, only the precise Text node or DOM attribute listener mutates in place.
+
+### 2. No Stale Closures or Hook Dependencies
+Because Preact adheres to the React hook paradigm, developers must manage dependency arrays, `useMemo`, and `useCallback` to avoid stale closures. In Visage, functions declare point-to-point connections once; signals are live accessors, eliminating stale closure hazards permanently.
+
+## Visage vs Svelte 5
+
+Svelte 5 introduced "Runes" (`$state`, `$derived`, `$effect`) to adopt fine-grained signals.
+
+### 1. TypeScript Freedom vs Proprietary Compiler DSL
+- **Svelte 5**: Requires a proprietary compiler and `.svelte` single-file components. You cannot declare multiple reactive components inside a single plain `.ts` file or easily compose UI helpers outside the Svelte compiler's dialect.
+- **Visage**: 100% standard TypeScript. Components are standard functions, signals are standard JavaScript accessors, and templates can be either JSX or tagged literals. You can define, export, and compose multiple components anywhere in your TypeScript codebase.
+
+### 2. Disappearing Component Instances
+In Svelte, components maintain an internal component instance object in memory. In Visage, components are constructor functions that discard themselves as soon as initial DOM wiring is complete. Only the subscribed DOM nodes and signal DAG nodes remain in memory, giving Visage an extraordinarily small memory profile.
+
+## Visage vs React 19
+
+React relies on whole-component re-evaluation and Virtual DOM diffing.
+
+### 1. Execution Model
+- In React, calling `setState()` re-evaluates the entire component function from line 1 to the end, triggering child re-renders unless explicitly mitigated with `React.memo`, `useCallback`, and `useMemo`.
+- In Visage, calling `setSignal()` updates only the DOM nodes subscribed to that signal. The component function never re-runs, and unconcerned child trees are completely bypassed.
+
+### 2. Runtime Footprint
+- **React**: React + React-DOM is ~45–50 kB minified before adding state management (Zustand/Redux), routing (React Router), and UI primitives (Radix).
+- **Visage**: Core signals + DOM runtime is **under 8 kB minified**. Everything else (router, charts, UI primitives) tree-shakes cleanly when not imported.
+
+## When Should You Choose Visage?
+
+<div className="doc-api-section">
+  <div className="doc-api-header">
+    <div className="doc-api-name">Ideal Use Cases for Visage</div>
+  </div>
+  <div className="doc-api-body">
+    <ul style={{ paddingLeft: "20px", margin: "0", color: "var(--text-body)", lineHeight: "1.8" }}>
+      <li><strong>Data-Dense SaaS Dashboards</strong>: High-frequency real-time updates (WebSockets, SSE streams) where Virtual DOM reconciliation would cause dropped animation frames.</li>
+      <li><strong>Interactive Visualizations & Tooling</strong>: Applications requiring reactive SVG charts, canvas scrubbers, and live parameter tuning that need zero-overhead 120 FPS rendering.</li>
+      <li><strong>Unified Full-Stack Projects</strong>: Teams that want a clean, batteries-included stack with built-in typed RPC, headless UI, and spatial layout engines without maintaining dozens of third-party dependencies.</li>
+      <li><strong>Edge & Micro-Frontend Apps</strong>: Workloads where tiny runtime footprint, high-speed hydration, and zero-build tagged template literal support are critical.</li>
+    </ul>
+  </div>
+</div>

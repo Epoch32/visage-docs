@@ -50,7 +50,13 @@ export function MobileNav(props: MobileNavProps) {
 
 	const activeCategory = () => {
 		const id = props.activeId();
-		if (id === "introduction" || id === "quickstart" || id === "philosophy" || id === "typescript") {
+		if (
+			id === "introduction" ||
+			id === "quickstart" ||
+			id === "philosophy" ||
+			id === "comparison" ||
+			id === "typescript"
+		) {
 			return "intro";
 		}
 		if (["signals", "computed", "effects", "store", "batch-scope"].includes(id)) {
