@@ -1,4 +1,4 @@
-import { Show, toast } from "@epoch32/visage";
+import { Show, Suspense, toast } from "@epoch32/visage";
 import { Share2 } from "lucide";
 import { getDocPage } from "../docs";
 import { Callout } from "./Callout";
@@ -81,7 +81,15 @@ export function DocContent(props: DocContentProps) {
 									<span>Share</span>
 								</button>
 							</div>
-							<Content components={defaultMdxComponents} />
+							<Suspense
+								fallback={
+									<div style={{ padding: "40px 0", color: "var(--text-muted)" }}>
+										Loading documentation...
+									</div>
+								}
+							>
+								<Content components={defaultMdxComponents} />
+							</Suspense>
 						</div>
 					);
 				}}

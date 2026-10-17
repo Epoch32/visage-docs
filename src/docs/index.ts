@@ -1,42 +1,36 @@
-import type { Child } from "@epoch32/visage";
+import { lazy, type Child } from "@epoch32/visage";
+import { docsMetadata } from "virtual:docs-metadata";
 import type { TocItem } from "../components/TableOfContents";
 
 export interface DocModule {
 	title: string;
 	breadcrumb?: string;
 	toc: TocItem[];
-	default: () => Child;
+	default: (props?: any) => Child;
+	preload: () => Promise<any>;
 }
 
-// Vite auto-discovers both .mdx and .tsx doc page files in this directory
-const tsxModules = import.meta.glob<DocModule>("./*.tsx", { eager: true });
-const mdxModules = import.meta.glob<DocModule>("./*.mdx", { eager: true });
+// Vite auto-discovers all .mdx page files as on-demand code-split chunks (lazy dynamic imports)
+const mdxLoaders = import.meta.glob<any>("./*.mdx");
 
 export const docsRegistry: Record<string, DocModule> = {};
 
-// Register TSX docs first
-for (const path in tsxModules) {
-	const key = path.replace(/^\.\//, "").replace(/\.tsx$/, "");
-	docsRegistry[key] = tsxModules[path]!;
-}
-
-// MDX docs override or complement TSX docs
-for (const path in mdxModules) {
+for (const path in mdxLoaders) {
 	const key = path.replace(/^\.\//, "").replace(/\.mdx$/, "");
-	const mod = mdxModules[path] as any;
-	let toc: TocItem[] = mod.toc ?? [];
+	const loader = mdxLoaders[path]!;
+	const meta = docsMetadata[key] ?? {
+		title: key,
+		toc: [],
+	};
 
-	if (mod.__autoToc) {
-		try {
-			toc = typeof mod.__autoToc === "string" ? JSON.parse(mod.__autoToc) : mod.__autoToc;
-		} catch {
-			// fallback to mod.toc
-		}
-	}
+	const LazyComponent = lazy(loader);
 
 	docsRegistry[key] = {
-		...mod,
-		toc,
+		title: meta.title,
+		breadcrumb: meta.breadcrumb,
+		toc: meta.toc,
+		default: LazyComponent,
+		preload: () => LazyComponent.preload(),
 	};
 }
 

@@ -107,7 +107,7 @@ function DocsApp() {
 
 function App() {
 	return (
-		<Router mode="history">
+		<Router mode="history" prefetch="hover">
 			{() => <DocsApp />}
 		</Router>
 	);

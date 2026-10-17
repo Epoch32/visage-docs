@@ -1,4 +1,5 @@
-import { Tabs, TabsList, TabsTrigger } from "@epoch32/visage";
+import { Link } from "@epoch32/visage";
+import { getDocPage } from "../docs";
 import "../styles/sidebar.css";
 
 export interface NavItem {
@@ -79,54 +80,59 @@ export const navigationSections: NavSection[] = [
 
 interface SidebarProps {
 	activeId: () => string;
-	onSelect: (id: string) => void;
+	onSelect?: (id: string) => void;
 }
 
 export function Sidebar(props: SidebarProps) {
 	return (
 		<aside class="sidebar-container">
 			<div class="sidebar-scroll sidebar-scroll-wrapper">
-				<Tabs
-					value={props.activeId}
-					onValueChange={props.onSelect}
-					orientation="vertical"
-					class="sidebar-sections"
-				>
-					{() => (
-						<TabsList class="sidebar-tabs-list">
-							{navigationSections.map((section) => (
-								<div class="sidebar-section-group">
-									<div class="sidebar-section-title">{section.title}</div>
+				<div class="sidebar-sections">
+					{navigationSections.map((section) => (
+						<div class="sidebar-section-group">
+							<div class="sidebar-section-title">{section.title}</div>
 
-									<nav class="sidebar-nav-list">
-										{section.items.map((item) => (
-											<TabsTrigger value={item.id} class="sidebar-nav-item">
-												<span
-													style={{
-														display: "flex",
-														alignItems: "center",
-														gap: "8px",
-													}}
-												>
-													<span class="sidebar-active-indicator" />
-													<span>{item.title}</span>
-												</span>
+							<nav class="sidebar-nav-list">
+								{section.items.map((item) => (
+									<Link
+										href={`/${item.id}`}
+										class={() =>
+											`sidebar-nav-item ${props.activeId() === item.id ? "active" : ""}`
+										}
+										onPointerEnter={() => {
+											getDocPage(item.id)?.preload();
+										}}
+										onClick={() => {
+											if (typeof window !== "undefined") {
+												window.scrollTo({ top: 0, behavior: "instant" });
+											}
+											props.onSelect?.(item.id);
+										}}
+									>
+										<span
+											style={{
+												display: "flex",
+												alignItems: "center",
+												gap: "8px",
+											}}
+										>
+											<span class="sidebar-active-indicator" />
+											<span>{item.title}</span>
+										</span>
 
-												{item.badge && (
-													<span
-														class={`sidebar-badge ${item.badge.toLowerCase() === "experimental" ? "experimental" : ""}`}
-													>
-														{item.badge}
-													</span>
-												)}
-											</TabsTrigger>
-										))}
-									</nav>
-								</div>
-							))}
-						</TabsList>
-					)}
-				</Tabs>
+										{item.badge && (
+											<span
+												class={`sidebar-badge ${item.badge.toLowerCase() === "experimental" ? "experimental" : ""}`}
+											>
+												{item.badge}
+											</span>
+										)}
+									</Link>
+								))}
+							</nav>
+						</div>
+					))}
+				</div>
 			</div>
 		</aside>
 	);

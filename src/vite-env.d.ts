@@ -8,3 +8,12 @@ declare module "*.mdx" {
 	const Component: (props?: any) => Child;
 	export default Component;
 }
+
+declare module "virtual:docs-metadata" {
+	export interface DocMetadata {
+		title: string;
+		breadcrumb?: string;
+		toc: Array<{ id: string; title: string; level: number }>;
+	}
+	export const docsMetadata: Record<string, DocMetadata>;
+}

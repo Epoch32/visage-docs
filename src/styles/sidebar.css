@@ -100,6 +100,8 @@
 	align-items: center;
 	justify-content: space-between;
 	width: 100%;
+	box-sizing: border-box;
+	text-decoration: none;
 	text-align: left;
 	padding: 7px 12px;
 	border-radius: 10px;
