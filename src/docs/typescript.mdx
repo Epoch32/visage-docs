@@ -1,42 +1,17 @@
-import { CodeBlock } from "../components/CodeBlock";
-import { CheckCircle2, Code2, Sparkles, Terminal } from "lucide-react";
-
 export const title = "TypeScript Setup";
 export const breadcrumb = "Documentation / Getting Started";
 
-export const toc = [
-  { id: "overview", title: "Overview", level: 2 },
-  { id: "tsconfig", title: "Compiler Configuration (tsconfig.json)", level: 2 },
-  { id: "jsx-runtime", title: "JSX Runtime & Typing", level: 2 },
-  { id: "typing-components", title: "Typing Components & Props", level: 2 },
-  { id: "typing-signals", title: "Typing Signals & Stores", level: 2 },
-  { id: "dom-refs", title: "DOM References (Refs)", level: 2 },
-  { id: "vite-types", title: "Vite Environment Definitions", level: 2 },
-];
-
 Visage is authored in strict TypeScript and provides first-class type definitions for JSX elements, HTML attributes, reactive signals, stores, and DOM references without requiring `@types/react`.
 
-<div className="doc-features-grid">
-  <div className="doc-feature-card">
-    <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "6px" }}>
-      <Code2 size={16} color="var(--pink-500)" />
-      <div className="doc-feature-title">Native JSX Declarations</div>
-    </div>
-    <div className="doc-feature-desc">
-      Full autocomplete for HTML5 and SVG tags, ARIA attributes, event handlers, and Visage-specific reactive property bindings.
-    </div>
-  </div>
+<FeatureGrid>
+  <FeatureCard icon="code" title="Native JSX Declarations">
+    Full autocomplete for HTML5 and SVG tags, ARIA attributes, event handlers, and Visage-specific reactive property bindings.
+  </FeatureCard>
 
-  <div className="doc-feature-card">
-    <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "6px" }}>
-      <CheckCircle2 size={16} color="var(--pink-500)" />
-      <div className="doc-feature-title">End-to-End Type Safety</div>
-    </div>
-    <div className="doc-feature-desc">
-      Type-safe signals, reactive stores with deep path proxy inferences, and Standard Schema v1 validation for forms and RPC endpoints.
-    </div>
-  </div>
-</div>
+  <FeatureCard icon="check-circle-2" title="End-to-End Type Safety">
+    Type-safe signals, reactive stores with deep path proxy inferences, and Standard Schema v1 validation for forms and RPC endpoints.
+  </FeatureCard>
+</FeatureGrid>
 
 ## Compiler Configuration (tsconfig.json)
 
@@ -60,15 +35,9 @@ To configure TypeScript for Visage JSX, set `jsx` to `"preserve"` (or `"react-js
 }`}
 />
 
-<div className="doc-callout">
-  <div className="doc-callout-icon">
-    <Sparkles size={18} color="var(--pink-500)" />
-  </div>
-  <div className="doc-callout-body">
-    <div className="doc-callout-title">Automatic JSX Import</div>
-    With <code>"jsxImportSource": "@epoch32/visage"</code>, the TypeScript compiler automatically resolves the Visage JSX factory from <code>@epoch32/visage/jsx-runtime</code>. You never need to import <code>h</code> or <code>jsx</code> manually.
-  </div>
-</div>
+<Callout type="tip" title="Automatic JSX Import">
+  With <code>"jsxImportSource": "@epoch32/visage"</code>, the TypeScript compiler automatically resolves the Visage JSX factory from <code>@epoch32/visage/jsx-runtime</code>. You never need to import <code>h</code> or <code>jsx</code> manually.
+</Callout>
 
 ## JSX Runtime & Typing
 

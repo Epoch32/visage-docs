@@ -1,0 +1,240 @@
+export const title = "Reactive Forms & Schema Validation";
+export const breadcrumb = "Documentation / Headless UI & Charts";
+
+Visage Forms (`@epoch32/visage/form`) provides fine-grained reactive form management powered by signals. Unlike traditional form libraries that trigger top-to-bottom re-renders on every keystroke, Visage updates only the specific input, error message, or submit button that changed.
+
+<FeatureGrid>
+  <FeatureCard icon="zap" title="Zero-VDOM Granular Binding">
+    Each form field is an independent signal. Typing into an input never re-evaluates the component tree or adjacent inputs.
+  </FeatureCard>
+
+  <FeatureCard icon="shield" title="Standard Schema v1 Support">
+    First-class compatibility with the Standard Schema specification. Use the built-in <code>v</code> micro-validator, Zod, Valibot, or ArkType without wrapper adapters.
+  </FeatureCard>
+
+  <FeatureCard icon="file-code" title="Instant Declarative Binding">
+    The <code>form.bind("name")</code> helper synchronizes values, blur events, touch state, and dirty flags with native HTML inputs or custom controls.
+  </FeatureCard>
+
+  <FeatureCard icon="check" title="Reactive Lifecycle Tracking">
+    Reactive signals for <code>isValid</code>, <code>isDirty</code>, <code>isSubmitting</code>, and <code>submitCount</code> make disabling buttons and showing progress trivial.
+  </FeatureCard>
+</FeatureGrid>
+
+## Form State with createForm
+
+Initialize a form instance using `createForm`. Pass `initialValues` and optional validation rules, validation trigger mode, and submission handlers:
+
+<CodeBlock
+  filename="components/UserProfileForm.tsx"
+  lang="tsx"
+  code={`import { createForm, v } from "@epoch32/visage/form";
+import { Show } from "@epoch32/visage";
+
+interface ProfileValues {
+  username: string;
+  email: string;
+  age: number;
+  newsletter: boolean;
+}
+
+export function UserProfileForm() {
+  const form = createForm<ProfileValues>({
+    initialValues: {
+      username: "",
+      email: "",
+      age: 18,
+      newsletter: false,
+    },
+    schema: v.object({
+      username: v.string().min(3, "Must be at least 3 characters"),
+      email: v.string().email("Enter a valid email address"),
+      age: v.number().min(18, "Must be at least 18"),
+      newsletter: v.boolean(),
+    }),
+    validateOn: "blur", // "change" | "blur" | "submit"
+    onSubmit: async (values) => {
+      await fetch("/api/profile", {
+        method: "POST",
+        body: JSON.stringify(values),
+      });
+    },
+  });
+
+  return (
+    <form onSubmit={form.handleSubmit} class="space-y-4">
+      <div>
+        <label class="block text-sm font-medium">Username</label>
+        <input {...form.bind("username")} class="input-primary" />
+        <Show when={() => form.fields.username.error()}>
+          {(err) => <span class="text-sm text-red-500">{err()}</span>}
+        </Show>
+      </div>
+
+      <button
+        type="submit"
+        disabled={() => form.isSubmitting() || !form.isValid()}
+        class="btn-primary"
+      >
+        {() => (form.isSubmitting() ? "Saving..." : "Save Profile")}
+      </button>
+    </form>
+  );
+}`}
+/>
+
+## Two-Way Binding (form.bind)
+
+The `form.bind(fieldName)` helper generates standard HTML attributes that wire up two-way reactivity:
+
+- `name`: Field name string.
+- `value`: Writable signal holding the current field value.
+- `onInput`: Change event listener that parses text input, checkbox `checked` state, or select dropdown values.
+- `onBlur`: Marks the field as touched.
+
+<CodeBlock
+  filename="components/BindingExamples.tsx"
+  lang="tsx"
+  code={`// Native text input
+<input type="text" {...form.bind("email")} />
+
+// Checkbox (bind automatically tracks event.target.checked)
+<input type="checkbox" {...form.bind("newsletter")} />
+
+// Textarea
+<textarea {...form.bind("bio")} rows={4} />
+
+// Manual binding if custom transformation is needed
+<input
+  value={() => form.fields.username.value()}
+  onInput={(e) => form.setFieldValue("username", e.currentTarget.value.toLowerCase())}
+  onBlur={() => form.fields.username.touched.set(true)}
+/>`}
+/>
+
+## Schema Validation with v
+
+Visage includes a built-in micro-validator `v` with zero external dependencies. It supports common schema types and constraints:
+
+<CodeBlock
+  filename="lib/validators.ts"
+  lang="ts"
+  code={`import { v } from "@epoch32/visage/form";
+
+export const signupSchema = v.object({
+  // String validation with constraints
+  name: v.string().min(2, "Name too short").max(50),
+  email: v.string().email("Invalid email address"),
+  website: v.string().regex(/^https?:\\/\\//, "Must be a valid URL").optional(),
+
+  // Number validation
+  age: v.number().min(13, "Must be 13 or older").integer("Must be a whole number"),
+
+  // Boolean validation
+  terms: v.boolean(),
+
+  // Arbitrary records or any types
+  metadata: v.record().optional(),
+  payload: v.any().optional(),
+});`}
+/>
+
+## Standard Schema (Zod, Valibot, ArkType)
+
+Visage natively supports the [Standard Schema v1](https://standardschema.dev) specification (`~standard`). Any library complying with Standard Schema works directly with `createForm` without third-party resolvers:
+
+<CodeBlock
+  filename="components/ZodForm.tsx"
+  lang="tsx"
+  code={`import { createForm } from "@epoch32/visage/form";
+import { z } from "zod";
+
+const registrationSchema = z.object({
+  email: z.string().email(),
+  password: z.string().min(8, "Password must be at least 8 characters"),
+  confirmPassword: z.string(),
+}).refine((data) => data.password === data.confirmPassword, {
+  message: "Passwords do not match",
+  path: ["confirmPassword"],
+});
+
+export function RegistrationForm() {
+  const form = createForm({
+    initialValues: { email: "", password: "", confirmPassword: "" },
+    schema: registrationSchema,
+    onSubmit: async (values) => {
+      console.log("Registered:", values);
+    },
+  });
+
+  return (
+    <form onSubmit={form.handleSubmit}>
+      <input type="email" {...form.bind("email")} />
+      <input type="password" {...form.bind("password")} />
+      <input type="password" {...form.bind("confirmPassword")} />
+      <button type="submit">Register</button>
+    </form>
+  );
+}`}
+/>
+
+## Submission & Async Handling
+
+`form.handleSubmit` accepts an optional event argument, calls `preventDefault()`, marks all fields as touched, validates the entire form against the schema, and executes `onSubmit`:
+
+<CodeBlock
+  filename="components/SubmitHandling.tsx"
+  lang="tsx"
+  code={`const form = createForm({
+  initialValues: { query: "" },
+  onSubmit: async (values) => {
+    // isSubmitting signal is set to true automatically
+    await runSearch(values.query);
+    // isSubmitting returns to false when promise settles
+  },
+});
+
+// Programmatic submission
+async function onExternalTrigger() {
+  const success = await form.handleSubmit();
+  if (success) {
+    console.log("Form validated and submitted successfully");
+  } else {
+    console.log("Validation errors exist:", form.errors());
+  }
+}
+
+// Reset form back to initial values or new defaults
+function onClear() {
+  form.reset();
+}`}
+/>
+
+## API Reference
+
+### createForm Options
+
+| Option | Type | Default | Description |
+| :--- | :--- | :--- | :--- |
+| `initialValues` | `T` | Required | Initial snapshot of field values. |
+| `schema` | `SchemaLike<any>` | `undefined` | Built-in `v` schema, Standard Schema (`zod`, `valibot`, `arktype`), or custom function. |
+| `validateOn` | `"change" \| "blur" \| "submit"` | `"change"` | When field validation errors are surfaced to `field.error`. |
+| `onSubmit` | `(values: T) => void \| Promise<void>` | `undefined` | Callback invoked upon valid form submission. |
+
+### Form Return Object
+
+| Property / Method | Type | Description |
+| :--- | :--- | :--- |
+| `fields` | `FormFields<T>` | Map of each field containing `value`, `error`, `touched`, and `isDirty` signals. |
+| `values` | `() => T` | Getter function returning an object snapshot of current form values. |
+| `errors` | `ReadonlySignal<Partial<Record<keyof T, string>>>` | Reactive map of active field error strings. |
+| `isValid` | `ReadonlySignal<boolean>` | `true` when there are zero validation errors. |
+| `isDirty` | `ReadonlySignal<boolean>` | `true` if any field value differs from its `initialValues`. |
+| `isSubmitting` | `ReadonlySignal<boolean>` | `true` while the `onSubmit` promise is pending. |
+| `submitCount` | `ReadonlySignal<number>` | Number of submission attempts made. |
+| `bind(name)` | `(name: keyof T) => { name, value, onInput, onBlur }` | Generates props for two-way input binding. |
+| `handleSubmit(e?)` | `(e?: Event) => Promise<boolean>` | Form submission handler. |
+| `reset(values?)` | `(values?: Partial<T>) => void` | Resets fields to initial state or overrides with new defaults. |
+| `setFieldValue(name, val)` | `<K>(name: K, value: T[K]) => void` | Programmatically sets a field value signal. |
+| `setFieldError(name, err)` | `(name: keyof T, error: string \| null) => void` | Programmatically sets or clears a custom field error. |
+| `validate()` | `() => boolean` | Evaluates schema rules immediately and returns validation success. |

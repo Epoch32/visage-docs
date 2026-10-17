@@ -1,5 +1,5 @@
 import { createSignal, effect } from "@epoch32/visage";
-import { Play, Plus, Power, RefreshCw } from "lucide-react";
+import { Play, Plus, Power, RefreshCw } from "lucide";
 
 export function EffectLoggerSandbox() {
 	const [active, setActive] = createSignal(true);

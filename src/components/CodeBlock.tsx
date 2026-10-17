@@ -1,5 +1,5 @@
 import { createSignal, effect, toast } from "@epoch32/visage";
-import { Check, Copy } from "lucide-react";
+import { Check, Copy } from "lucide";
 import { highlightCode } from "../lib/highlighter";
 import "../styles/codeblock.css";
 

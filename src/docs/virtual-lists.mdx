@@ -1,46 +1,25 @@
-import { CodeBlock } from "../components/CodeBlock";
-import { Cpu, Eye, Gauge, Layers, Sparkles } from "lucide-react";
-
 export const title = "Virtualizer (100k+ Rows)";
 export const breadcrumb = "Documentation / Headless UI & Charts";
 
-export const toc = [
-  { id: "overview", title: "Overview", level: 2 },
-  { id: "virtual-list-primitive", title: "Virtual List (<VirtualList>)", level: 2 },
-  { id: "variable-heights", title: "Dynamic Variable Heights", level: 2 },
-  { id: "headless-virtualizer", title: "Headless Virtualizer (createVirtualizer)", level: 2 },
-  { id: "virtual-grid", title: "2D Grid Virtualization (<VirtualGrid>)", level: 2 },
-  { id: "performance", title: "Performance Benchmarks", level: 2 },
-  { id: "api-reference", title: "API Reference", level: 2 },
-];
+Rendering tens of thousands of DOM nodes causes severe browser memory bloat and sluggish scrolling. Visage includes a high-performance virtualization engine (`@epoch32/visage/virtual`) capable of rendering 100,000+ items at constant 60fps with sub-millisecond scrolling latency.
 
-Rendering tens of thousands of DOM nodes causes severe browser memory bloat and sluggish scrolling. Visage includes a high-performance virtualization engine (`visage/virtual`) capable of rendering 100,000+ items at constant 60fps with sub-millisecond scrolling latency.
+<FeatureGrid>
+  <FeatureCard icon="zap" title="Constant DOM Footprint">
+    Only mounts the exact slice of visible DOM nodes plus a configurable overscan buffer. 100,000 items consume the same DOM memory as 20 items.
+  </FeatureCard>
 
-<div className="doc-features-grid">
-  <div className="doc-feature-card">
-    <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "6px" }}>
-      <Gauge size={16} color="var(--pink-500)" />
-      <div className="doc-feature-title">Constant DOM Footprint</div>
-    </div>
-    <div className="doc-feature-desc">
-      Only mounts the exact slice of visible DOM nodes plus a configurable overscan buffer. 100,000 items consume the same DOM memory as 20 items.
-    </div>
-  </div>
+  <FeatureCard icon="cpu" title="Fine-Grained Item Updates">
+    Mutations to individual items update through signal accessors without re-virtualizing or remounting the rest of the list.
+  </FeatureCard>
 
-  <div className="doc-feature-card">
-    <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "6px" }}>
-      <Cpu size={16} color="var(--pink-500)" />
-      <div className="doc-feature-title">Fine-Grained Item Updates</div>
-    </div>
-    <div className="doc-feature-desc">
-      Mutations to individual items update through signal accessors without re-virtualizing or remounting the rest of the list.
-    </div>
-  </div>
-</div>
+  <FeatureCard icon="layers" title="2D Bidirectional Virtualization">
+    <code>&lt;VirtualGrid&gt;</code> virtualizes both rows and columns simultaneously with custom cell key tracking to prevent unneeded DOM churn.
+  </FeatureCard>
+</FeatureGrid>
 
 ## Virtual List (&lt;VirtualList&gt;)
 
-Use `<VirtualList>` to virtualize large vertical lists with fixed or estimated item heights:
+Use `<VirtualList>` to virtualize large vertical lists with fixed or dynamic item heights:
 
 <CodeBlock
   filename="VirtualListExample.tsx"
@@ -63,32 +42,34 @@ const bigDataset: LogEntry[] = Array.from({ length: 100_000 }, (_, i) => ({
 export function SystemLogViewer() {
   return (
     <VirtualList
-      items={bigDataset}
+      each={bigDataset}
       height={500}
-      estimateSize={44}
-      overscan={6}
-      renderItem={(item, index) => (
+      itemHeight={44}
+      overscan={5}
+    >
+      {(item, index) => (
         <div class="log-row">
-          <span class="log-index">#{index()}</span>
+          <span class="log-index">#{() => index() + 1}</span>
           <span class="log-time">{item.timestamp}</span>
           <span class="log-msg">{item.message}</span>
         </div>
       )}
-    />
+    </VirtualList>
   );
 }`}
 />
 
 Props:
-- `items`: Array or reactive signal containing list data.
-- `height`: Container height in pixels or CSS dimension string (e.g. `500` or `"100%"`).
-- `estimateSize`: Fixed number or function returning expected item height in pixels.
-- `overscan`: Number of offscreen items rendered above and below the visible viewport (default `5`).
-- `renderItem`: Callback receiving `(item: T, index: () => number)` and returning a `Child`.
+- `each`: Array or reactive signal returning list data.
+- `height`: Container height in pixels or CSS dimension string (default `400`).
+- `width`: Container width in pixels or CSS dimension string (default `"100%"`).
+- `itemHeight`: Fixed number or function returning item height in pixels `(index: number) => number`.
+- `overscan`: Number of offscreen items rendered above and below the visible viewport (default `3`).
+- `children`: Item template function receiving `(item: T, index: () => number) => any`.
 
 ## Dynamic Variable Heights
 
-When items have unpredictable content heights (e.g., chat messages or multi-line comments), Visage calculates dynamic positions using prefix-sum offsets and DOM measurement:
+When items have variable heights based on index or content, pass a sizing function to `itemHeight`:
 
 <CodeBlock
   filename="VariableHeights.tsx"
@@ -98,70 +79,133 @@ When items have unpredictable content heights (e.g., chat messages or multi-line
 export function ChatFeed({ messages }: { messages: string[] }) {
   return (
     <VirtualList
-      items={messages}
+      each={messages}
       height="100dvh"
-      estimateSize={(index) => (index % 3 === 0 ? 80 : 44)}
-      overscan={8}
-      renderItem={(msg) => (
+      itemHeight={(index) => (index % 3 === 0 ? 80 : 44)}
+      overscan={6}
+    >
+      {(msg, index) => (
         <div class="chat-bubble">
+          <span class="text-xs text-zinc-500">Msg #{() => index() + 1}</span>
           <p>{msg}</p>
         </div>
       )}
-    />
+    </VirtualList>
   );
 }`}
 />
 
-## Headless Virtualizer (createVirtualizer)
-
-For custom scroll containers, tables, or window-scrolling layouts, use the headless `createVirtualizer` hook:
-
-<CodeBlock
-  filename="HeadlessVirtualizer.ts"
-  lang="ts"
-  code={`import { createVirtualizer } from "@epoch32/visage/virtual";
-
-let scrollContainerRef: HTMLDivElement | null = null;
-
-const virtualizer = createVirtualizer({
-  count: 50_000,
-  getScrollElement: () => scrollContainerRef,
-  estimateSize: () => 48,
-  overscan: 5,
-});
-
-// Query visible items
-const visibleRows = virtualizer.getVirtualItems();
-const totalHeight = virtualizer.getTotalSize();
-
-// Programmatic scrolling
-virtualizer.scrollToIndex(2500, { align: "center" });`}
-/>
-
 ## 2D Grid Virtualization (&lt;VirtualGrid&gt;)
 
-Virtualize massive 2D grids (e.g. spreadsheets or photo galleries) with bidirectional row and column virtualization:
+Virtualize massive 2D grids (e.g. spreadsheets or data tables) with bidirectional row and column virtualization:
 
 <CodeBlock
   filename="VirtualGridExample.tsx"
   lang="tsx"
   code={`import { VirtualGrid } from "@epoch32/visage/virtual";
 
+// 10,000 rows x 100 columns matrix
+const matrix = Array.from({ length: 10_000 }, (_, r) =>
+  Array.from({ length: 100 }, (_, c) => ({
+    id: \`cell-\${r}-\${c}\`,
+    value: \`R\${r}C\${c}\`,
+  }))
+);
+
 export function SpreadsheetView() {
   return (
     <VirtualGrid
-      rowCount={10_000}
-      columnCount={100}
+      data={matrix}
       rowHeight={32}
       columnWidth={120}
       height={600}
       width={900}
-      renderCell={(row, col) => (
+      overscan={3}
+    >
+      {(cell, row, col) => (
         <div class="spreadsheet-cell">
-          R{row} C{col}
+          {cell.value}
         </div>
       )}
+    </VirtualGrid>
+  );
+}`}
+/>
+
+## Cell Identity with getItemKey
+
+When scrolling fast through 2D grids or updating cell data asynchronously, use `getItemKey` to preserve DOM identity and state (such as input focus or CSS animations) across render passes:
+
+<CodeBlock
+  filename="SpreadsheetWithKeys.tsx"
+  lang="tsx"
+  code={`import { VirtualGrid } from "@epoch32/visage/virtual";
+
+<VirtualGrid
+  data={matrix}
+  rowHeight={36}
+  columnWidth={140}
+  height={600}
+  width="100%"
+  // Retains exact DOM element identity across virtualizer viewport shifts
+  getItemKey={(cell, row, col) => cell.id}
+>
+  {(cell, row, col) => (
+    <input
+      type="text"
+      value={cell.value}
+      class="border border-zinc-700 bg-transparent px-2 w-full h-full"
     />
+  )}
+</VirtualGrid>`}
+/>
+
+`VirtualGrid` automatically parses string or numeric heights and widths to pre-calculate scroll offsets on initial render before layout measurements occur, preventing layout shift flickers.
+
+## Headless Virtualizer (createVirtualizer)
+
+For custom scroll containers or arbitrary layouts, use the headless `createVirtualizer` primitive:
+
+<CodeBlock
+  filename="HeadlessVirtualizer.ts"
+  lang="tsx"
+  code={`import { createVirtualizer } from "@epoch32/visage/virtual";
+import { signal, For } from "@epoch32/visage";
+
+export function CustomVirtualScroll() {
+  const containerRef = signal<HTMLDivElement | null>(null);
+
+  const virtualizer = createVirtualizer({
+    count: 50_000,
+    itemHeight: 48,
+    overscan: 4,
+    getScrollElement: () => containerRef(),
+  });
+
+  return (
+    <div
+      ref={(el) => containerRef.set(el)}
+      style={{ height: "400px", overflow: "auto", position: "relative" }}
+    >
+      <div style={() => ({ height: \`\${virtualizer.totalSize()}px\`, position: "relative" })}>
+        <For each={virtualizer.virtualItems} by={(item) => item.key}>
+          {(item) => (
+            <div
+              style={() => ({
+                position: "absolute",
+                top: 0,
+                left: 0,
+                width: "100%",
+                height: \`\${item.size}px\`,
+                transform: \`translateY(\${item.start}px)\`,
+              })}
+            >
+              Item #{item.index}
+            </div>
+          )}
+        </For>
+      </div>
+    </div>
   );
 }`}
 />
@@ -203,87 +247,28 @@ export function SpreadsheetView() {
 
 ## API Reference
 
-<div className="doc-api-section">
-  <div className="doc-fn-card">
-    <div className="doc-fn-header">
-      <div className="doc-fn-meta">
-        <span className="doc-fn-kind">Component</span>
-      </div>
-      <div className="doc-fn-signature">
-        &lt;VirtualList items=&#123;T[]&#125; estimateSize=&#123;number&#125; height=&#123;number | string&#125;&gt;&#123;renderItem&#125;&lt;/VirtualList&gt;
-      </div>
-    </div>
+### VirtualList Props
 
-    <div className="doc-fn-body">
-      <div className="doc-fn-desc">
-        Virtualizes massive vertical lists by rendering only the visible viewport window plus an overscan buffer.
-      </div>
+| Prop | Type | Default | Description |
+| :--- | :--- | :--- | :--- |
+| `each` | `T[] \| (() => T[])` | Required | Array or reactive accessor containing dataset items. |
+| `itemHeight` | `number \| ((index: number) => number)` | Required | Fixed height or dynamic sizing function. |
+| `height` | `number \| string` | `400` | Container viewport height. |
+| `width` | `number \| string` | `"100%"` | Container viewport width. |
+| `overscan` | `number` | `3` | Offscreen buffer rows rendered above and below viewport. |
+| `class` | `string` | `undefined` | CSS class string on scroll container element. |
+| `style` | `Record<string, any> \| (() => Record<string, any>)` | `undefined` | Inline style overrides on scroll container. |
+| `children` | `(item: T, index: () => number) => any` | Required | Render template function. |
 
-      <div>
-        <div className="doc-fn-subheading">Props</div>
-        <div className="doc-params-list">
-          <div className="doc-param-row">
-            <div className="doc-param-meta">
-              <span className="doc-param-name">items</span>
-              <span className="doc-param-type">T[] | ReadonlySignal&lt;T[]&gt;</span>
-              <span className="doc-param-badge required">Required</span>
-            </div>
-            <div className="doc-param-desc">
-              Array of items or reactive signal to virtualize.
-            </div>
-          </div>
+### VirtualGrid Props
 
-          <div className="doc-param-row">
-            <div className="doc-param-meta">
-              <span className="doc-param-name">estimateSize</span>
-              <span className="doc-param-type">number | ((index: number) =&gt; number)</span>
-              <span className="doc-param-badge required">Required</span>
-            </div>
-            <div className="doc-param-desc">
-              Predicted height of items in pixels for scrollbar thumb calculations.
-            </div>
-          </div>
-
-          <div className="doc-param-row">
-            <div className="doc-param-meta">
-              <span className="doc-param-name">overscan</span>
-              <span className="doc-param-type">number</span>
-              <span className="doc-param-badge optional">Optional</span>
-            </div>
-            <div className="doc-param-desc">
-              Number of buffer items rendered above and below the visible viewport (default <code>5</code>).
-            </div>
-          </div>
-
-          <div className="doc-param-row">
-            <div className="doc-param-meta">
-              <span className="doc-param-name">renderItem</span>
-              <span className="doc-param-type">(item: T, index: () =&gt; number) =&gt; Child</span>
-              <span className="doc-param-badge required">Required</span>
-            </div>
-            <div className="doc-param-desc">
-              Item template renderer receiving item and reactive index accessor.
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <div className="doc-fn-card">
-    <div className="doc-fn-header">
-      <div className="doc-fn-meta">
-        <span className="doc-fn-kind">Hook</span>
-      </div>
-      <div className="doc-fn-signature">
-        createVirtualizer(options: VirtualizerOptions): Virtualizer
-      </div>
-    </div>
-
-    <div className="doc-fn-body">
-      <div className="doc-fn-desc">
-        Low-level headless virtualizer hook for custom scroll containers, tables, and variable-height items.
-      </div>
-    </div>
-  </div>
-</div>
+| Prop | Type | Default | Description |
+| :--- | :--- | :--- | :--- |
+| `data` | `T[][] \| (() => T[][])` | Required | 2D matrix array or reactive accessor. |
+| `rowHeight` | `number` | Required | Fixed row height in pixels. |
+| `columnWidth` | `number` | Required | Fixed column width in pixels. |
+| `height` | `number \| string` | `400` | Container viewport height. |
+| `width` | `number \| string` | `400` | Container viewport width. |
+| `overscan` | `number` | `3` | Buffer cells rendered outside visible bounds. |
+| `getItemKey` | `(item: T, row: number, col: number) => any` | `undefined` | Custom cell key identifier to preserve DOM identity. |
+| `children` | `(item: T, row: number, col: number) => any` | Required | Cell render template function. |

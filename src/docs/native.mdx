@@ -1,0 +1,292 @@
+export const title = "Native Desktop Bridge (Zig & WebViews)";
+export const breadcrumb = "Documentation / Full-Stack & Tools";
+
+Visage Native (`@epoch32/visage/native`) provides a unified, type-safe IPC (Inter-Process Communication) bridge between your Visage web UI and a lightweight native desktop host written in Zig. Instead of shipping a 150MB+ Chromium runtime like Electron, Visage pairs with native OS web engines (WebView2 on Windows, WKWebView on macOS, and WebKitGTK on Linux) to produce executables under 10MB that start instantaneously.
+
+<Callout type="experimental" title="Experimental Feature" tag="Active Development">
+  The Visage Native desktop runtime and compiled Zig host integration (<code>@epoch32/visage/native</code> and <code>experimental.zigNative</code>) are currently in active experimentation. APIs, IPC protocols, and host build configurations are subject to changes prior to the Visage 2.0 release.
+</Callout>
+
+<FeatureGrid>
+  <FeatureCard icon="zap" title="Sub-10MB Native Bundles">
+    Leverages the native platform webview rather than bundling Chromium, cutting memory usage from 200MB+ to under 30MB.
+  </FeatureCard>
+
+  <FeatureCard icon="cpu" title="Fast Zig IPC Runtime">
+    Direct message passing between JavaScript and compiled Zig host code with automatic ID correlation and promise resolution.
+  </FeatureCard>
+
+  <FeatureCard icon="shield" title="Zero-Setup Browser Mocking">
+    When running in standard browser dev mode without the native executable, commands return mock responses so UI development is never blocked.
+  </FeatureCard>
+
+  <FeatureCard icon="window" title="Window Lifecycle Controls">
+    First-class helpers to minimize, maximize, restore, and close application windows from custom title bars.
+  </FeatureCard>
+</FeatureGrid>
+
+## Detecting Native Host (isNativeApp)
+
+Use `isNativeApp()` to conditionally render native desktop controls, title bars, or file system access buttons:
+
+<CodeBlock
+  filename="components/TitleBar.tsx"
+  lang="tsx"
+  code={`import { isNativeApp, native } from "@epoch32/visage/native";
+import { Show } from "@epoch32/visage";
+
+export function TitleBar() {
+  return (
+    <Show when={isNativeApp()}>
+      <header class="h-8 bg-zinc-900 flex justify-between items-center px-3 select-none">
+        <span class="text-xs text-zinc-400">Visage Studio</span>
+        <div class="flex gap-2">
+          <button onClick={() => native.minimize()} class="hover:bg-zinc-800 px-2 text-xs">
+            _
+          </button>
+          <button onClick={() => native.maximize()} class="hover:bg-zinc-800 px-2 text-xs">
+            [ ]
+          </button>
+          <button onClick={() => native.close()} class="hover:bg-red-600 px-2 text-xs">
+            x
+          </button>
+        </div>
+      </header>
+    </Show>
+  );
+}`}
+/>
+
+## Calling Native Commands (native.invoke)
+
+Use `native.invoke<T>(command, payload)` to execute native functions on the Zig backend (e.g., reading local files, querying hardware specs, or opening OS dialogs):
+
+<CodeBlock
+  filename="lib/systemInfo.ts"
+  lang="ts"
+  code={`import { native } from "@epoch32/visage/native";
+
+interface SystemInfo {
+  os: "windows" | "macos" | "linux";
+  cpuCores: number;
+  memoryGb: number;
+  homeDir: string;
+}
+
+export async function fetchSystemInfo(): Promise<SystemInfo> {
+  const info = await native.invoke<SystemInfo>("getSystemInfo", {
+    includeMemory: true,
+  });
+  return info;
+}
+
+export async function openNativeFileDialog(): Promise<string | null> {
+  const filePath = await native.invoke<string | null>("dialog:openFile", {
+    filter: ["*.png", "*.jpg", "*.webp"],
+  });
+  return filePath;
+}`}
+/>
+
+## Listening for Native Events (native.on)
+
+Subscribe to asynchronous events pushed from the host (such as global hotkeys, file drop events, system sleep notifications, or USB plug events):
+
+<CodeBlock
+  filename="components/HotkeyListener.tsx"
+  lang="tsx"
+  code={`import { onCleanup } from "@epoch32/visage";
+import { native } from "@epoch32/visage/native";
+
+export function HotkeyListener() {
+  // Listen for global shortcut registered in Zig
+  const unsubscribe = native.on("hotkey:save", (payload) => {
+    console.log("Global save triggered from host:", payload);
+    saveCurrentProject();
+  });
+
+  // Clean up listener when component unmounts
+  onCleanup(() => {
+    unsubscribe();
+  });
+
+  return null;
+}`}
+/>
+
+## Window Lifecycle Controls
+
+Visage exports convenience methods for frameless window management:
+
+<CodeBlock
+  filename="components/WindowControls.ts"
+  lang="ts"
+  code={`import { closeWindow, minimizeWindow, maximizeWindow, native } from "@epoch32/visage/native";
+
+// Close the desktop window
+await native.close();
+// or
+await closeWindow();
+
+// Minimize to taskbar/dock
+await native.minimize();
+
+// Toggle maximize / unmaximize
+await native.maximize();`}
+/>
+
+## Vite Plugin Zig Scaffolding (Experimental)
+
+<Callout type="experimental" title="Experimental Option" tag="experimental.zigNative">
+  To enable native executable builds, configure <code>experimental.zigNative</code> in <code>vite.config.ts</code>. You must have a compatible Zig toolchain (0.13+) installed on your machine.
+</Callout>
+
+Enable desktop compilation directly inside `vite.config.ts`:
+
+<CodeBlock
+  filename="vite.config.ts"
+  lang="ts"
+  code={`import { defineConfig } from "vite";
+import { visage } from "@epoch32/visage/vite";
+
+export default defineConfig({
+  plugins: [
+    visage({
+      experimental: {
+        zigNative: {
+          title: "Visage Desktop",
+          width: 1200,
+          height: 800,
+          resizable: true,
+          outputDir: "src-native",
+          scaffold: true, // Automatically writes build.zig and main.zig
+        },
+      },
+    }),
+  ],
+});`}
+/>
+
+## API Reference
+
+<div className="doc-api-section">
+  <div className="doc-fn-card">
+    <div className="doc-fn-header">
+      <div className="doc-fn-meta">
+        <span className="doc-fn-kind">Method</span>
+      </div>
+      <div className="doc-fn-signature">
+        native.invoke&lt;T = any&gt;(command: string, payload?: any): Promise&lt;T&gt;
+      </div>
+    </div>
+
+    <div className="doc-fn-body">
+      <div className="doc-fn-desc">
+        Sends a command with an optional payload to the native Zig desktop host. Resolves when the host responds or falls back to browser mock mode in non-native environments.
+      </div>
+
+      <div>
+        <div className="doc-fn-subheading">Parameters</div>
+        <div className="doc-params-list">
+          <div className="doc-param-row">
+            <div className="doc-param-meta">
+              <span className="doc-param-name">command</span>
+              <span className="doc-param-type">string</span>
+              <span className="doc-param-badge required">Required</span>
+            </div>
+            <div className="doc-param-desc">
+              The IPC command name registered in the Zig host handler.
+            </div>
+          </div>
+          <div className="doc-param-row">
+            <div className="doc-param-meta">
+              <span className="doc-param-name">payload</span>
+              <span className="doc-param-type">any</span>
+              <span className="doc-param-badge optional">Optional</span>
+            </div>
+            <div className="doc-param-desc">
+              Data passed to the host command handler.
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div className="doc-fn-card">
+    <div className="doc-fn-header">
+      <div className="doc-fn-meta">
+        <span className="doc-fn-kind">Method</span>
+      </div>
+      <div className="doc-fn-signature">
+        native.on(event: string, callback: (payload: any) =&gt; void): () =&gt; void
+      </div>
+    </div>
+
+    <div className="doc-fn-body">
+      <div className="doc-fn-desc">
+        Subscribes to asynchronous native events broadcast from the Zig desktop host. Automatically unbinds when the returned cleanup disposal function is invoked or when the component scope tears down.
+      </div>
+
+      <div>
+        <div className="doc-fn-subheading">Parameters</div>
+        <div className="doc-params-list">
+          <div className="doc-param-row">
+            <div className="doc-param-meta">
+              <span className="doc-param-name">event</span>
+              <span className="doc-param-type">string</span>
+              <span className="doc-param-badge required">Required</span>
+            </div>
+            <div className="doc-param-desc">
+              The event channel name emitted by the native application.
+            </div>
+          </div>
+          <div className="doc-param-row">
+            <div className="doc-param-meta">
+              <span className="doc-param-name">callback</span>
+              <span className="doc-param-type">(payload: any) =&gt; void</span>
+              <span className="doc-param-badge required">Required</span>
+            </div>
+            <div className="doc-param-desc">
+              Listener invoked whenever the host pushes an event on this channel.
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div className="doc-fn-card">
+    <div className="doc-fn-header">
+      <div className="doc-fn-meta">
+        <span className="doc-fn-kind">Method</span>
+      </div>
+      <div className="doc-fn-signature">
+        native.isNativeApp(): boolean
+      </div>
+    </div>
+
+    <div className="doc-fn-body">
+      <div className="doc-fn-desc">
+        Returns <code>true</code> when running inside a supported native desktop webview environment (WebView2 on Windows, WKWebView on macOS, WebKitGTK on Linux), or <code>false</code> in standard web browsers.
+      </div>
+    </div>
+  </div>
+
+  <div className="doc-fn-card">
+    <div className="doc-fn-header">
+      <div className="doc-fn-meta">
+        <span className="doc-fn-kind">Window Controls</span>
+      </div>
+      <div className="doc-fn-signature">
+        native.close() | native.minimize() | native.maximize()
+      </div>
+    </div>
+
+    <div className="doc-fn-body">
+      <div className="doc-fn-desc">
+        Convenience functions that invoke <code>"window:close"</code>, <code>"window:minimize"</code>, and <code>"window:maximize"</code> on the host window manager for custom frameless titlebars.
+      </div>
+    </div>
+  </div>
+</div>

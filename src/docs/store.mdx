@@ -1,43 +1,17 @@
-import { StoreSandbox } from "../components/StoreSandbox";
-import { CodeBlock } from "../components/CodeBlock";
-import { FolderTree, PenTool } from "lucide-react";
-
 export const title = "Deep State (createStore)";
 export const breadcrumb = "Documentation / Reactivity";
 
-export const toc = [
-  { id: "overview", title: "Overview", level: 2 },
-  { id: "interactive-demo", title: "Interactive Store Sandbox", level: 2 },
-  { id: "how-stores-work", title: "How Stores Work: Proxy Architecture", level: 2 },
-  { id: "mutation-patterns", title: "Direct Mutation & Arrays", level: 2 },
-  { id: "batched-mutations", title: "Batched Updates with mutateStore", level: 2 },
-  { id: "unwrapping", title: "Unwrapping Raw Objects", level: 2 },
-  { id: "api-reference", title: "API Reference", level: 2 },
-];
-
 While signals manage primitive and discrete values, `createStore` provides deeply reactive proxy trees for objects and arrays. Visage stores enable natural, direct mutations while maintaining surgical per-property signal subscriptions behind the scenes.
 
-<div className="doc-features-grid">
-  <div className="doc-feature-card">
-    <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "6px" }}>
-      <FolderTree size={16} color="var(--pink-500)" />
-      <div className="doc-feature-title">Per-Property Signals</div>
-    </div>
-    <div className="doc-feature-desc">
-      Modifying <code>store.user.name</code> only notifies subscribers listening specifically to <code>name</code>. The rest of the object tree remains untouched with zero re-rendering overhead.
-    </div>
-  </div>
+<FeatureGrid>
+  <FeatureCard icon="folder-tree" title="Per-Property Signals">
+    Modifying <code>store.user.name</code> only notifies subscribers listening specifically to <code>name</code>. The rest of the object tree remains untouched with zero re-rendering overhead.
+  </FeatureCard>
 
-  <div className="doc-feature-card">
-    <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "6px" }}>
-      <PenTool size={16} color="var(--pink-500)" />
-      <div className="doc-feature-title">Natural Direct Mutation</div>
-    </div>
-    <div className="doc-feature-desc">
-      No spread operators, immutability helpers, or draft boilerplate. Direct assignments like <code>store.count++</code> or <code>store.items.push(item)</code> trigger precise reactive updates.
-    </div>
-  </div>
-</div>
+  <FeatureCard icon="pen" title="Natural Direct Mutation">
+    No spread operators, immutability helpers, or draft boilerplate. Direct assignments like <code>store.count++</code> or <code>store.items.push(item)</code> trigger precise reactive updates.
+  </FeatureCard>
+</FeatureGrid>
 
 ## Interactive Store Sandbox
 

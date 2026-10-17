@@ -1,42 +1,17 @@
-import { CodeBlock } from "../components/CodeBlock";
-import { Compass, Globe, Link2, Route as RouteIcon, Sparkles, Zap } from "lucide-react";
-
 export const title = "SPA Router (<Router>)";
 export const breadcrumb = "Documentation / DOM & Control Flow";
 
-export const toc = [
-  { id: "overview", title: "Overview", level: 2 },
-  { id: "basic-setup", title: "Basic Setup (<Router> & <Routes>)", level: 2 },
-  { id: "deferred-children", title: "Deferred Scope Mounts", level: 2 },
-  { id: "link-primitive", title: "Client Navigation (<Link>)", level: 2 },
-  { id: "class-preservation", title: "Class & Active State Preservation", level: 2 },
-  { id: "hooks", title: "Router Hooks (useLocation, useNavigate, useParams)", level: 2 },
-  { id: "api-reference", title: "API Reference", level: 2 },
-];
-
 Visage includes a fine-grained, zero-overhead Single Page Application (SPA) router (`@epoch32/visage/router` or exported from `@epoch32/visage`). It synchronizes browser URL history with reactive signals, eliminating whole-page reloads and bulky external routing dependencies.
 
-<div className="doc-features-grid">
-  <div className="doc-feature-card">
-    <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "6px" }}>
-      <Globe size={16} color="var(--pink-500)" />
-      <div className="doc-feature-title">HTML5 History Mode</div>
-    </div>
-    <div className="doc-feature-desc">
-      Full <code>pushState</code> and <code>popstate</code> synchronization. Direct URL paths (e.g. <code>/signals</code> or <code>/docs/signals</code>) resolve cleanly without messy <code>#hash</code> workarounds.
-    </div>
-  </div>
+<FeatureGrid>
+  <FeatureCard icon="globe" title="HTML5 History Mode">
+    Full <code>pushState</code> and <code>popstate</code> synchronization. Direct URL paths (e.g. <code>/signals</code> or <code>/docs/signals</code>) resolve cleanly without messy <code>#hash</code> workarounds.
+  </FeatureCard>
 
-  <div className="doc-feature-card">
-    <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "6px" }}>
-      <Zap size={16} color="var(--pink-500)" />
-      <div className="doc-feature-title">Signal-Driven Matching</div>
-    </div>
-    <div className="doc-feature-desc">
-      <code>useLocation()</code> and <code>useParams()</code> expose reactive signals that update point-to-point without re-evaluating unchanged parent component trees.
-    </div>
-  </div>
-</div>
+  <FeatureCard icon="zap" title="Signal-Driven Matching">
+    <code>useLocation()</code> and <code>useParams()</code> expose reactive signals that update point-to-point without re-evaluating unchanged parent component trees.
+  </FeatureCard>
+</FeatureGrid>
 
 ## Basic Setup (&lt;Router&gt; & &lt;Routes&gt;)
 
@@ -139,9 +114,131 @@ Visage's `<Link>` accepts either `class` or `className` and seamlessly preserves
 
 When a route is active (matching `href`), `activeClass` (defaults to `"active"`) is appended to your base class. When inactive, your base class remains intact, preventing links from accidentally dropping their styling or reverting to browser default blue unstyled links.
 
+## Native View Transitions API
+
+Visage features first-class integration with the browser's native **View Transitions API** (`document.startViewTransition()`). It enables smooth, GPU-accelerated page transitions without bloated external animation frameworks.
+
+<Callout type="experimental" title="Progressive Enhancement" tag="Browser Feature">
+  The document View Transitions API (<code>document.startViewTransition</code>) is progressively enhanced. In browsers where the API is unavailable, Visage automatically falls back to synchronous DOM updates without throwing runtime errors or disrupting navigation.
+</Callout>
+
+### Router-Level View Transitions
+
+Enable view transitions globally on the `<Router>`:
+
+<CodeBlock
+  filename="App.tsx"
+  lang="tsx"
+  code={`import { Router, Routes, Route, Link } from "@epoch32/visage";
+
+function App() {
+  return (
+    <Router viewTransitions={true}>
+      {() => (
+        <div class="app">
+          <Routes>
+            <Route path="/" component={Home} />
+            <Route path="/about" component={About} />
+          </Routes>
+        </div>
+      )}
+    </Router>
+  );
+}`}
+/>
+
+### Per-Link & Imperative Control
+
+You can enable or override view transitions on individual `<Link>` components or via `useNavigate()`:
+
+<CodeBlock
+  filename="ViewTransitionExample.tsx"
+  lang="tsx"
+  code={`import { Link, useNavigate } from "@epoch32/visage";
+
+export function Navigation() {
+  const navigate = useNavigate();
+
+  return (
+    <nav>
+      {/* Enable transition for this specific link */}
+      <Link href="/gallery" viewTransition={true}>
+        Photo Gallery
+      </Link>
+
+      {/* Imperative navigation with View Transition */}
+      <button onClick={() => navigate("/dashboard", { viewTransition: true })}>
+        Go to Dashboard
+      </button>
+    </nav>
+  );
+}`}
+/>
+
+If the user's browser does not yet support `document.startViewTransition`, Visage gracefully falls back to synchronous DOM updates with zero overhead or runtime exceptions.
+
+## Speculative Prefetching (Speculation Rules)
+
+Visage leverages modern browser **Speculation Rules API** (`<script type="speculationrules">`) to initiate next-page loading before the user even clicks, achieving instant 0ms perceived navigation.
+
+<Callout type="experimental" title="Emerging Web Standard" tag="Speculation Rules">
+  The W3C Speculation Rules API is supported in modern Chromium browsers (Chrome 109+, Edge 109+). In Safari and Firefox, Visage gracefully falls back to injecting standard <code>&lt;link rel="prefetch"&gt;</code> elements into the document head.
+</Callout>
+
+### Automatic Hover & Render Prefetching
+
+Configure `<Link>` to prefetch speculatively:
+
+<CodeBlock
+  filename="PrefetchLink.tsx"
+  lang="tsx"
+  code={`import { Link, Router } from "@epoch32/visage";
+
+// 1. Prefetch on pointer hover and keyboard focus:
+<Link href="/docs/signals" prefetch="hover">
+  Signals Guide
+</Link>
+
+// 2. Prefetch immediately upon element mount:
+<Link href="/critical-dashboard" prefetch="render">
+  Dashboard
+</Link>
+
+// 3. Cascade default prefetch behavior across all links in the router:
+<Router prefetch="hover">
+  {() => <AppNav />}
+</Router>`}
+/>
+
+### Imperative Prefetching
+
+Prefetch URLs programmatically via `usePrefetch()` or the standalone `prefetch()` helper:
+
+<CodeBlock
+  filename="imperative-prefetch.ts"
+  lang="ts"
+  code={`import { prefetch, usePrefetch } from "@epoch32/visage";
+
+// Standalone function (useful in loaders or background tasks):
+prefetch("/api/docs-chunk");
+
+// Inside components via hook:
+function RecommendedCard({ url }: { url: string }) {
+  const prefetchUrl = usePrefetch();
+
+  return (
+    <div onMouseEnter={() => prefetchUrl(url)}>
+      Card Content
+    </div>
+  );
+}`}
+/>
+
+Visage automatically deduplicates prefetched URLs to prevent duplicate network requests and excludes mutating or non-navigable protocols (`javascript:`, `mailto:`, `tel:`, `#`). In browsers without Speculation Rules support, it seamlessly falls back to standard `<link rel="prefetch">`.
+
 ## Router Hooks
 
-Visage exports fine-grained reactive hooks for URL inspection and navigation:
+Visage exports fine-grained reactive hooks for URL inspection, prefetching, and navigation:
 
 ### useLocation()
 
@@ -167,8 +264,8 @@ function LoginForm() {
     // Navigate with pushState:
     navigate("/dashboard");
 
-    // Or replace history entry:
-    // navigate("/dashboard", { replace: true });
+    // Replace history entry with View Transition:
+    // navigate("/dashboard", { replace: true, viewTransition: true });
   };
 
   return <button onClick={handleLogin}>Log In</button>;
@@ -189,6 +286,19 @@ const params = useParams<{ id: string }>();
 console.log(params().id); // Reactive accessor`}
 />
 
+### usePrefetch()
+
+Returns a function to speculatively prefetch URLs:
+
+<CodeBlock
+  filename="use-prefetch.ts"
+  lang="ts"
+  code={`import { usePrefetch } from "@epoch32/visage";
+
+const prefetch = usePrefetch();
+prefetch("/docs/quickstart");`}
+/>
+
 ## API Reference
 
 <div className="doc-api-section">
@@ -198,13 +308,13 @@ console.log(params().id); // Reactive accessor`}
         <span className="doc-fn-kind">Component</span>
       </div>
       <div className="doc-fn-signature">
-        &lt;Router mode=&#123;"history" | "hash"&#125; base=&#123;string&#125;&gt;&#123;children&#125;&lt;/Router&gt;
+        &lt;Router mode=&#123;"history" | "hash"&#125; base=&#123;string&#125; viewTransitions=&#123;boolean&#125; prefetch=&#123;"hover" | "render"&#125;&gt;&#123;children&#125;&lt;/Router&gt;
       </div>
     </div>
 
     <div className="doc-fn-body">
       <div className="doc-fn-desc">
-        Root router provider establishing HTML5 history listeners, popstate synchronization, and reactive location context.
+        Root router provider establishing HTML5 history listeners, popstate synchronization, native View Transitions, and reactive location context.
       </div>
 
       <div>
@@ -218,6 +328,28 @@ console.log(params().id); // Reactive accessor`}
             </div>
             <div className="doc-param-desc">
               Navigation mode. Defaults to <code>"history"</code> for clean URL paths.
+            </div>
+          </div>
+
+          <div className="doc-param-row">
+            <div className="doc-param-meta">
+              <span className="doc-param-name">viewTransitions</span>
+              <span className="doc-param-type">boolean</span>
+              <span className="doc-param-badge optional">Optional</span>
+            </div>
+            <div className="doc-param-desc">
+              When true, wraps page navigations in native <code>document.startViewTransition()</code>.
+            </div>
+          </div>
+
+          <div className="doc-param-row">
+            <div className="doc-param-meta">
+              <span className="doc-param-name">prefetch</span>
+              <span className="doc-param-type">boolean | "hover" | "render"</span>
+              <span className="doc-param-badge optional">Optional</span>
+            </div>
+            <div className="doc-param-desc">
+              Default prefetch strategy cascaded to all child <code>&lt;Link&gt;</code> elements.
             </div>
           </div>
 
@@ -242,13 +374,13 @@ console.log(params().id); // Reactive accessor`}
         <span className="doc-fn-kind">Component</span>
       </div>
       <div className="doc-fn-signature">
-        &lt;Link href=&#123;string&#125; class=&#123;string&#125; activeClass=&#123;string&#125;&gt;&#123;children&#125;&lt;/Link&gt;
+        &lt;Link href=&#123;string&#125; class=&#123;string&#125; activeClass=&#123;string&#125; viewTransition=&#123;boolean&#125; prefetch=&#123;"hover" | "render"&#125;&gt;&#123;children&#125;&lt;/Link&gt;
       </div>
     </div>
 
     <div className="doc-fn-body">
       <div className="doc-fn-desc">
-        Client-side navigation link with automatic pushState click interception and active route class toggling. Supports both <code>class</code> and <code>className</code>.
+        Client-side navigation link with automatic pushState click interception, active route class toggling, native View Transitions, and Speculation Rules prefetching.
       </div>
     </div>
   </div>
@@ -259,13 +391,13 @@ console.log(params().id); // Reactive accessor`}
         <span className="doc-fn-kind">Hook</span>
       </div>
       <div className="doc-fn-signature">
-        useLocation(): LocationState
+        useNavigate(): (to: string, options?: NavigateOptions) =&gt; void
       </div>
     </div>
 
     <div className="doc-fn-body">
       <div className="doc-fn-desc">
-        Returns reactive signals for current <code>pathname</code>, <code>search</code>, and <code>hash</code>.
+        Returns an imperative navigation function to transition between routes programmatically. Supports <code>&#123; replace?: boolean, viewTransition?: boolean &#125;</code>.
       </div>
     </div>
   </div>
@@ -273,16 +405,16 @@ console.log(params().id); // Reactive accessor`}
   <div className="doc-fn-card">
     <div className="doc-fn-header">
       <div className="doc-fn-meta">
-        <span className="doc-fn-kind">Hook</span>
+        <span className="doc-fn-kind">Function</span>
       </div>
       <div className="doc-fn-signature">
-        useNavigate(): (to: string, options?: &#123; replace?: boolean &#125;) =&gt; void
+        prefetch(url: string): void
       </div>
     </div>
 
     <div className="doc-fn-body">
       <div className="doc-fn-desc">
-        Returns an imperative navigation function to transition between routes programmatically.
+        Speculatively prefetches a URL using the Speculation Rules API when supported, falling back to <code>&lt;link rel="prefetch"&gt;</code>.
       </div>
     </div>
   </div>

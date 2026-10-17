@@ -1,44 +1,17 @@
-import { EffectLoggerSandbox } from "../components/EffectLoggerSandbox";
-import { CodeBlock } from "../components/CodeBlock";
-import { AlertTriangle, Sparkles, Trash2, Zap } from "lucide-react";
-
 export const title = "Side Effects (effect)";
 export const breadcrumb = "Documentation / Reactivity";
 
-export const toc = [
-  { id: "overview", title: "Overview", level: 2 },
-  { id: "computed-vs-effect", title: "Computed vs Effect", level: 2 },
-  { id: "why-use-effects", title: "Why Use an Effect Over a Computed?", level: 2 },
-  { id: "interactive-demo", title: "Interactive Effect & Cleanup Logger", level: 2 },
-  { id: "cleanup-lifecycle", title: "Cleanups & Lifecycle", level: 2 },
-  { id: "batching-execution", title: "Batching & Microtasks", level: 2 },
-  { id: "common-pitfalls", title: "Infinite Loops & Gotchas", level: 2 },
-  { id: "api-reference", title: "API Reference", level: 2 },
-];
-
 Side effects allow your application to escape pure reactive computations and synchronize state with the outside world. An effect automatically tracks every signal read during its execution, runs immediately upon creation, and re-executes whenever those signals update.
 
-<div className="doc-features-grid">
-  <div className="doc-feature-card">
-    <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "6px" }}>
-      <Zap size={16} color="var(--pink-500)" />
-      <div className="doc-feature-title">Eager & Push-Based</div>
-    </div>
-    <div className="doc-feature-desc">
-      Unlike <code>computed</code> which is lazy and only evaluates when read, an <code>effect</code> is eager. It queues in pending effects and flushes automatically to execute side-effects like DOM updates, network requests, or timers.
-    </div>
-  </div>
+<FeatureGrid>
+  <FeatureCard icon="zap" title="Eager & Push-Based">
+    Unlike <code>computed</code> which is lazy and only evaluates when read, an <code>effect</code> is eager. It queues in pending effects and flushes automatically to execute side-effects like DOM updates, network requests, or timers.
+  </FeatureCard>
 
-  <div className="doc-feature-card">
-    <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "6px" }}>
-      <Trash2 size={16} color="var(--pink-500)" />
-      <div className="doc-feature-title">Self-Cleaning Lifecycle</div>
-    </div>
-    <div className="doc-feature-desc">
-      Effects automatically execute their registered cleanups before each re-run and when their enclosing component scope disposes, preventing memory leaks and dangling event listeners.
-    </div>
-  </div>
-</div>
+  <FeatureCard icon="trash" title="Self-Cleaning Lifecycle">
+    Effects automatically execute their registered cleanups before each re-run and when their enclosing component scope disposes, preventing memory leaks and dangling event listeners.
+  </FeatureCard>
+</FeatureGrid>
 
 ## Computed vs Effect: When to Use Which?
 
@@ -110,18 +83,12 @@ effect(() => {
 });`}
 />
 
-<div className="doc-callout">
-  <div className="doc-callout-icon">
-    <Sparkles size={18} color="var(--pink-500)" />
-  </div>
-  <div className="doc-callout-body">
-    <div className="doc-callout-title">The Rule of Thumb</div>
-    <ul style={{ paddingLeft: "18px", marginTop: "4px" }}>
-      <li><strong>Do I need a value to display, compute, or pass around?</strong> Use <code>computed</code>.</li>
-      <li><strong>Do I need to trigger an action or update an external system?</strong> Use <code>effect</code>.</li>
-    </ul>
-  </div>
-</div>
+<Callout type="tip" title="The Rule of Thumb">
+  <ul style={{ paddingLeft: "18px", marginTop: "4px" }}>
+    <li><strong>Do I need a value to display, compute, or pass around?</strong> Use <code>computed</code>.</li>
+    <li><strong>Do I need to trigger an action or update an external system?</strong> Use <code>effect</code>.</li>
+  </ul>
+</Callout>
 
 ## Interactive Effect & Cleanup Logger
 
@@ -192,25 +159,13 @@ batch(() => {
 
 ## Infinite Loops & Common Traps
 
-<div className="doc-callout" style={{ borderLeftColor: "var(--pink-500)" }}>
-  <div className="doc-callout-icon">
-    <AlertTriangle size={18} color="var(--pink-500)" />
-  </div>
-  <div className="doc-callout-body">
-    <div className="doc-callout-title">Trap 1: Writing to Read Signals</div>
-    If an effect reads a signal and also writes to that same signal, it will trigger itself in an infinite loop! Visage includes built-in cycle detection to safeguard your app, but you should avoid writing to tracked dependencies inside an effect. Use <code>untrack()</code> if you need to read a signal's value without subscribing to it.
-  </div>
-</div>
+<Callout type="warning" title="Trap 1: Writing to Read Signals">
+  If an effect reads a signal and also writes to that same signal, it will trigger itself in an infinite loop! Visage includes built-in cycle detection to safeguard your app, but you should avoid writing to tracked dependencies inside an effect. Use <code>untrack()</code> if you need to read a signal's value without subscribing to it.
+</Callout>
 
-<div className="doc-callout" style={{ borderLeftColor: "var(--pink-500)" }}>
-  <div className="doc-callout-icon">
-    <Sparkles size={18} color="var(--pink-500)" />
-  </div>
-  <div className="doc-callout-body">
-    <div className="doc-callout-title">Trap 2: Using Effect for Derived State</div>
-    Never use an <code>effect</code> to calculate a value and store it in another signal. That causes unnecessary double renders and timing glitches. Always use <code>computed(() =&gt; ...)</code> for derived state!
-  </div>
-</div>
+<Callout type="warning" title="Trap 2: Using Effect for Derived State">
+  Never use an <code>effect</code> to calculate a value and store it in another signal. That causes unnecessary double renders and timing glitches. Always use <code>computed(() =&gt; ...)</code> for derived state!
+</Callout>
 
 ## API Reference
 

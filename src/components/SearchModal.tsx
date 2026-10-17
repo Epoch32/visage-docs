@@ -7,7 +7,7 @@ import {
 	useNavigate,
 } from "@epoch32/visage";
 import { CommandDialog } from "@epoch32/visage/ui";
-import { BookOpen, FileText, Hash, Search } from "lucide-react";
+import { BookOpen, FileText, Hash, Search } from "lucide";
 import { buildSearchIndex, type SearchResultItem } from "../lib/searchIndex";
 import "../styles/search-modal.css";
 

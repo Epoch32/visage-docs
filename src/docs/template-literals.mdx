@@ -1,39 +1,17 @@
-import { CodeBlock } from "../components/CodeBlock";
-import { Code2, Cpu, Zap } from "lucide-react";
-
 export const title = "HTML Template Literals";
 export const breadcrumb = "Documentation / DOM & Control Flow";
 
-export const toc = [
-  { id: "overview", title: "Overview", level: 2 },
-  { id: "syntax", title: "The html Tagged Template", level: 2 },
-  { id: "fine-grained-interpolation", title: "Fine-Grained Interpolation", level: 2 },
-  { id: "when-to-use", title: "When to Use html vs JSX", level: 2 },
-];
-
 Visage provides a first-class, zero-build `html` tagged template literal engine. You can write reactive, fine-grained components in pure JavaScript or TypeScript without needing Babel, SWC, or a JSX compiler.
 
-<div className="doc-features-grid">
-  <div className="doc-feature-card">
-    <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "6px" }}>
-      <Zap size={16} color="var(--pink-500)" />
-      <div className="doc-feature-title">Zero Compiler Required</div>
-    </div>
-    <div className="doc-feature-desc">
-      Write native reactive components in standard JavaScript/TypeScript template literals without Babel or SWC build pipelines.
-    </div>
-  </div>
+<FeatureGrid>
+  <FeatureCard icon="zap" title="Zero Compiler Required">
+    Write native reactive components in standard JavaScript/TypeScript template literals without Babel or SWC build pipelines.
+  </FeatureCard>
 
-  <div className="doc-feature-card">
-    <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "6px" }}>
-      <Cpu size={16} color="var(--pink-500)" />
-      <div className="doc-feature-title">Direct DOM Cloning</div>
-    </div>
-    <div className="doc-feature-desc">
-      Templates parse into native <code>&lt;template&gt;</code> elements once and clone in microseconds without virtual DOM diffing.
-    </div>
-  </div>
-</div>
+  <FeatureCard icon="cpu" title="Direct DOM Cloning">
+    Templates parse into native <code>&lt;template&gt;</code> elements once and clone in microseconds without virtual DOM diffing.
+  </FeatureCard>
+</FeatureGrid>
 
 ## The html Tagged Template
 

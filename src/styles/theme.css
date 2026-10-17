@@ -61,6 +61,10 @@
 	padding: 0;
 }
 
+html {
+	scrollbar-gutter: stable;
+}
+
 html,
 body {
 	min-height: 100%;

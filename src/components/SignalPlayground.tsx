@@ -1,5 +1,5 @@
 import { createSignal } from "@epoch32/visage";
-import { Play, Plus, RefreshCw, Sparkles, Zap } from "lucide-react";
+import { Play, Plus, RefreshCw, Sparkles, Zap } from "lucide";
 
 export function SignalPlayground() {
 	const [count, setCount] = createSignal(0);

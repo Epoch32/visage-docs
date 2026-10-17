@@ -1,6 +1,3 @@
-import { CodeBlock } from "../components/CodeBlock";
-import { CheckCircle2, Cpu, HelpCircle, Layers, ShieldCheck, Sparkles, Zap, Package, Compass } from "lucide-react";
-
 export const title = "Framework Comparison";
 export const breadcrumb = "Documentation / Getting Started";
 
@@ -10,27 +7,15 @@ While fine-grained signals have become the industry standard for UI state, most 
 
 Visage is architected as an **integrated, full-stack application engine** designed from day one around Zero-VDOM fine-grained reactivity.
 
-<div className="doc-features-grid">
-  <div className="doc-feature-card">
-    <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "6px" }}>
-      <Package size={16} color="var(--pink-500)" />
-      <div className="doc-feature-title">Batteries-Included Cohesion</div>
-    </div>
-    <div className="doc-feature-desc">
-      First-class SVG charts, headless accessible UI primitives, 4px spatial layouts, full-stack typed RPC, forms, devtools, and virtualization built natively for signals.
-    </div>
-  </div>
+<FeatureGrid>
+  <FeatureCard icon="package" title="Batteries-Included Cohesion">
+    First-class SVG charts, headless accessible UI primitives, 4px spatial layouts, full-stack typed RPC, forms, devtools, and virtualization built natively for signals.
+  </FeatureCard>
 
-  <div className="doc-feature-card">
-    <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "6px" }}>
-      <Zap size={16} color="var(--pink-500)" />
-      <div className="doc-feature-title">Zero Virtual DOM Overhead</div>
-    </div>
-    <div className="doc-feature-desc">
-      Components execute once as constructors. Point-to-point reactive bindings mutate living DOM text nodes and attributes in microseconds without VNode allocations.
-    </div>
-  </div>
-</div>
+  <FeatureCard icon="zap" title="Zero Virtual DOM Overhead">
+    Components execute once as constructors. Point-to-point reactive bindings mutate living DOM text nodes and attributes in microseconds without VNode allocations.
+  </FeatureCard>
+</FeatureGrid>
 
 ## Quick Comparison Matrix
 

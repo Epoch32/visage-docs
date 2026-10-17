@@ -1,5 +1,5 @@
 import { batch, createSignal, effect } from "@epoch32/visage";
-import { Play, RefreshCw, Zap } from "lucide-react";
+import { Play, RefreshCw, Zap } from "lucide";
 
 export function BatchSimulator() {
 	const [countA, setCountA] = createSignal(0);

@@ -1,19 +1,11 @@
-import { CodeBlock } from "../components/CodeBlock";
-
 export const title = "Quickstart Guide";
 export const breadcrumb = "Documentation / Getting Started";
 
-export const toc = [
-  { id: "installation", title: "Installation", level: 2 },
-  { id: "setup", title: "Vite Configuration", level: 2 },
-  { id: "first-component", title: "Your First Component", level: 2 },
-];
-
-Get up and running with Visage in under two minutes using Bun or npm.
+Get up and running with Visage in under two minutes using Bun, pnpm, or npm.
 
 ## Installation
 
-Install Visage and the official Vite plugin for TypeScript support and fast HMR:
+Install Visage and the official Vite plugin for TypeScript support, fast HMR, and AOT template compilation:
 
 <CodeBlock
   filename="terminal"
@@ -34,7 +26,12 @@ pnpm add @epoch32/visage`}
 import visage from "@epoch32/visage/vite";
 
 export default defineConfig({
-  plugins: [visage()]
+  plugins: [
+    visage({
+      devtools: true, // Auto-inject DAG devtools in development
+      hmr: true,      // Fast signal-preserving HMR
+    }),
+  ],
 });`}
 />
 
@@ -43,17 +40,19 @@ export default defineConfig({
 <CodeBlock
   filename="src/main.tsx"
   lang="tsx"
-  code={`import { createSignal, render } from "@epoch32/visage";
+  code={`import { signal, render } from "@epoch32/visage";
 
 function App() {
-  const [name, setName] = createSignal("World");
+  const name = signal("World");
 
   return (
-    <div>
-      <h1>Hello, {name}!</h1>
+    <div class="p-6 max-w-md mx-auto space-y-4">
+      <h1 class="text-2xl font-bold">Hello, {name}!</h1>
       <input
-        value={name()}
-        onInput={(e) => setName((e.target as HTMLInputElement).value)}
+        type="text"
+        value={name}
+        onInput={(e) => name.set(e.currentTarget.value)}
+        class="border border-zinc-700 bg-zinc-900 px-3 py-2 rounded w-full"
       />
     </div>
   );

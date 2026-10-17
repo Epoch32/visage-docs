@@ -1,5 +1,5 @@
 import { createSignal, createStore, mutateStore } from "@epoch32/visage";
-import { Play, Plus, RefreshCw, Sparkles } from "lucide-react";
+import { Play, Plus, RefreshCw, Sparkles } from "lucide";
 
 export function StoreSandbox() {
 	const store = createStore({

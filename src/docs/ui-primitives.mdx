@@ -1,47 +1,17 @@
-import { CodeBlock } from "../components/CodeBlock";
-import { CheckSquare, Command as CmdIcon, Layers, MessageSquare, Sliders, Sparkles } from "lucide-react";
-
 export const title = "Accessible UI Components";
 export const breadcrumb = "Documentation / Headless UI & Charts";
 
-export const toc = [
-  { id: "overview", title: "Overview", level: 2 },
-  { id: "dialog-primitive", title: "Dialog / Modal (<Dialog>)", level: 2 },
-  { id: "select-primitive", title: "Select (<Select>)", level: 2 },
-  { id: "slider-primitive", title: "Slider (<Slider>)", level: 2 },
-  { id: "popover-primitive", title: "Popover (<Popover>)", level: 2 },
-  { id: "dropdown-primitive", title: "Dropdown Menu (<DropdownMenu>)", level: 2 },
-  { id: "command-primitive", title: "Command Palette (<Command>)", level: 2 },
-  { id: "tabs-accordion", title: "Tabs & Accordions (<Tabs>, <Accordion>)", level: 2 },
-  { id: "bottom-bar-primitive", title: "Floating Bottom Bar (<BottomBar>)", level: 2 },
-  { id: "toasts-primitive", title: "Reactive Toasts (toast)", level: 2 },
-  { id: "dismiss-primitive", title: "Headless Dismiss (useDismiss)", level: 2 },
-  { id: "api-reference", title: "API Reference", level: 2 },
-];
-
 Visage provides a complete suite of WAI-ARIA compliant, headless and composable UI primitives. They manage focus trapping, keyboard navigation, click-outside detection, ARIA attributes, and portals without imposing rigid opinionated CSS styling.
 
-<div className="doc-features-grid">
-  <div className="doc-feature-card">
-    <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "6px" }}>
-      <CheckSquare size={16} color="var(--pink-500)" />
-      <div className="doc-feature-title">Fully Accessible (WAI-ARIA)</div>
-    </div>
-    <div className="doc-feature-desc">
-      Built-in focus trapping, Escape key dismissal, ARIA expanded/controls wiring, and keyboard roving tabindex navigation.
-    </div>
-  </div>
+<FeatureGrid>
+  <FeatureCard icon="check" title="Fully Accessible (WAI-ARIA)">
+    Built-in focus trapping, Escape key dismissal, ARIA expanded/controls wiring, and keyboard roving tabindex navigation.
+  </FeatureCard>
 
-  <div className="doc-feature-card">
-    <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "6px" }}>
-      <Sliders size={16} color="var(--pink-500)" />
-      <div className="doc-feature-title">Controlled & Uncontrolled</div>
-    </div>
-    <div className="doc-feature-desc">
-      Supports both internal state management or external signal binding via <code>value</code>/<code>open</code> and <code>onValueChange</code>/<code>onOpenChange</code>.
-    </div>
-  </div>
-</div>
+  <FeatureCard icon="sliders" title="Controlled & Uncontrolled">
+    Supports both internal state management or external signal binding via <code>value</code>/<code>open</code> and <code>onValueChange</code>/<code>onOpenChange</code>.
+  </FeatureCard>
+</FeatureGrid>
 
 ## Dialog / Modal (&lt;Dialog&gt;)
 
@@ -84,6 +54,55 @@ export function ConfirmDeleteDialog() {
   );
 }`}
 />
+
+## Data Table (&lt;DataTable&gt;)
+
+The `<DataTable>` primitive delivers high-performance tabular data presentation with fine-grained column sorting, search filtering, row selection, and pagination:
+
+<CodeBlock
+  filename="DataTableExample.tsx"
+  lang="tsx"
+  code={`import { DataTable, type ColumnDef, createSignal } from "@epoch32/visage";
+
+interface User {
+  id: string;
+  name: string;
+  email: string;
+  role: string;
+}
+
+const users: User[] = [
+  { id: "1", name: "Alice Smith", email: "alice@example.com", role: "Admin" },
+  { id: "2", name: "Bob Jones", email: "bob@example.com", role: "Engineer" },
+  { id: "3", name: "Carol Vance", email: "carol@example.com", role: "Designer" },
+];
+
+const columns: ColumnDef<User>[] = [
+  { header: "Name", accessorKey: "name", sortable: true },
+  { header: "Email", accessorKey: "email" },
+  { header: "Role", accessorKey: "role", sortable: true },
+];
+
+export function UserDirectory() {
+  const [selectedIds, setSelectedIds] = createSignal<string[]>([]);
+
+  return (
+    <DataTable
+      data={users}
+      columns={columns}
+      searchKey="name"
+      pageSize={10}
+      sortable={true}
+      selectable={true}
+      selectedRowIds={selectedIds}
+      onSelectionChange={setSelectedIds}
+      getRowId={(user) => user.id}
+    />
+  );
+}`}
+/>
+
+Under the hood, `<DataTable>` wraps sorting and filtering in memoized `computed()` signals and keys rows in `<For by={getRowId}>` so existing table rows and input focus states are preserved in-place rather than destroyed during sorts.
 
 ## Select (&lt;Select&gt;)
 
@@ -139,9 +158,9 @@ export function VolumeSlider() {
 }`}
 />
 
-## Popover (&lt;Popover&gt;)
+## Popover & CSS Anchor Positioning (&lt;Popover&gt;)
 
-The Popover primitive positions non-modal floating content with click-outside and Escape key dismissal:
+The Popover primitive positions non-modal floating overlays with click-outside and Escape key dismissal. It supports both standard signal-based positioning and cutting-edge **Browser-Native Popover API** with **CSS Anchor Positioning**:
 
 <CodeBlock
   filename="PopoverExample.tsx"
@@ -156,11 +175,16 @@ The Popover primitive positions non-modal floating content with click-outside an
 
 export function SettingsPopover() {
   return (
-    <Popover>
+    // Enable native HTML Popover and CSS Anchor Positioning:
+    <Popover native={true} anchorName="--filter-anchor">
       <PopoverTrigger class="btn">Filters</PopoverTrigger>
 
       <PopoverPortal>
-        <PopoverContent class="popover-card">
+        <PopoverContent
+          side="bottom"
+          positionArea="block-end span-inline-end"
+          class="popover-card"
+        >
           <h4>Filter Results</h4>
           <label>
             <input type="checkbox" /> Include Archived
@@ -172,6 +196,18 @@ export function SettingsPopover() {
   );
 }`}
 />
+
+### Native HTML Popover API
+
+Passing `native={true}` (or `popover="auto"` / `popover="manual"` on `<PopoverContent>`) promotes the overlay directly into the browser's top layer. The browser natively manages light-dismiss (clicking outside or pressing Escape) without complex document listeners, and Visage automatically synchronizes the browser's `toggle` events with your reactive signals.
+
+### Declarative CSS Anchor Positioning
+
+Using `side="top" | "bottom" | "left" | "right"` or `positionArea="block-end span-inline-end"` automatically applies CSS Anchor Positioning (`anchor-name`, `position-anchor`, `position-area`, `position-try-fallbacks`, `inset: auto`). The browser flips the overlay on overflow without executing expensive `getBoundingClientRect()` scroll calculations in JavaScript!
+
+<Callout type="experimental" title="Emerging CSS Standard" tag="CSS Anchor Positioning">
+  CSS Anchor Positioning (<code>position-area</code>, <code>anchor-name</code>) is supported natively in modern Chromium browsers (Chrome 125+, Edge 125+) and is being actively implemented across Safari and Firefox. For legacy browser environments, provide fallback absolute coordinate styles or polyfills.
+</Callout>
 
 ## Dropdown Menu (&lt;DropdownMenu&gt;)
 

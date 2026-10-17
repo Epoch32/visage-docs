@@ -1,5 +1,5 @@
 import { For } from "@epoch32/visage";
-import { Edit } from "lucide-react";
+import { Edit } from "lucide";
 import "../styles/toc.css";
 
 export interface TocItem {

@@ -1,41 +1,17 @@
-import { CodeBlock } from "../components/CodeBlock";
-import { Grid, Maximize2, Move, Ruler, Sparkles } from "lucide-react";
-
 export const title = "4px Spatial Grid Engine";
 export const breadcrumb = "Documentation / Spatial & Styles";
 
-export const toc = [
-  { id: "overview", title: "Overview", level: 2 },
-  { id: "grid-scale", title: "The 4px Engineering Scale", level: 2 },
-  { id: "dimension-intents", title: "Semantic Dimension Keywords", level: 2 },
-  { id: "fluid-typography", title: "Fluid Clamping (fluid)", level: 2 },
-  { id: "unit-helpers", title: "Unit Measurement Helpers", level: 2 },
-  { id: "api-reference", title: "API Reference", level: 2 },
-];
-
 The Visage Spatial Engine eliminates layout bugs, measurement fatigue, and manual viewport calculations. It provides a crisp, mathematical 4px spatial scale, semantic viewport intents (`screen`, `full`, `half`), and zero-math fluid clamping.
 
-<div className="doc-features-grid">
-  <div className="doc-feature-card">
-    <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "6px" }}>
-      <Ruler size={16} color="var(--pink-500)" />
-      <div className="doc-feature-title">4px Grid Discipline</div>
-    </div>
-    <div className="doc-feature-desc">
-      All numbers passed to Visage layout props automatically resolve to the 4px spatial system (e.g., <code>gap={4}</code> resolves to <code>16px</code>).
-    </div>
-  </div>
+<FeatureGrid>
+  <FeatureCard icon="ruler" title="4px Grid Discipline">
+    All numbers passed to Visage layout props automatically resolve to the 4px spatial system (e.g., <code>gap=&#123;4&#125;</code> resolves to <code>16px</code>).
+  </FeatureCard>
 
-  <div className="doc-feature-card">
-    <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "6px" }}>
-      <Maximize2 size={16} color="var(--pink-500)" />
-      <div className="doc-feature-title">Dynamic Viewport Units</div>
-    </div>
-    <div className="doc-feature-desc">
-      Viewport dimensions automatically utilize modern <code>dvh</code> / <code>dvw</code> units to prevent mobile browser address bar layout jumps.
-    </div>
-  </div>
-</div>
+  <FeatureCard icon="maximize" title="Dynamic Viewport Units">
+    Viewport dimensions automatically utilize modern <code>dvh</code> / <code>dvw</code> units to prevent mobile browser address bar layout jumps.
+  </FeatureCard>
+</FeatureGrid>
 
 ## The 4px Engineering Scale
 
@@ -134,17 +110,11 @@ resolveDimension("min");          // "min-content"
 resolveDimension("max");          // "max-content"`}
 />
 
-<div className="doc-callout">
-  <div className="doc-callout-icon">
-    <Sparkles size={18} color="var(--pink-500)" />
-  </div>
-  <div className="doc-callout-body">
-    <div className="doc-callout-title">Smart Dimension Threshold</div>
-    When passing numbers to width/height props via <code>resolveDimension()</code>:
-    Numbers <code>&lt;= 48</code> multiply by 4px (e.g. <code>w={10}</code> = <code>40px</code>).
-    Numbers <code>&gt; 48</code> are treated as explicit pixel dimensions (e.g. <code>w={320}</code> = <code>320px</code>).
-  </div>
-</div>
+<Callout type="tip" title="Smart Dimension Threshold">
+  When passing numbers to width/height props via <code>resolveDimension()</code>:
+  Numbers <code>&lt;= 48</code> multiply by 4px (e.g. <code>w=&#123;10&#125;</code> = <code>40px</code>).
+  Numbers <code>&gt; 48</code> are treated as explicit pixel dimensions (e.g. <code>w=&#123;320&#125;</code> = <code>320px</code>).
+</Callout>
 
 ## Fluid Clamping (fluid)
 

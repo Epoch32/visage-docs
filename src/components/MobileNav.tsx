@@ -8,7 +8,7 @@ import {
 	BottomBarAction,
 	BottomBarItem,
 } from "@epoch32/visage/ui";
-import { BookOpen, ChevronRight, Layers, ListTree, Menu, Search, X, Zap } from "lucide-react";
+import { BookOpen, ChevronRight, Layers, ListTree, Menu, Search, X, Zap } from "lucide";
 import { navigationSections } from "./Sidebar";
 import type { TocItem } from "./TableOfContents";
 import "../styles/mobile-nav.css";

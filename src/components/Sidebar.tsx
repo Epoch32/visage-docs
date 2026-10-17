@@ -37,7 +37,7 @@ export const navigationSections: NavSection[] = [
 		title: "DOM & Control Flow",
 		items: [
 			{ id: "rendering", title: "Fine-Grained DOM (render)" },
-			{ id: "control-flow", title: "<Show> & <For>" },
+			{ id: "control-flow", title: "<Show>, <For> & <Index>" },
 			{ id: "portals-suspense", title: "<Portal> & <Suspense>" },
 			{ id: "spa-router", title: "SPA Router (<Router>)" },
 			{ id: "template-literals", title: "HTML Template Literals" },
@@ -55,6 +55,7 @@ export const navigationSections: NavSection[] = [
 		title: "Headless UI & Charts",
 		items: [
 			{ id: "ui-primitives", title: "Accessible UI Components" },
+			{ id: "forms", title: "Reactive Forms & Validation" },
 			{ id: "io-primitives", title: "IO & Drag-and-Drop" },
 			{ id: "charts", title: "Reactive SVG Charts" },
 			{ id: "virtual-lists", title: "Virtualizer (100k+ Rows)" },
@@ -63,11 +64,14 @@ export const navigationSections: NavSection[] = [
 	{
 		title: "Full-Stack & Tools",
 		items: [
+			{ id: "query", title: "Async Query & Mutations" },
+			{ id: "ssr", title: "Server-Side Rendering (SSR)" },
+			{ id: "native", title: "Native Desktop Bridge", badge: "Experimental" },
 			{ id: "file-api", title: "Opinionated File-Based API" },
 			{ id: "rpc-sse", title: "End-to-End Typed RPC & SSE" },
 			{ id: "i18n", title: "I18n & Community Sync" },
 			{ id: "devtools", title: "Live DAG Graph DevTools" },
-			{ id: "vite-plugin", title: "Vite Plugin & Fast HMR" },
+			{ id: "vite-plugin", title: "Vite Plugin & Build Tooling" },
 		],
 	},
 ];
@@ -108,7 +112,11 @@ export function Sidebar(props: SidebarProps) {
 												</span>
 
 												{item.badge && (
-													<span class="sidebar-badge">{item.badge}</span>
+													<span
+														class={`sidebar-badge ${item.badge.toLowerCase() === "experimental" ? "experimental" : ""}`}
+													>
+														{item.badge}
+													</span>
 												)}
 											</TabsTrigger>
 										))}

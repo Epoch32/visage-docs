@@ -71,7 +71,7 @@
 	}
 
 	.app-main {
-		max-width: calc(100% - 300px);
+		max-width: 880px;
 	}
 }
 

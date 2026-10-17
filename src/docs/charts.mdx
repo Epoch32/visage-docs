@@ -1,43 +1,17 @@
-import { CodeBlock } from "../components/CodeBlock";
-import { Activity, BarChart3, LineChart, PieChart, Sparkles } from "lucide-react";
-
 export const title = "Reactive SVG Charts";
 export const breadcrumb = "Documentation / Headless UI & Charts";
 
-export const toc = [
-  { id: "overview", title: "Overview", level: 2 },
-  { id: "line-chart", title: "Line Charts (<Line>)", level: 2 },
-  { id: "area-chart", title: "Area Charts (<Area>)", level: 2 },
-  { id: "bar-chart", title: "Bar Charts (<Bar>)", level: 2 },
-  { id: "pie-chart", title: "Pie & Donut Charts (<Pie>)", level: 2 },
-  { id: "axes-grid", title: "Axes, Grid & Cursor Tooltips", level: 2 },
-  { id: "math-scales", title: "Mathematical Scales Engine", level: 2 },
-  { id: "api-reference", title: "API Reference", level: 2 },
-];
-
 Visage includes a high-performance SVG chart engine (`visage/charts`). Because Visage bypasses Virtual DOM diffing, SVG path strings, coordinate transformations, and hover cursors react directly to signal updates with smooth 60fps responsiveness.
 
-<div className="doc-features-grid">
-  <div className="doc-feature-card">
-    <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "6px" }}>
-      <Activity size={16} color="var(--pink-500)" />
-      <div className="doc-feature-title">Pure Reactive SVG</div>
-    </div>
-    <div className="doc-feature-desc">
-      Zero canvas/WebGL black boxes or bulky D3 bundles. Pure, crisp, accessible SVG elements styled with standard CSS.
-    </div>
-  </div>
+<FeatureGrid>
+  <FeatureCard icon="activity" title="Pure Reactive SVG">
+    Zero canvas/WebGL black boxes or bulky D3 bundles. Pure, crisp, accessible SVG elements styled with standard CSS.
+  </FeatureCard>
 
-  <div className="doc-feature-card">
-    <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "6px" }}>
-      <LineChart size={16} color="var(--pink-500)" />
-      <div className="doc-feature-title">Live Signal Telemetry</div>
-    </div>
-    <div className="doc-feature-desc">
-      Streaming real-time financial or metrics data updates SVG path attributes directly without re-rendering the surrounding component.
-    </div>
-  </div>
-</div>
+  <FeatureCard icon="line-chart" title="Live Signal Telemetry">
+    Streaming real-time financial or metrics data updates SVG path attributes directly without re-rendering the surrounding component.
+  </FeatureCard>
+</FeatureGrid>
 
 ## Line Charts (&lt;Line&gt;)
 

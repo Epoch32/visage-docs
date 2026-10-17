@@ -1,42 +1,17 @@
-import { CodeBlock } from "../components/CodeBlock";
-import { ArrowDownToLine, Copy, FileCheck, FolderUp, MousePointer, ShieldCheck } from "lucide-react";
-
 export const title = "IO & Drag-and-Drop Primitives";
 export const breadcrumb = "Documentation / Headless UI & Charts";
 
-export const toc = [
-  { id: "overview", title: "Overview", level: 2 },
-  { id: "dropzone-primitive", title: "Drag and Drop DropZone (<DropZone> / createDropZone)", level: 2 },
-  { id: "clipboard-primitive", title: "Reactive Clipboard (createClipboard)", level: 2 },
-  { id: "file-picker", title: "Imperative File Picker (createFilePicker)", level: 2 },
-  { id: "media-url", title: "Object URL Management (createMediaUrl)", level: 2 },
-  { id: "paste-handler", title: "Paste Event Handler (onPaste)", level: 2 },
-  { id: "api-reference", title: "API Reference", level: 2 },
-];
-
 Visage IO (`visage/io`) provides headless, fine-grained reactive primitives for drag-and-drop file ingestion, file dialog triggers, object URL lifecycle cleanup, and reactive clipboard read/write with legacy fallbacks.
 
-<div className="doc-features-grid">
-  <div className="doc-feature-card">
-    <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "6px" }}>
-      <FolderUp size={16} color="var(--pink-500)" />
-      <div className="doc-feature-title">Zero-Flicker Drag Counter</div>
-    </div>
-    <div className="doc-feature-desc">
-      Tracks nested DOM enter/leave cycles using an internal counter, avoiding erratic drag-leave flicker when hovering over child elements.
-    </div>
-  </div>
+<FeatureGrid>
+  <FeatureCard icon="folder" title="Zero-Flicker Drag Counter">
+    Tracks nested DOM enter/leave cycles using an internal counter, avoiding erratic drag-leave flicker when hovering over child elements.
+  </FeatureCard>
 
-  <div className="doc-feature-card">
-    <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "6px" }}>
-      <ShieldCheck size={16} color="var(--pink-500)" />
-      <div className="doc-feature-title">Strict MIME & Extension Filters</div>
-    </div>
-    <div className="doc-feature-desc">
-      Supports exact MIME types (<code>image/png</code>), wildcards (<code>image/*</code>), file extensions (<code>.pdf</code>), and size caps with detailed rejection reasons.
-    </div>
-  </div>
-</div>
+  <FeatureCard icon="shield-check" title="Strict MIME & Extension Filters">
+    Supports exact MIME types (<code>image/png</code>), wildcards (<code>image/*</code>), file extensions (<code>.pdf</code>), and size caps with detailed rejection reasons.
+  </FeatureCard>
+</FeatureGrid>
 
 ## Drag and Drop DropZone (&lt;DropZone&gt; / createDropZone)
 

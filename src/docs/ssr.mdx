@@ -1,0 +1,270 @@
+export const title = "Server-Side Rendering (SSR) & Hydration";
+export const breadcrumb = "Documentation / Full-Stack & Tools";
+
+Visage Server (`@epoch32/visage/server`) provides lightning-fast Server-Side Rendering (SSR) and fine-grained DOM hydration. Because Visage does not use a virtual DOM, server rendering executes as pure string generation with zero node-diffing structures, achieving near-native throughput on edge and server runtimes.
+
+<FeatureGrid>
+  <FeatureCard icon="zap" title="Zero-VDOM Throughput">
+    Without synthetic event trees or virtual node allocations, components compile directly into escaped HTML streams at tens of thousands of requests per second.
+  </FeatureCard>
+
+  <FeatureCard icon="globe" title="Standard Web Streams">
+    <code>renderToStream</code> outputs a standard WHATWG <code>ReadableStream&lt;Uint8Array&gt;</code> that plugs into Bun, Cloudflare Workers, Fastly, Deno, and Node.js.
+  </FeatureCard>
+
+  <FeatureCard icon="cpu" title="Selective Non-Destructive Hydration">
+    The client <code>hydrate()</code> function walks existing server DOM elements and attaches signal subscriptions without destroying or recreating markup.
+  </FeatureCard>
+
+  <FeatureCard icon="server" title="Isomorphic Reactivity">
+    Signals and computed getters evaluate synchronously on the server during rendering, automatically generating pristine initial markup.
+  </FeatureCard>
+</FeatureGrid>
+
+## Synchronous SSR (renderToString)
+
+`renderToString` evaluates a component tree inside an isolated root and outputs an HTML string:
+
+<CodeBlock
+  filename="server/index.ts"
+  lang="tsx"
+  code={`import { renderToString } from "@epoch32/visage/server";
+import { App } from "./src/App";
+
+// Render to static HTML string
+const html = renderToString(() => <App title="Visage SSR" />);
+
+console.log(html);
+// Output: <div class="app"><h1>Visage SSR</h1>...</div>`}
+/>
+
+## Streaming SSR (renderToStream)
+
+For fast Time-to-First-Byte (TTFB), use `renderToStream` to deliver HTML over standard WHATWG `ReadableStream`:
+
+<CodeBlock
+  filename="server/stream.ts"
+  lang="tsx"
+  code={`import { renderToStream } from "@epoch32/visage/server";
+import { App } from "./src/App";
+
+// Web standard Response with ReadableStream
+export function handleRequest(request: Request): Response {
+  const stream = renderToStream(() => <App url={request.url} />, {
+    onError: (err) => {
+      console.error("SSR Stream Error:", err);
+    },
+  });
+
+  return new Response(stream, {
+    headers: {
+      "Content-Type": "text/html; charset=utf-8",
+      "Transfer-Encoding": "chunked",
+    },
+  });
+}`}
+/>
+
+## Fine-Grained Hydration (hydrate)
+
+On the client, replace `render()` with `hydrate()`. Visage matches the client component graph against the existing server-rendered HTML nodes in the container, binding event listeners and signal reactivity without redrawing the DOM:
+
+<CodeBlock
+  filename="src/entry-client.tsx"
+  lang="tsx"
+  code={`import { hydrate } from "@epoch32/visage/server";
+import { App } from "./App";
+
+const container = document.getElementById("root")!;
+
+// Hydrate existing DOM without re-creating nodes
+const dispose = hydrate(() => <App />, container);
+
+// Clean up listeners on hot module reload or route unmount
+if (import.meta.hot) {
+  import.meta.hot.dispose(() => dispose());
+}`}
+/>
+
+## Server Integration (Bun, Hono, Node)
+
+Visage SSR works out-of-the-box with any modern JavaScript runtime:
+
+### Bun Server
+
+<CodeBlock
+  filename="server.ts"
+  lang="tsx"
+  code={`import { renderToString } from "@epoch32/visage/server";
+import { App } from "./src/App";
+
+Bun.serve({
+  port: 3000,
+  fetch(req) {
+    const appHtml = renderToString(() => <App path={new URL(req.url).pathname} />);
+
+    const html = \`<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Visage App</title>
+    <link rel="stylesheet" href="/assets/index.css" />
+  </head>
+  <body>
+    <div id="root">\${appHtml}</div>
+    <script type="module" src="/src/entry-client.tsx"></script>
+  </body>
+</html>\`;
+
+    return new Response(html, {
+      headers: { "Content-Type": "text/html; charset=utf-8" },
+    });
+  },
+});`}
+/>
+
+### Hono / Cloudflare Workers
+
+<CodeBlock
+  filename="worker.ts"
+  lang="tsx"
+  code={`import { Hono } from "hono";
+import { renderToStream } from "@epoch32/visage/server";
+import { App } from "./src/App";
+
+const app = new Hono();
+
+app.get("*", (c) => {
+  const stream = renderToStream(() => <App url={c.req.url} />);
+
+  return c.newResponse(stream, 200, {
+    "Content-Type": "text/html; charset=utf-8",
+  });
+});
+
+export default app;`}
+/>
+
+## API Reference
+
+<div className="doc-api-section">
+  <div className="doc-fn-card">
+    <div className="doc-fn-header">
+      <div className="doc-fn-meta">
+        <span className="doc-fn-kind">Function</span>
+      </div>
+      <div className="doc-fn-signature">
+        renderToString(fn: () =&gt; Child): string
+      </div>
+    </div>
+
+    <div className="doc-fn-body">
+      <div className="doc-fn-desc">
+        Synchronously renders a Visage component tree to an escaped HTML string. Signals evaluate their current values at render time.
+      </div>
+
+      <div>
+        <div className="doc-fn-subheading">Parameters</div>
+        <div className="doc-params-list">
+          <div className="doc-param-row">
+            <div className="doc-param-meta">
+              <span className="doc-param-name">fn</span>
+              <span className="doc-param-type">() =&gt; Child</span>
+              <span className="doc-param-badge required">Required</span>
+            </div>
+            <div className="doc-param-desc">
+              The root component factory function to render to string.
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div className="doc-fn-card">
+    <div className="doc-fn-header">
+      <div className="doc-fn-meta">
+        <span className="doc-fn-kind">Function</span>
+      </div>
+      <div className="doc-fn-signature">
+        renderToStream(fn: () =&gt; Child, options?: StreamOptions): ReadableStream&lt;Uint8Array&gt;
+      </div>
+    </div>
+
+    <div className="doc-fn-body">
+      <div className="doc-fn-desc">
+        Streams HTML chunks progressively using standard WHATWG <code>ReadableStream&lt;Uint8Array&gt;</code>. Ideal for edge runtimes (Cloudflare Workers, Deno, Bun) and Node.js servers.
+      </div>
+
+      <div>
+        <div className="doc-fn-subheading">Options</div>
+        <div className="doc-params-list">
+          <div className="doc-param-row">
+            <div className="doc-param-meta">
+              <span className="doc-param-name">options.onChunk</span>
+              <span className="doc-param-type">(chunk: string) =&gt; void</span>
+              <span className="doc-param-badge optional">Optional</span>
+            </div>
+            <div className="doc-param-desc">
+              Callback invoked as each HTML chunk is serialized.
+            </div>
+          </div>
+          <div className="doc-param-row">
+            <div className="doc-param-meta">
+              <span className="doc-param-name">options.onError</span>
+              <span className="doc-param-type">(error: any) =&gt; void</span>
+              <span className="doc-param-badge optional">Optional</span>
+            </div>
+            <div className="doc-param-desc">
+              Error handler invoked if stream serialization fails.
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div className="doc-fn-card">
+    <div className="doc-fn-header">
+      <div className="doc-fn-meta">
+        <span className="doc-fn-kind">Function</span>
+      </div>
+      <div className="doc-fn-signature">
+        hydrate(fn: () =&gt; Child, container: HTMLElement | DocumentFragment): () =&gt; void
+      </div>
+    </div>
+
+    <div className="doc-fn-body">
+      <div className="doc-fn-desc">
+        Attaches reactive signal subscriptions and DOM event listeners to existing server-rendered HTML nodes in <code>container</code> without re-creating nodes. Returns a cleanup disposal function.
+      </div>
+
+      <div>
+        <div className="doc-fn-subheading">Parameters</div>
+        <div className="doc-params-list">
+          <div className="doc-param-row">
+            <div className="doc-param-meta">
+              <span className="doc-param-name">fn</span>
+              <span className="doc-param-type">() =&gt; Child</span>
+              <span className="doc-param-badge required">Required</span>
+            </div>
+            <div className="doc-param-desc">
+              The root component factory function matching the server-rendered tree.
+            </div>
+          </div>
+          <div className="doc-param-row">
+            <div className="doc-param-meta">
+              <span className="doc-param-name">container</span>
+              <span className="doc-param-type">HTMLElement | DocumentFragment</span>
+              <span className="doc-param-badge required">Required</span>
+            </div>
+            <div className="doc-param-desc">
+              The host DOM element containing server-rendered HTML nodes.
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

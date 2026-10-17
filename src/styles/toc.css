@@ -1,5 +1,6 @@
 .toc-container {
 	width: 240px;
+	flex-shrink: 0;
 	position: sticky;
 	top: 84px;
 	height: fit-content;

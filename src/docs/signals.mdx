@@ -1,44 +1,17 @@
-import { SignalPlayground } from "../components/SignalPlayground";
-import { CodeBlock } from "../components/CodeBlock";
-import { AlertTriangle, Gauge, HelpCircle, Sparkles, Zap } from "lucide-react";
-
 export const title = "Signals (createSignal)";
 export const breadcrumb = "Documentation / Reactivity";
 
-export const toc = [
-  { id: "overview", title: "Overview", level: 2 },
-  { id: "interactive-demo", title: "Interactive Playground", level: 2 },
-  { id: "anatomy", title: "Anatomy & Syntax", level: 2 },
-  { id: "mental-model", title: "Mental Model: Zero VDOM", level: 2 },
-  { id: "functional-updates", title: "Functional Updates", level: 2 },
-  { id: "custom-equality", title: "Equality & Deduplication", level: 2 },
-  { id: "pitfalls", title: "Common Traps to Avoid", level: 2 },
-  { id: "api-reference", title: "API Reference", level: 2 },
-];
-
 Signals are the atomic reactive building blocks in Visage. Unlike frameworks that rely on Virtual DOM diffing and re-running entire component trees, Visage components execute **exactly once**. Signals establish direct point-to-point connections to the precise DOM text nodes and attributes they control.
 
-<div className="doc-features-grid">
-  <div className="doc-feature-card">
-    <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "6px" }}>
-      <Zap size={16} color="var(--pink-500)" />
-      <div className="doc-feature-title">Microsecond Micro-Updates</div>
-    </div>
-    <div className="doc-feature-desc">
-      Calling a signal setter updates only subscribed DOM text nodes directly, skipping whole-tree diffs, fiber reconciliation, and garbage collector pressure.
-    </div>
-  </div>
+<FeatureGrid>
+  <FeatureCard icon="zap" title="Microsecond Micro-Updates">
+    Calling a signal setter updates only subscribed DOM text nodes directly, skipping whole-tree diffs, fiber reconciliation, and garbage collector pressure.
+  </FeatureCard>
 
-  <div className="doc-feature-card">
-    <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "6px" }}>
-      <Gauge size={16} color="var(--pink-500)" />
-      <div className="doc-feature-title">Glitch-Free Execution</div>
-    </div>
-    <div className="doc-feature-desc">
-      Visage tracks topological dependencies using a synchronous, deterministic push/pull algorithm that prevents intermediate inconsistent state across computed graphs.
-    </div>
-  </div>
-</div>
+  <FeatureCard icon="gauge" title="Glitch-Free Execution">
+    Visage tracks topological dependencies using a synchronous, deterministic push/pull algorithm that prevents intermediate inconsistent state across computed graphs.
+  </FeatureCard>
+</FeatureGrid>
 
 ## Interactive Playground
 
@@ -66,15 +39,9 @@ setCount(10);
 console.log(count()); // -> 10`}
 />
 
-<div className="doc-callout">
-  <div className="doc-callout-icon">
-    <Sparkles size={18} color="var(--pink-500)" />
-  </div>
-  <div className="doc-callout-body">
-    <div className="doc-callout-title">Visage Pro-Tip: JSX Auto-Unwrapping</div>
-    In Visage JSX, you can interpolate either <code>{`{count}`}</code> or <code>{`{count()}`}</code>. Both subscribe automatically to fine-grained updates, but passing <code>{`{count}`}</code> directly passes the accessor function without allocating an unnecessary wrapper closure.
-  </div>
-</div>
+<Callout type="tip" title="Visage Pro-Tip: JSX Auto-Unwrapping">
+  In Visage JSX, you can interpolate either <code>&#123;count&#125;</code> or <code>&#123;count()&#125;</code>. Both subscribe automatically to fine-grained updates, but passing <code>&#123;count&#125;</code> directly passes the accessor function without allocating an unnecessary wrapper closure.
+</Callout>
 
 ## Mental Model: React vs Visage
 
@@ -147,25 +114,13 @@ const [coords, setCoords] = createSignal(
 
 ## Common Traps to Avoid
 
-<div className="doc-callout" style={{ borderLeftColor: "var(--pink-500)" }}>
-  <div className="doc-callout-icon">
-    <AlertTriangle size={18} color="var(--pink-500)" />
-  </div>
-  <div className="doc-callout-body">
-    <div className="doc-callout-title">Trap 1: Destructuring Props</div>
-    Because components execute only once, destructuring incoming props like <code>const {`{ value }`} = props;</code> strips reactivity! Always access reactive properties on props as functions or properties (e.g., <code>props.value</code>).
-  </div>
-</div>
+<Callout type="warning" title="Trap 1: Destructuring Props">
+  Because components execute only once, destructuring incoming props like <code>const &#123; value &#125; = props;</code> strips reactivity! Always access reactive properties on props as functions or properties (e.g., <code>props.value</code>).
+</Callout>
 
-<div className="doc-callout" style={{ borderLeftColor: "var(--pink-500)" }}>
-  <div className="doc-callout-icon">
-    <HelpCircle size={18} color="var(--pink-500)" />
-  </div>
-  <div className="doc-callout-body">
-    <div className="doc-callout-title">Trap 2: Reading Outside Reactive Scopes</div>
-    Reading <code>count()</code> in the outer body of a component function only executes once during mount. If you want derived calculations that update dynamically when <code>count</code> changes, use <code>computed(() =&gt; count() * 2)</code> or wrap the expression in an accessor function <code>{`() => count() * 2`}</code>.
-  </div>
-</div>
+<Callout type="warning" title="Trap 2: Reading Outside Reactive Scopes">
+  Reading <code>count()</code> in the outer body of a component function only executes once during mount. If you want derived calculations that update dynamically when <code>count</code> changes, use <code>computed(() =&gt; count() * 2)</code> or wrap the expression in an accessor function <code>&#123;() =&gt; count() * 2&#125;</code>.
+</Callout>
 
 ## API Reference
 

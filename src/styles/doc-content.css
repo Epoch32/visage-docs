@@ -4,6 +4,9 @@
 	padding: 40px 44px;
 	border: 1px solid var(--border-pink);
 	box-shadow: var(--shadow-card);
+	width: 100%;
+	box-sizing: border-box;
+	min-width: 0;
 }
 
 .doc-breadcrumb {
@@ -189,6 +192,61 @@
 	margin-bottom: 4px;
 }
 
+/* Experimental & Warning Callouts */
+.doc-callout-experimental {
+	margin: 24px 0;
+	padding: 16px 20px;
+	border-radius: 12px;
+	border-left: 4px solid #f59e0b;
+	background: rgba(245, 158, 11, 0.08);
+	border-top: 1px solid rgba(245, 158, 11, 0.25);
+	border-right: 1px solid rgba(245, 158, 11, 0.25);
+	border-bottom: 1px solid rgba(245, 158, 11, 0.25);
+	display: flex;
+	gap: 14px;
+	align-items: flex-start;
+}
+
+.doc-callout-experimental .doc-callout-title {
+	color: #d97706;
+	display: flex;
+	align-items: center;
+	gap: 8px;
+}
+
+[data-theme="dark"] .doc-callout-experimental {
+	background: rgba(245, 158, 11, 0.12);
+	border-top-color: rgba(245, 158, 11, 0.35);
+	border-right-color: rgba(245, 158, 11, 0.35);
+	border-bottom-color: rgba(245, 158, 11, 0.35);
+}
+
+[data-theme="dark"] .doc-callout-experimental .doc-callout-title {
+	color: #fbbf24;
+}
+
+.doc-tag-experimental {
+	display: inline-flex;
+	align-items: center;
+	font-size: 11px;
+	font-weight: 700;
+	text-transform: uppercase;
+	letter-spacing: 0.06em;
+	padding: 2px 8px;
+	border-radius: 9999px;
+	background: rgba(245, 158, 11, 0.15);
+	color: #d97706;
+	border: 1px solid rgba(245, 158, 11, 0.35);
+	margin-left: 8px;
+	vertical-align: middle;
+}
+
+[data-theme="dark"] .doc-tag-experimental {
+	background: rgba(245, 158, 11, 0.22);
+	color: #fbbf24;
+	border-color: rgba(245, 158, 11, 0.45);
+}
+
 /* Interactive Playground Card */
 .doc-playground {
 	background: var(--surface-glass);
@@ -266,11 +324,19 @@
 /* Data Table & Markdown Tables */
 .doc-table-wrapper {
 	width: 100%;
+	max-width: 100%;
 	overflow-x: auto;
 	margin: 20px 0 28px 0;
 	border: 1px solid var(--border-pink);
 	border-radius: 12px;
 	background: var(--surface-card);
+	-webkit-overflow-scrolling: touch;
+}
+
+.doc-table-wrapper .doc-table-wrapper {
+	border: none;
+	margin: 0;
+	padding: 0;
 }
 
 .doc-table,
@@ -280,11 +346,8 @@
 	border-spacing: 0;
 	text-align: left;
 	font-size: 13.5px;
-	margin: 20px 0 28px 0;
+	margin: 0;
 	background: var(--surface-card);
-	border: 1px solid var(--border-pink);
-	border-radius: 12px;
-	overflow: hidden;
 }
 
 .doc-table th,

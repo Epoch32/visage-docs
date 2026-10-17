@@ -1,42 +1,17 @@
-import { CodeBlock } from "../components/CodeBlock";
-import { ExternalLink, Hourglass, Layers, Sparkles, Zap } from "lucide-react";
-
 export const title = "<Portal> & <Suspense>";
 export const breadcrumb = "Documentation / DOM & Control Flow";
 
-export const toc = [
-  { id: "overview", title: "Overview", level: 2 },
-  { id: "portal-primitive", title: "Portals (<Portal>)", level: 2 },
-  { id: "custom-mount-targets", title: "Custom Mount Targets", level: 2 },
-  { id: "suspense-primitive", title: "Async Suspense (<Suspense>)", level: 2 },
-  { id: "create-resource", title: "Async State (createResource)", level: 2 },
-  { id: "code-splitting-lazy", title: "Lazy Code Splitting (lazy)", level: 2 },
-  { id: "api-reference", title: "API Reference", level: 2 },
-];
-
 Visage provides two foundational primitives for orchestrating DOM boundaries and asynchronous execution: `<Portal>` for escaping parent overflow containers into external DOM nodes, and `<Suspense>` for coordinating async data loading.
 
-<div className="doc-features-grid">
-  <div className="doc-feature-card">
-    <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "6px" }}>
-      <ExternalLink size={16} color="var(--pink-500)" />
-      <div className="doc-feature-title">Context-Preserving Portals</div>
-    </div>
-    <div className="doc-feature-desc">
-      <code>&lt;Portal&gt;</code> teleports DOM nodes into <code>document.body</code> or any target element while completely preserving signal ownership and Context scopes.
-    </div>
-  </div>
+<FeatureGrid>
+  <FeatureCard icon="external-link" title="Context-Preserving Portals">
+    <code>&lt;Portal&gt;</code> teleports DOM nodes into <code>document.body</code> or any target element while completely preserving signal ownership and Context scopes.
+  </FeatureCard>
 
-  <div className="doc-feature-card">
-    <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "6px" }}>
-      <Hourglass size={16} color="var(--pink-500)" />
-      <div className="doc-feature-title">Fine-Grained Suspense</div>
-    </div>
-    <div className="doc-feature-desc">
-      <code>&lt;Suspense&gt;</code> automatically tracks pending promises registered by <code>createResource</code>, <code>lazy</code>, or <code>createQuery</code> without tearing down parent trees.
-    </div>
-  </div>
-</div>
+  <FeatureCard icon="hourglass" title="Fine-Grained Suspense">
+    <code>&lt;Suspense&gt;</code> automatically tracks pending promises registered by <code>createResource</code>, <code>lazy</code>, or <code>createQuery</code> without tearing down parent trees.
+  </FeatureCard>
+</FeatureGrid>
 
 ## Portals (&lt;Portal&gt;)
 

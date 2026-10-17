@@ -1,44 +1,17 @@
-import { DirtyLoadingSimulator } from "../components/DirtyLoadingSimulator";
-import { CodeBlock } from "../components/CodeBlock";
-import { Brain, Cpu, Sparkles } from "lucide-react";
-
 export const title = "Derived State (computed)";
 export const breadcrumb = "Documentation / Reactivity";
 
-export const toc = [
-  { id: "overview", title: "Overview", level: 2 },
-  { id: "dirty-loading", title: "How Dirty Loading Works", level: 2 },
-  { id: "interactive-demo", title: "Interactive Subscriber Simulator", level: 2 },
-  { id: "syntax", title: "Basic Syntax & Usage", level: 2 },
-  { id: "subscriber-tree", title: "The Subscriber Tree", level: 2 },
-  { id: "memoization", title: "Memoization & Deduplication", level: 2 },
-  { id: "dynamic-dependencies", title: "Dynamic Dependency Pruning", level: 2 },
-  { id: "api-reference", title: "API Reference", level: 2 },
-];
-
 A computed node is a derived reactive container calculated from the values of one or more signals. Computed nodes cannot be written to manually; they exist strictly as pure transformations of upstream state.
 
-<div className="doc-features-grid">
-  <div className="doc-feature-card">
-    <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "6px" }}>
-      <Cpu size={16} color="var(--pink-500)" />
-      <div className="doc-feature-title">Dirty Loading Architecture</div>
-    </div>
-    <div className="doc-feature-desc">
-      When upstream signals change, computed nodes do not recalculate. They simply mark themselves dirty. Zero CPU cycles are spent until a subscriber explicitly reads the value.
-    </div>
-  </div>
+<FeatureGrid>
+  <FeatureCard icon="cpu" title="Dirty Loading Architecture">
+    When upstream signals change, computed nodes do not recalculate. They simply mark themselves dirty. Zero CPU cycles are spent until a subscriber explicitly reads the value.
+  </FeatureCard>
 
-  <div className="doc-feature-card">
-    <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "6px" }}>
-      <Brain size={16} color="var(--pink-500)" />
-      <div className="doc-feature-title">Automatic Memoization</div>
-    </div>
-    <div className="doc-feature-desc">
-      If an upstream signal hasn't changed, reading a computed node 100 times returns the cached value in sub-nanoseconds without re-executing the derivation callback.
-    </div>
-  </div>
-</div>
+  <FeatureCard icon="brain" title="Automatic Memoization">
+    If an upstream signal hasn't changed, reading a computed node 100 times returns the cached value in sub-nanoseconds without re-executing the derivation callback.
+  </FeatureCard>
+</FeatureGrid>
 
 ## How Dirty Loading Works
 
@@ -46,34 +19,19 @@ In naive reactive systems, updating a signal immediately triggers an eager recal
 
 Visage solves this with **Dirty Loading**:
 
-<div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "12px", marginBottom: "28px" }}>
-  <div style={{ padding: "16px", background: "var(--surface-card)", borderRadius: "12px", border: "1px solid var(--border-pink)" }}>
-    <div style={{ fontSize: "12px", fontWeight: 700, color: "var(--pink-600)", marginBottom: "4px" }}>
-      1. Upstream Signal Changes
-    </div>
-    <div style={{ fontSize: "13px", color: "var(--text-body)" }}>
-      Signal <code>A</code> updates from <code>0</code> to <code>1</code>. Signal <code>A</code> notifies its subscriber tree that a change occurred.
-    </div>
-  </div>
+<FeatureGrid>
+  <FeatureCard icon="zap" title="1. Upstream Signal Changes">
+    Signal <code>A</code> updates from <code>0</code> to <code>1</code>. Signal <code>A</code> notifies its subscriber tree that a change occurred.
+  </FeatureCard>
 
-  <div style={{ padding: "16px", background: "var(--surface-card)", borderRadius: "12px", border: "1px solid var(--border-pink)" }}>
-    <div style={{ fontSize: "12px", fontWeight: 700, color: "var(--pink-600)", marginBottom: "4px" }}>
-      2. Mark as Dirty
-    </div>
-    <div style={{ fontSize: "13px", color: "var(--text-body)" }}>
-      Computed node <code>Z</code> is <strong>not</strong> calculated yet. Instead, it marks its internal state as <code>DIRTY</code>.
-    </div>
-  </div>
+  <FeatureCard icon="refresh" title="2. Mark as Dirty">
+    Computed node <code>Z</code> is <strong>not</strong> calculated yet. Instead, it marks its internal state as <code>DIRTY</code>.
+  </FeatureCard>
 
-  <div style={{ padding: "16px", background: "var(--surface-card)", borderRadius: "12px", border: "1px solid var(--border-pink)" }}>
-    <div style={{ fontSize: "12px", fontWeight: 700, color: "var(--pink-600)", marginBottom: "4px" }}>
-      3. Compute On Read
-    </div>
-    <div style={{ fontSize: "13px", color: "var(--text-body)" }}>
-      When someone reads <code>Z()</code>, Visage sees that <code>Z</code> is dirty, performs the calculation using <code>A</code>'s latest value, caches it, and marks it <code>CLEAN</code>.
-    </div>
-  </div>
-</div>
+  <FeatureCard icon="cpu" title="3. Compute On Read">
+    When someone reads <code>Z()</code>, Visage sees that <code>Z</code> is dirty, performs the calculation using <code>A</code>'s latest value, caches it, and marks it <code>CLEAN</code>.
+  </FeatureCard>
+</FeatureGrid>
 
 ## Interactive Subscriber Simulator
 
@@ -127,15 +85,9 @@ const d = computed(() => c() ** 2);     // Depends on C
 
 Once computed, a node caches its output. Subsequent reads return the cached value directly without calling your function:
 
-<div className="doc-callout">
-  <div className="doc-callout-icon">
-    <Sparkles size={18} color="var(--pink-500)" />
-  </div>
-  <div className="doc-callout-body">
-    <div className="doc-callout-title">Glitch-Free Guarantee</div>
-    If a computed node depends on multiple signals that change within the same microtask batch, Visage topological versioning ensures the computed value never executes against an inconsistent intermediate state.
-  </div>
-</div>
+<Callout type="tip" title="Glitch-Free Guarantee">
+  If a computed node depends on multiple signals that change within the same microtask batch, Visage topological versioning ensures the computed value never executes against an inconsistent intermediate state.
+</Callout>
 
 ## Dynamic Dependency Pruning
 

@@ -1,42 +1,17 @@
-import { CodeBlock } from "../components/CodeBlock";
-import { Cpu, Layers, Sparkles, Zap, ShieldCheck } from "lucide-react";
-
 export const title = "Zero-VDOM Architecture";
 export const breadcrumb = "Documentation / Getting Started";
 
-export const toc = [
-  { id: "overview", title: "Why Zero-VDOM?", level: 2 },
-  { id: "vdom-overhead", title: "The Problem with Virtual DOM", level: 2 },
-  { id: "visage-model", title: "The Visage Execution Model", level: 2 },
-  { id: "point-to-point", title: "Point-to-Point DOM Binding", level: 2 },
-  { id: "topological-graph", title: "Topological Dependency Graph", level: 2 },
-  { id: "memory-profile", title: "Memory & Garbage Collection", level: 2 },
-  { id: "comparison", title: "Architecture Comparison", level: 2 },
-];
-
 Visage is built on a simple premise: **the fastest Virtual DOM is no Virtual DOM at all**. Instead of creating disposable JavaScript trees on every keystroke and reconciling them against previous snapshots, Visage connects reactive signals directly to living DOM nodes.
 
-<div className="doc-features-grid">
-  <div className="doc-feature-card">
-    <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "6px" }}>
-      <Zap size={16} color="var(--pink-500)" />
-      <div className="doc-feature-title">Runs Exactly Once</div>
-    </div>
-    <div className="doc-feature-desc">
-      Component functions execute once during initial mount. They construct the DOM elements, register reactive subscriptions, and never re-run.
-    </div>
-  </div>
+<FeatureGrid>
+  <FeatureCard icon="zap" title="Runs Exactly Once">
+    Component functions execute once during initial mount. They construct the DOM elements, register reactive subscriptions, and never re-run.
+  </FeatureCard>
 
-  <div className="doc-feature-card">
-    <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "6px" }}>
-      <Cpu size={16} color="var(--pink-500)" />
-      <div className="doc-feature-title">Direct Micro-Updates</div>
-    </div>
-    <div className="doc-feature-desc">
-      Updating a signal mutates only the exact Text node or element attribute that references it. The surrounding tree is completely untouched.
-    </div>
-  </div>
-</div>
+  <FeatureCard icon="cpu" title="Direct Micro-Updates">
+    Updating a signal mutates only the exact Text node or element attribute that references it. The surrounding tree is completely untouched.
+  </FeatureCard>
+</FeatureGrid>
 
 ## The Problem with Virtual DOM
 

@@ -1,46 +1,54 @@
-import { CodeBlock } from "../components/CodeBlock";
-
 export const title = "Introduction to Visage";
 export const breadcrumb = "Documentation / Getting Started";
 
-export const toc = [
-  { id: "overview", title: "Overview", level: 2 },
-  { id: "key-features", title: "Core Architecture", level: 2 },
-  { id: "quickstart", title: "Quickstart Example", level: 2 },
-];
+Visage is a high-performance, zero-VDOM, fine-grained reactive UI and application framework for TypeScript. Components run **exactly once** on mount to construct a surgical DOM dependency graph. Subsequent state updates bypass component re-rendering entirely, directly modifying specific text nodes, attributes, and styles with sub-millisecond precision.
 
-Visage is a lightning-fast, zero-VDOM, fine-grained reactive UI library for TypeScript. Components run exactly once to build a surgical DOM dependency graph; subsequent state changes update precise text nodes and attributes directly with microsecond latency.
+## Core Architecture Pillars
 
-## Core Architecture
+<FeatureGrid>
+  <FeatureCard icon="zap" title="Zero Virtual DOM">
+    Real DOM nodes clone in nanoseconds via native template cloning. No fiber trees, diffing algorithms, or synthetic event overhead.
+  </FeatureCard>
 
-<div className="doc-features-grid">
-  <div className="doc-feature-card">
-    <div className="doc-feature-title">Zero Virtual DOM</div>
-    <div className="doc-feature-desc">
-      Real DOM nodes clone in nanoseconds via native template cloning. No fiber trees, diffing algorithms, or VNode allocations.
-    </div>
-  </div>
+  <FeatureCard icon="layers" title="Fine-Grained Reactivity">
+    Glitch-free push/pull state graph. State reads register dynamic subscriptions; updates trigger only the exact bindings that changed.
+  </FeatureCard>
 
-  <div className="doc-feature-card">
-    <div className="doc-feature-title">Fine-Grained Reactivity</div>
-    <div className="doc-feature-desc">
-      Glitch-free push/pull state graph. State reads register dynamic subscriptions; updates trigger only the exact bindings that changed.
-    </div>
-  </div>
-</div>
+  <FeatureCard icon="globe" title="Browser-Native Primitives">
+    First-class integration with modern web standards: View Transitions API, Speculation Rules API, Popover API, CSS Anchor Positioning, and WHATWG Streams.
+  </FeatureCard>
+
+  <FeatureCard icon="window" title="Sub-10MB Native Desktop">
+    Pairs with a lightweight Zig host to power native desktop executables using OS web engines (WebView2, WKWebView, WebKitGTK) without 150MB+ Chromium bundles.
+  </FeatureCard>
+</FeatureGrid>
+
+## Comprehensive Ecosystem
+
+Visage 1.12 is a cohesive, end-to-end framework providing:
+
+- **Core Reactivity (`@epoch32/visage`)**: Signals, computed derivations, effects, batched updates, deep stores, and root scopes.
+- **DOM & Control Flow**: `<Show>`, `<For>` with custom keying (`by`), and position-indexed `<Index>`.
+- **Navigation (`@epoch32/visage`)**: `<Router>`, `<Route>`, `<Link>`, programmatic navigation, Native View Transitions, and Speculation Rules prefetching.
+- **Headless UI Primitives**: Accessible dialogs, tabs, popovers, tooltips, accordions, context menus, and high-performance `<DataTable>` with DOM recycling.
+- **Async Data & State (`@epoch32/visage/query`)**: Automatic query caching, window refocus revalidation, retry backoff, and optimistic mutations with rollback.
+- **Reactive Forms (`@epoch32/visage/form`)**: Granular field signals, two-way `form.bind()`, built-in `v` micro-validator, and native Standard Schema v1 (Zod, Valibot, ArkType).
+- **Server & Edge SSR (`@epoch32/visage/server`)**: Synchronous string rendering, WHATWG ReadableStream chunk streaming, and non-destructive client hydration.
+- **Desktop Bridge (`@epoch32/visage/native`)**: Type-safe IPC bridge and frameless window controls connecting to a native Zig host (Experimental).
+- **Build Toolchain (`@epoch32/visage/vite`)**: AOT template compiler, state-preserving HMR, Lucide icon transform, dev server RPC, and compile-time security shields (Experimental).
 
 ## Quickstart Example
 
 <CodeBlock
   filename="Counter.tsx"
   lang="tsx"
-  code={`import { createSignal, render } from "@epoch32/visage";
+  code={`import { signal, render } from "@epoch32/visage";
 
 function Counter() {
-  const [count, setCount] = createSignal(0);
+  const count = signal(0);
 
   return (
-    <button onClick={() => setCount(c => c + 1)}>
+    <button onClick={() => count.update(c => c + 1)}>
       Count is: {count}
     </button>
   );

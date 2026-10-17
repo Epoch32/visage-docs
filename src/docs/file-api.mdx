@@ -1,42 +1,17 @@
-import { CodeBlock } from "../components/CodeBlock";
-import { CheckCheck, FileCode2, Network, ShieldCheck, Sparkles } from "lucide-react";
-
 export const title = "Opinionated File-Based API";
 export const breadcrumb = "Documentation / Full-Stack & Tools";
 
-export const toc = [
-  { id: "overview", title: "Overview", level: 2 },
-  { id: "defining-procedures", title: "Defining Procedures (query & mutation)", level: 2 },
-  { id: "input-validation", title: "Standard Schema v1 Validation", level: 2 },
-  { id: "middleware", title: "Type-Safe Middleware (defineMiddleware)", level: 2 },
-  { id: "file-routing", title: "File-Based Route Convention", level: 2 },
-  { id: "client-calling", title: "Calling APIs from Client", level: 2 },
-  { id: "api-reference", title: "API Reference", level: 2 },
-];
-
 Visage provides an opinionated full-stack file-based API framework (`visage/api`). It combines file system routing with end-to-end typed procedures, Standard Schema v1 validation, and composable middleware pipelines.
 
-<div className="doc-features-grid">
-  <div className="doc-feature-card">
-    <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "6px" }}>
-      <FileCode2 size={16} color="var(--pink-500)" />
-      <div className="doc-feature-title">File-Based Route Convention</div>
-    </div>
-    <div className="doc-feature-desc">
-      Files in your API directory (e.g. <code>api/users/[id].ts</code>) automatically map to RESTful URL endpoints and typed RPC procedures.
-    </div>
-  </div>
+<FeatureGrid>
+  <FeatureCard icon="file-code" title="File-Based Route Convention">
+    Files in your API directory (e.g. <code>api/users/[id].ts</code>) automatically map to RESTful URL endpoints and typed RPC procedures.
+  </FeatureCard>
 
-  <div className="doc-feature-card">
-    <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "6px" }}>
-      <ShieldCheck size={16} color="var(--pink-500)" />
-      <div className="doc-feature-title">Standard Schema v1</div>
-    </div>
-    <div className="doc-feature-desc">
-      Native support for Standard Schema v1: validate inputs seamlessly with ArkType, Zod, Valibot, or Visage's built-in <code>v</code> validator.
-    </div>
-  </div>
-</div>
+  <FeatureCard icon="shield-check" title="Standard Schema v1">
+    Native support for Standard Schema v1: validate inputs seamlessly with ArkType, Zod, Valibot, or Visage's built-in <code>v</code> validator.
+  </FeatureCard>
+</FeatureGrid>
 
 ## Defining Procedures (query & mutation)
 

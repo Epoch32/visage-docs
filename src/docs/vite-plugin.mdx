@@ -1,42 +1,25 @@
-import { CodeBlock } from "../components/CodeBlock";
-import { Cpu, Flame, Layers, PackageCheck, Sparkles, Zap } from "lucide-react";
-
-export const title = "Vite Plugin & Fast HMR";
+export const title = "Vite Plugin & Build Tooling";
 export const breadcrumb = "Documentation / Full-Stack & Tools";
 
-export const toc = [
-  { id: "overview", title: "Overview", level: 2 },
-  { id: "plugin-configuration", title: "Vite Configuration (vite.config.ts)", level: 2 },
-  { id: "hmr-state-preservation", title: "Signal-Preserving HMR", level: 2 },
-  { id: "lucide-icon-bridge", title: "Lucide Icon Transform (visageLucide)", level: 2 },
-  { id: "fullstack-rpc-middleware", title: "Full-Stack Dev Server RPC", level: 2 },
-  { id: "deduplication", title: "Package Deduplication", level: 2 },
-  { id: "api-reference", title: "API Reference", level: 2 },
-];
+The Visage Vite Plugin (`@epoch32/visage/vite`) provides an integrated development and build toolchain. Beyond JSX compilation and instant sub-millisecond Hot Module Replacement (HMR), it includes an Ahead-of-Time (AOT) template cloneNode compiler, automated HTML security shields, Content Security Policy generation, and dev server RPC integration.
 
-The Visage Vite Plugin (`@epoch32/visage/vite`) configures your build toolchain for instant sub-millisecond Hot Module Replacement (HMR), automatic JSX runtime configuration, and development server RPC middleware.
+<FeatureGrid>
+  <FeatureCard icon="flame" title="State-Preserving HMR">
+    Editing a component hot-swaps DOM elements while preserving running signal state, form inputs, and scroll offsets without reloading the page.
+  </FeatureCard>
 
-<div className="doc-features-grid">
-  <div className="doc-feature-card">
-    <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "6px" }}>
-      <Flame size={16} color="var(--pink-500)" />
-      <div className="doc-feature-title">State-Preserving HMR</div>
-    </div>
-    <div className="doc-feature-desc">
-      Editing a component hot-swaps DOM elements while preserving running signal state, form inputs, and scroll offsets without reloading the page.
-    </div>
-  </div>
+  <FeatureCard icon="zap" title="AOT Template Compiler">
+    Compiles static JSX trees into hoisted <code>&lt;template&gt;</code> elements and fast <code>cloneNode(true)</code> calls, bypassing runtime DOM creation overhead.
+  </FeatureCard>
 
-  <div className="doc-feature-card">
-    <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "6px" }}>
-      <PackageCheck size={16} color="var(--pink-500)" />
-      <div className="doc-feature-title">Lucide Icon Transform</div>
-      </div>
-    <div className="doc-feature-desc">
-      <code>visageLucide()</code> automatically transforms <code>lucide-react</code> imports into native Visage JSX SVG nodes without requiring React.
-    </div>
-  </div>
-</div>
+  <FeatureCard icon="shield" title="Built-In Security Shields">
+    Automated compile-time shields for <code>javascript:</code> protocol injection, missing <code>rel="noopener"</code>, DOM clobbering, and prototype pollution in props spreads.
+  </FeatureCard>
+
+  <FeatureCard icon="package" title="Lucide Icon Transform">
+    <code>visageLucide()</code> transforms <code>lucide</code> imports into native Visage JSX SVG nodes without requiring React.
+  </FeatureCard>
+</FeatureGrid>
 
 ## Vite Configuration (vite.config.ts)
 
@@ -47,16 +30,148 @@ Add `visage()` and `visageLucide()` to your Vite plugin array:
   lang="ts"
   code={`import { defineConfig } from "vite";
 import visage, { visageLucide } from "@epoch32/visage/vite";
+import { appRouter } from "./server/router";
 
 export default defineConfig({
   plugins: [
     visage({
-      devtools: true, // Auto-inject in dev mode
+      compiler: true, // Enable AOT cloneNode compiler
+      devtools: true, // Auto-inject DAG devtools in development
       hmr: true,      // Fast state-preserving HMR
+      rpc: {
+        router: appRouter,
+        endpoint: "/api/rpc",
+      },
+      experimental: {
+        secureTransforms: {
+          urlShield: true,
+          relShield: true,
+          spreadSanitizer: true,
+        },
+        csp: {
+          enabled: true,
+          connectSrc: ["'self'", "https://api.example.com"],
+        },
+      },
     }),
-    visageLucide(),   // Native Lucide SVG icon support
+    visageLucide(), // Native Lucide SVG icon support
   ],
 });`}
+/>
+
+## AOT JSX Template Compiler
+
+By enabling `compiler: true`, the Visage compiler transforms static JSX structures into hoisted HTML templates at build time:
+
+<CodeBlock
+  filename="AOTTransformation.tsx"
+  lang="tsx"
+  code={`// Source JSX:
+export function Header(props: { title: () => string }) {
+  return (
+    <header class="site-header">
+      <div class="logo">Visage</div>
+      <h1>{props.title}</h1>
+    </header>
+  );
+}
+
+// Compiled Output:
+// A hoisted template element is instantiated once:
+// const _tmpl$ = document.createElement("template");
+// _tmpl$.innerHTML = '<header class="site-header"><div class="logo">Visage</div><h1></h1></header>';
+//
+// Mounting clones the template in one C++ operation:
+// const _el$ = _tmpl$.content.cloneNode(true).firstChild;
+// Bindings attach directly via static child navigation:
+// insertChild(_el$.childNodes[1], props.title);`}
+/>
+
+This reduces JavaScript bundle size and makes initial DOM creation up to 4x faster than runtime `document.createElement` calls.
+
+## JSX Attribute Alias Normalization
+
+To simplify migration from React and standard web conventions, Visage automatically normalizes attribute aliases during JSX compilation:
+
+- `className` is normalized to `class`.
+- `htmlFor` is normalized to `for`.
+- Event casing (`onClick`, `onKeyDown`, `onpointerdown`) maps cleanly to native event listeners without runtime overhead.
+
+<CodeBlock
+  filename="Component.tsx"
+  lang="tsx"
+  code={`// Both work interchangeably in Visage JSX:
+<label htmlFor="user-input" className="label-style">
+  Username
+</label>
+<input id="user-input" class="input-style" />`}
+/>
+
+## Security Transforms Suite (Experimental)
+
+<Callout type="experimental" title="Experimental Feature" tag="experimental.secureTransforms">
+  The Security Transforms suite performs compile-time AST rewrites to enforce URL sanitization, rel attributes, and prototype pollution guards. It is strictly disabled by default. Enable it with care and verify your test suite as rules may evolve.
+</Callout>
+
+When `experimental.secureTransforms` is enabled, Visage applies compile-time shields to prevent common web security vulnerabilities:
+
+<CodeBlock
+  filename="vite.config.ts"
+  lang="ts"
+  code={`visage({
+  experimental: {
+    secureTransforms: {
+      urlShield: true,       // Blocks javascript:, vbscript:, and data: scripts
+      relShield: true,       // Ensures rel="noopener noreferrer" on target="_blank"
+      eventShield: true,     // Prevents string literals on event handlers
+      clobberShield: true,   // Guards dynamic id/name against DOM clobbering
+      htmlShield: true,      // Shields innerHTML from direct unescaped injection
+      spreadSanitizer: true, // Strips __proto__ and prototype keys from spreads
+    },
+  },
+})`}
+/>
+
+### URL & Protocol Shield
+
+Attribute bindings to `href`, `src`, `action`, and `formAction` are protected against dangerous protocols:
+
+```tsx
+// Malicious user-controlled links are sanitized:
+<a href={userWebsite()}>Visit Profile</a>
+// If userWebsite returns "javascript:stealKeys()", the URL shield blocks execution.
+```
+
+### Spread Sanitizer
+
+Spreading arbitrary objects onto DOM elements is guarded against prototype pollution and prototype key overrides:
+
+```tsx
+// Cleaned safely at runtime:
+<div {...externalProps} />
+```
+
+## Content Security Policy (CSP) (Experimental)
+
+<Callout type="experimental" title="Experimental Feature" tag="experimental.csp">
+  Automated CSP generation scans JSX attributes during production builds to synthesize a strict Content Security Policy meta tag. This feature is opt-in and experimental.
+</Callout>
+
+The Vite plugin can generate and inject a strict Content Security Policy meta tag into your `index.html`:
+
+<CodeBlock
+  filename="vite.config.ts"
+  lang="ts"
+  code={`visage({
+  experimental: {
+    csp: {
+      enabled: true,
+      connectSrc: ["'self'", "https://api.myapp.com"],
+      imgSrc: ["'self'", "data:", "https://images.unsplash.com"],
+      autoDetectOrigins: true, // Automatically scans JSX static URLs and adds them to CSP!
+    },
+  },
+})`}
 />
 
 ## Signal-Preserving HMR
@@ -67,7 +182,7 @@ In traditional frameworks, HMR often resets component state back to defaults. Vi
   filename="hmr-behavior.ts"
   lang="ts"
   code={`// 1. You type text into an input field or increment a counter:
-const [count, setCount] = createSignal(42);
+const count = signal(42);
 
 // 2. You change the JSX in your code editor from <h1> to <h2>:
 // 3. Vite pushes the update in < 5ms:
@@ -76,13 +191,13 @@ const [count, setCount] = createSignal(42);
 
 ## Lucide Icon Transform (visageLucide)
 
-Many existing libraries and icon sets target React. Visage's `visageLucide()` plugin intercepts imports from `lucide-react` at compile time and transforms them into native Visage SVG elements:
+Many existing libraries and icon sets target React. Visage's `visageLucide()` plugin intercepts imports from `lucide` at compile time and transforms them into native Visage SVG elements:
 
 <CodeBlock
   filename="IconUsage.tsx"
   lang="tsx"
-  code={`// Zero react dependency! Transformed automatically to native Visage SVG:
-import { Check, Heart, Sparkles, Terminal } from "lucide-react";
+  code={`// Zero React dependency! Transformed automatically to native Visage SVG:
+import { Check, Heart, Sparkles, Terminal } from "lucide";
 
 export function IconBar() {
   return (
@@ -97,7 +212,7 @@ export function IconBar() {
 
 ## Full-Stack Dev Server RPC
 
-You can attach your server's RPC router directly into the Vite development server so frontend API calls work without running a separate backend server:
+Attach your server's RPC router directly into the Vite development server so frontend API calls work without running a separate backend server:
 
 <CodeBlock
   filename="vite.config.ts"
@@ -118,95 +233,20 @@ export default defineConfig({
 });`}
 />
 
-Now, client requests to `/api/rpc` are handled directly by your typed server procedures inside Vite!
-
-## Package Deduplication
-
-If you have multiple dependencies in a monorepo or nested `node_modules` that depend on `@epoch32/visage`, the Vite plugin automatically aliases `@epoch32/visage` to a single root instance. This ensures that signals, contexts, and batch queues share one single reactive engine instance.
+Client requests to `/api/rpc` are handled directly by your typed server procedures inside Vite.
 
 ## API Reference
 
-<div className="doc-api-section">
-  <div className="doc-fn-card">
-    <div className="doc-fn-header">
-      <div className="doc-fn-meta">
-        <span className="doc-fn-kind">Plugin</span>
-      </div>
-      <div className="doc-fn-signature">
-        visage(options?: VisagePluginOptions): VisageVitePlugin
-      </div>
-    </div>
+### VisagePluginOptions
 
-    <div className="doc-fn-body">
-      <div className="doc-fn-desc">
-        Core Vite plugin configuring automatic JSX runtime, signal-preserving HMR boundaries, devtools auto-injection, and RPC dev server middleware.
-      </div>
-
-      <div>
-        <div className="doc-fn-subheading">Options</div>
-        <div className="doc-params-list">
-          <div className="doc-param-row">
-            <div className="doc-param-meta">
-              <span className="doc-param-name">devtools</span>
-              <span className="doc-param-type">boolean</span>
-              <span className="doc-param-badge optional">Optional</span>
-            </div>
-            <div className="doc-param-desc">
-              Automatically injects Visage DevTools into HTML shell in development mode. Defaults to <code>true</code>.
-            </div>
-          </div>
-
-          <div className="doc-param-row">
-            <div className="doc-param-meta">
-              <span className="doc-param-name">hmr</span>
-              <span className="doc-param-type">boolean</span>
-              <span className="doc-param-badge optional">Optional</span>
-            </div>
-            <div className="doc-param-desc">
-              Enables signal state preservation during hot module replacements. Defaults to <code>true</code>.
-            </div>
-          </div>
-
-          <div className="doc-param-row">
-            <div className="doc-param-meta">
-              <span className="doc-param-name">extractCss</span>
-              <span className="doc-param-type">boolean</span>
-              <span className="doc-param-badge optional">Optional</span>
-            </div>
-            <div className="doc-param-desc">
-              Extracts static styles into the production CSS bundle. Defaults to <code>true</code>.
-            </div>
-          </div>
-
-          <div className="doc-param-row">
-            <div className="doc-param-meta">
-              <span className="doc-param-name">rpc</span>
-              <span className="doc-param-type">&#123; router: Router, endpoint?: string &#125;</span>
-              <span className="doc-param-badge optional">Optional</span>
-            </div>
-            <div className="doc-param-desc">
-              Attaches full-stack RPC procedure handling to the Vite development server.
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <div className="doc-fn-card">
-    <div className="doc-fn-header">
-      <div className="doc-fn-meta">
-        <span className="doc-fn-kind">Plugin</span>
-      </div>
-      <div className="doc-fn-signature">
-        visageLucide(options?: VisageLucideOptions): VisageVitePlugin
-      </div>
-    </div>
-
-    <div className="doc-fn-body">
-      <div className="doc-fn-desc">
-        Transforms <code>lucide-react</code> imports into native Visage JSX SVG icon elements with zero React runtime overhead.
-      </div>
-    </div>
-  </div>
-</div>
+| Option | Type | Default | Status | Description |
+| :--- | :--- | :--- | :--- | :--- |
+| `compiler` | `boolean \| CompilerOptions` | `false` | Stable | Enables AOT JSX template cloneNode compilation. |
+| `devtools` | `boolean` | `true` | Stable | Auto-injects Visage DAG DevTools in dev mode. |
+| `hmr` | `boolean` | `true` | Stable | Enables signal state preservation during HMR. |
+| `extractCss` | `boolean` | `true` | Stable | Extracts static `<Style>` tags into production CSS bundle. |
+| `ssr` | `boolean` | `false` | Stable | Configures SSR module resolution and output. |
+| `rpc` | `{ router, endpoint? }` | `undefined` | Stable | Attaches full-stack RPC procedure handler to dev server. |
+| `experimental.secureTransforms` | `SecureTransformsOptions` | `undefined` | **Experimental** | Automated compile-time security shields. |
+| `experimental.csp` | `CSPOptions` | `undefined` | **Experimental** | Automatic Content Security Policy generation. |
+| `experimental.zigNative` | `ZigNativeOptions` | `undefined` | **Experimental** | Scaffolds and builds native Zig desktop host executables. |

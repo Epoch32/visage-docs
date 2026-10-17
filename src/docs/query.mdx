@@ -1,0 +1,277 @@
+export const title = "Async Query & Mutations";
+export const breadcrumb = "Documentation / Full-Stack & Tools";
+
+Visage Query (`@epoch32/visage/query`) delivers asynchronous server state management tailored specifically for fine-grained signals. It handles caching, deduplication, background revalidation, window focus refetching, and optimistic mutations without VDOM reconciliation overhead.
+
+<FeatureGrid>
+  <FeatureCard icon="zap" title="Granular Signal Subscriptions">
+    <code>data</code>, <code>isPending</code>, <code>isFetching</code>, and <code>error</code> are individual signals. Updating a query only re-evaluates the exact DOM nodes reading those signals.
+  </FeatureCard>
+
+  <FeatureCard icon="database" title="Smart Global Cache">
+    Hierarchical key matching, automatic garbage collection via <code>cacheTime</code>, and microtask request deduplication across multiple mounted components.
+  </FeatureCard>
+
+  <FeatureCard icon="refresh" title="Automatic Window & Network Revalidation">
+    Built-in <code>focusManager</code> and <code>onlineManager</code> automatically refetch stale queries when users refocus browser tabs or regain network connectivity.
+  </FeatureCard>
+
+  <FeatureCard icon="sparkles" title="Optimistic Rollback">
+    Mutations support <code>onMutate</code> context snapshots, allowing instantaneous UI updates with clean rollbacks if server requests fail.
+  </FeatureCard>
+</FeatureGrid>
+
+## QueryClient & QueryClientProvider
+
+Wrap your application root with `QueryClientProvider` to configure shared defaults such as `staleTime`, `cacheTime`, and retry policies:
+
+<CodeBlock
+  filename="src/App.tsx"
+  lang="tsx"
+  code={`import { QueryClient, QueryClientProvider } from "@epoch32/visage/query";
+import { UserList } from "./components/UserList";
+
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: 1000 * 60 * 5, // 5 minutes
+      cacheTime: 1000 * 60 * 30, // 30 minutes
+      retry: 2,
+      refetchOnWindowFocus: true,
+    },
+  },
+});
+
+export function App() {
+  return (
+    <QueryClientProvider client={queryClient}>
+      <UserList />
+    </QueryClientProvider>
+  );
+}`}
+/>
+
+## Fetching Data (createQuery)
+
+Use `createQuery` to declare server state. Query keys can be static arrays or reactive signal accessors for dynamic parameters:
+
+<CodeBlock
+  filename="components/UserProfile.tsx"
+  lang="tsx"
+  code={`import { signal, Show } from "@epoch32/visage";
+import { createQuery } from "@epoch32/visage/query";
+
+export function UserProfile() {
+  const userId = signal("user_123");
+
+  const query = createQuery({
+    // Dynamic query key tracking userId signal
+    queryKey: () => ["users", userId()],
+    queryFn: async ({ queryKey }) => {
+      const [_, id] = queryKey;
+      const res = await fetch(\`/api/users/\${id}\`);
+      if (!res.ok) throw new Error("Failed to load user");
+      return res.json();
+    },
+    // Only execute when userId is present
+    enabled: () => Boolean(userId()),
+  });
+
+  return (
+    <div>
+      <Show when={() => query.isLoading()}>
+        <p>Loading user profile...</p>
+      </Show>
+
+      <Show when={() => query.isError()}>
+        <p class="text-red-500">Error: {() => query.error()?.message}</p>
+      </Show>
+
+      <Show when={() => query.data()}>
+        {(user) => (
+          <div>
+            <h2>{user().name}</h2>
+            <p>{user().email}</p>
+          </div>
+        )}
+      </Show>
+
+      <button onClick={() => query.refetch()} disabled={() => query.isFetching()}>
+        {() => (query.isFetching() ? "Refreshing..." : "Refresh")}
+      </button>
+    </div>
+  );
+}`}
+/>
+
+## Mutations & Optimistic Updates (createMutation)
+
+Use `createMutation` for POST, PUT, DELETE operations and cache invalidations:
+
+<CodeBlock
+  filename="components/CreateTodo.tsx"
+  lang="tsx"
+  code={`import { signal } from "@epoch32/visage";
+import { createMutation, useQueryClient } from "@epoch32/visage/query";
+
+export function CreateTodo() {
+  const queryClient = useQueryClient();
+  const title = signal("");
+
+  const mutation = createMutation({
+    mutationFn: async (newTodoTitle: string) => {
+      const res = await fetch("/api/todos", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ title: newTodoTitle }),
+      });
+      if (!res.ok) throw new Error("Could not create todo");
+      return res.json();
+    },
+
+    // Optimistic Update
+    onMutate: async (newTodoTitle) => {
+      await queryClient.cancelQueries({ queryKey: ["todos"] });
+      const previousTodos = queryClient.getQueryData(["todos"]);
+
+      queryClient.setQueryData(["todos"], (old: any = []) => [
+        ...old,
+        { id: "temp-id", title: newTodoTitle, completed: false },
+      ]);
+
+      return { previousTodos };
+    },
+
+    // Rollback on error
+    onError: (err, newTodoTitle, context) => {
+      if (context?.previousTodos) {
+        queryClient.setQueryData(["todos"], context.previousTodos);
+      }
+    },
+
+    // Always refetch on settlement
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: ["todos"] });
+    },
+  });
+
+  const onSubmit = (e: Event) => {
+    e.preventDefault();
+    if (!title().trim()) return;
+    mutation.mutate(title(), {
+      onSuccess: () => {
+        title.set("");
+      },
+    });
+  };
+
+  return (
+    <form onSubmit={onSubmit}>
+      <input
+        type="text"
+        value={title}
+        onInput={(e) => title.set(e.currentTarget.value)}
+        placeholder="New todo item"
+      />
+      <button type="submit" disabled={() => mutation.isPending()}>
+        {() => (mutation.isPending() ? "Adding..." : "Add Todo")}
+      </button>
+    </form>
+  );
+}`}
+/>
+
+## Infinite Pagination (createInfiniteQuery)
+
+For infinite scrolling feeds, use `createInfiniteQuery`:
+
+<CodeBlock
+  filename="components/InfiniteFeed.tsx"
+  lang="tsx"
+  code={`import { For, Show } from "@epoch32/visage";
+import { createInfiniteQuery } from "@epoch32/visage/query";
+
+export function InfiniteFeed() {
+  const feed = createInfiniteQuery({
+    queryKey: () => ["feed"],
+    initialPageParam: 1,
+    queryFn: async ({ pageParam = 1 }) => {
+      const res = await fetch(\`/api/feed?page=\${pageParam}&limit=10\`);
+      return res.json();
+    },
+    getNextPageParam: (lastPage, allPages) => {
+      return lastPage.hasMore ? allPages.length + 1 : undefined;
+    },
+  });
+
+  return (
+    <div>
+      <For each={() => feed.data()?.pages || []}>
+        {(page) => (
+          <For each={() => page.items}>
+            {(item) => <div class="feed-card">{item.title}</div>}
+          </For>
+        )}
+      </For>
+
+      <Show when={() => feed.hasNextPage()}>
+        <button
+          onClick={() => feed.fetchNextPage()}
+          disabled={() => feed.isFetchingNextPage()}
+        >
+          {() => (feed.isFetchingNextPage() ? "Loading more..." : "Load More")}
+        </button>
+      </Show>
+    </div>
+  );
+}`}
+/>
+
+## Focus & Network Connectivity
+
+Visage automatically subscribes to browser window focus and network status events. You can also manually interface with the managers for custom environments (e.g., native desktop apps):
+
+<CodeBlock
+  filename="lib/connectivity.ts"
+  lang="ts"
+  code={`import { focusManager, onlineManager } from "@epoch32/visage/query";
+
+// Manually control window focus state (e.g. from native webview events)
+focusManager.setFocused(true);
+
+// Manually override online connectivity
+onlineManager.setOnline(navigator.onLine);
+
+// Listen to focus changes
+const unsubscribe = focusManager.subscribe((focused) => {
+  console.log("Window focus state changed:", focused);
+});`}
+/>
+
+## API Reference
+
+### createQuery Options
+
+| Option | Type | Default | Description |
+| :--- | :--- | :--- | :--- |
+| `queryKey` | `QueryKey \| (() => QueryKey)` | Required | Unique cache key array or reactive accessor. |
+| `queryFn` | `(context: QueryFunctionContext) => Promise<TData>` | Required | Async function returning query payload. |
+| `enabled` | `boolean \| (() => boolean)` | `true` | When `false`, query execution is paused. |
+| `staleTime` | `number` | `0` | Duration in ms before cached data is considered stale. |
+| `cacheTime` | `number` | `300000` (5m) | Duration in ms unused cache items are kept in memory. |
+| `refetchInterval` | `number \| false \| (() => number \| false)` | `false` | Periodic polling interval in milliseconds. |
+| `refetchOnWindowFocus`| `boolean` | `true` | Automatically refetch stale queries when window regains focus. |
+| `refetchOnReconnect` | `boolean` | `true` | Automatically refetch stale queries when browser reconnects. |
+| `retry` | `number \| boolean \| ((failureCount, error) => boolean)` | `3` | Maximum retry attempts on failure. |
+| `retryDelay` | `number \| ((attemptIndex) => number)` | Exponential | Delay in ms between retry attempts. |
+
+### createMutation Options
+
+| Option | Type | Description |
+| :--- | :--- | :--- |
+| `mutationFn` | `(variables: TVariables) => Promise<TData>` | Async function executing the mutation. |
+| `onMutate` | `(variables: TVariables) => Promise<TContext> \| TContext` | Invoked before mutation runs. Useful for optimistic updates. |
+| `onSuccess` | `(data: TData, variables: TVariables, context: TContext) => void` | Invoked when mutation resolves successfully. |
+| `onError` | `(error: TError, variables: TVariables, context: TContext) => void` | Invoked when mutation fails. Useful for rollbacks. |
+| `onSettled` | `(data, error, variables, context) => void` | Invoked after mutation completes regardless of outcome. |
+| `retry` | `number \| boolean` | Retry policy on network error. |

@@ -1,42 +1,17 @@
-import { CodeBlock } from "../components/CodeBlock";
-import { ArrowLeftRight, Radio, Server, ShieldAlert, Sparkles, Zap } from "lucide-react";
-
 export const title = "End-to-End Typed RPC & SSE";
 export const breadcrumb = "Documentation / Full-Stack & Tools";
 
-export const toc = [
-  { id: "overview", title: "Overview", level: 2 },
-  { id: "defining-router", title: "Defining an RPC Router (createRouter)", level: 2 },
-  { id: "server-handler", title: "Server Fetch Handler (createFetchHandler)", level: 2 },
-  { id: "client-sdk", title: "Typed Client & Query Integration (createClient)", level: 2 },
-  { id: "sse-subscriptions", title: "Real-Time Streaming Subscriptions", level: 2 },
-  { id: "error-handling", title: "Error Handling (RPCError)", level: 2 },
-  { id: "api-reference", title: "API Reference", level: 2 },
-];
-
 Visage RPC (`visage/rpc`) is a lightweight, zero-boilerplate alternative to tRPC and REST APIs. It provides full end-to-end type safety between client and server, automatic microtask query batching, and real-time Server-Sent Events (SSE) streaming without heavy runtime dependencies.
 
-<div className="doc-features-grid">
-  <div className="doc-feature-card">
-    <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "6px" }}>
-      <Zap size={16} color="var(--pink-500)" />
-      <div className="doc-feature-title">Microtask Query Batching</div>
-    </div>
-    <div className="doc-feature-desc">
-      Multiple concurrent queries triggered across separate components automatically batch into a single HTTP POST request, eliminating network waterfalls.
-    </div>
-  </div>
+<FeatureGrid>
+  <FeatureCard icon="zap" title="Microtask Query Batching">
+    Multiple concurrent queries triggered across separate components automatically batch into a single HTTP POST request, eliminating network waterfalls.
+  </FeatureCard>
 
-  <div className="doc-feature-card">
-    <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "6px" }}>
-      <Radio size={16} color="var(--pink-500)" />
-      <div className="doc-feature-title">Native SSE Streaming</div>
-    </div>
-    <div className="doc-feature-desc">
-      First-class <code>subscription()</code> procedures stream real-time events over Server-Sent Events with automatic reconnection and typed data channels.
-    </div>
-  </div>
-</div>
+  <FeatureCard icon="radio" title="Native SSE Streaming">
+    First-class <code>subscription()</code> procedures stream real-time events over Server-Sent Events with automatic reconnection and typed data channels.
+  </FeatureCard>
+</FeatureGrid>
 
 ## Defining an RPC Router (createRouter)
 

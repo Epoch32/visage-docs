@@ -9,7 +9,7 @@ import {
 	Plus,
 	RefreshCw,
 	Sparkles,
-} from "lucide-react";
+} from "lucide";
 
 export function DirtyLoadingSimulator() {
 	// Signal A: The root source

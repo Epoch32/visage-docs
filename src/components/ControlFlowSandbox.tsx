@@ -1,5 +1,5 @@
 import { For, Show, createSignal } from "@epoch32/visage";
-import { Eye, Play, Plus, RotateCcw, Trash2 } from "lucide-react";
+import { Check, Eye, Play, Plus, RotateCcw, Trash2 } from "lucide";
 
 interface TodoItem {
 	id: number;
@@ -237,7 +237,9 @@ export function ControlFlowSandbox() {
 													transition: "all 0.15s ease",
 												}}
 											>
-												{item.completed ? "✓" : ""}
+												{item.completed ? (
+													<Check size={11} strokeWidth={3} />
+												) : null}
 											</span>
 
 											<span

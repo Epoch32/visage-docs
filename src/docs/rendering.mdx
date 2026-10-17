@@ -1,42 +1,17 @@
-import { CodeBlock } from "../components/CodeBlock";
-import { CheckCircle, Layers, Play, Sparkles, Terminal } from "lucide-react";
-
 export const title = "Fine-Grained DOM (render)";
 export const breadcrumb = "Documentation / DOM & Control Flow";
 
-export const toc = [
-  { id: "overview", title: "Overview", level: 2 },
-  { id: "mount-app", title: "Mounting with render()", level: 2 },
-  { id: "teardown-cleanup", title: "Teardown & Cleanup", level: 2 },
-  { id: "event-binding", title: "Event Binding & Delegation", level: 2 },
-  { id: "reactive-classes", title: "Dynamic Classes & Styles", level: 2 },
-  { id: "callback-refs", title: "Callback Refs", level: 2 },
-  { id: "api-reference", title: "API Reference", level: 2 },
-];
-
 The `render()` function is the entry point that attaches a Visage component tree to the living browser DOM. It sets up an isolated root reactive scope, mounts native elements, and returns a teardown function.
 
-<div className="doc-features-grid">
-  <div className="doc-feature-card">
-    <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "6px" }}>
-      <Play size={16} color="var(--pink-500)" />
-      <div className="doc-feature-title">Native DOM Mounting</div>
-    </div>
-    <div className="doc-feature-desc">
-      Builds real browser DOM nodes directly using <code>document.createElement</code>. No intermediate virtual trees, diffing engines, or hydration mismatches.
-    </div>
-  </div>
+<FeatureGrid>
+  <FeatureCard icon="play" title="Native DOM Mounting">
+    Builds real browser DOM nodes directly using <code>document.createElement</code>. No intermediate virtual trees, diffing engines, or hydration mismatches.
+  </FeatureCard>
 
-  <div className="doc-feature-card">
-    <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "6px" }}>
-      <CheckCircle size={16} color="var(--pink-500)" />
-      <div className="doc-feature-title">Root Lifecycle Isolation</div>
-    </div>
-    <div className="doc-feature-desc">
-      Automatically isolates reactive subscriptions within a top-level <code>createRoot</code>, preventing memory leaks and providing complete teardown when unmounted.
-    </div>
-  </div>
-</div>
+  <FeatureCard icon="check-circle" title="Root Lifecycle Isolation">
+    Automatically isolates reactive subscriptions within a top-level <code>createRoot</code>, preventing memory leaks and providing complete teardown when unmounted.
+  </FeatureCard>
+</FeatureGrid>
 
 ## Mounting with render()
 

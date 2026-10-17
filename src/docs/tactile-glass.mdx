@@ -1,41 +1,17 @@
-import { CodeBlock } from "../components/CodeBlock";
-import { Eye, Layers, Shield, Sparkles, Sun } from "lucide-react";
-
 export const title = "Tactile Glass & Shadows";
 export const breadcrumb = "Documentation / Spatial & Styles";
 
-export const toc = [
-  { id: "overview", title: "Overview", level: 2 },
-  { id: "glassmorphism", title: "Tactile Glass (glass)", level: 2 },
-  { id: "shadow-tokens", title: "Optical Depth Shadows (shadow)", level: 2 },
-  { id: "radius-tokens", title: "Curvature Radii (radius)", level: 2 },
-  { id: "composition-example", title: "Composing Modern UI Cards", level: 2 },
-  { id: "api-reference", title: "API Reference", level: 2 },
-];
-
 Visage provides modern visual tokens designed for tactile depth, high-contrast readability, and frosted glassmorphism without manual CSS vendor prefixing.
 
-<div className="doc-features-grid">
-  <div className="doc-feature-card">
-    <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "6px" }}>
-      <Eye size={16} color="var(--pink-500)" />
-      <div className="doc-feature-title">Frosted Glass Helper</div>
-    </div>
-    <div className="doc-feature-desc">
-      <code>glass()</code> generates cross-browser backdrop filter blurs, translucent tinting, and crisp border reflections.
-    </div>
-  </div>
+<FeatureGrid>
+  <FeatureCard icon="eye" title="Frosted Glass Helper">
+    <code>glass()</code> generates cross-browser backdrop filter blurs, translucent tinting, and crisp border reflections.
+  </FeatureCard>
 
-  <div className="doc-feature-card">
-    <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "6px" }}>
-      <Layers size={16} color="var(--pink-500)" />
-      <div className="doc-feature-title">Optical Depth Shadows</div>
-    </div>
-    <div className="doc-feature-desc">
-      Hand-tuned multi-layer shadows (<code>sm</code> through <code>xl</code>, plus <code>soft</code> and <code>glow</code>) give floating surfaces natural visual elevation.
-    </div>
-  </div>
-</div>
+  <FeatureCard icon="layers" title="Optical Depth Shadows">
+    Hand-tuned multi-layer shadows (<code>sm</code> through <code>xl</code>, plus <code>soft</code> and <code>glow</code>) give floating surfaces natural visual elevation.
+  </FeatureCard>
+</FeatureGrid>
 
 ## Tactile Glass (glass)
 

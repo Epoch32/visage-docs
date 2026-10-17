@@ -1,5 +1,5 @@
 import { Link, Show } from "@epoch32/visage";
-import { Moon, Sun } from "lucide-react";
+import { Moon, Sun } from "lucide";
 import { theme, toggleTheme } from "../theme";
 import "../styles/header-transitions.css";
 

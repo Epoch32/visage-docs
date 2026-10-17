@@ -1,43 +1,17 @@
-import { BatchSimulator } from "../components/BatchSimulator";
-import { CodeBlock } from "../components/CodeBlock";
-import { Layers, Zap } from "lucide-react";
-
 export const title = "Batching & Scopes";
 export const breadcrumb = "Documentation / Reactivity";
 
-export const toc = [
-  { id: "overview", title: "Overview", level: 2 },
-  { id: "batching", title: "Atomic Updates with batch()", level: 2 },
-  { id: "interactive-demo", title: "Interactive Batching Simulator", level: 2 },
-  { id: "scopes-memory", title: "Reactive Scopes & Automatic Memory Cleanup", level: 2 },
-  { id: "createroot", title: "Isolated Roots with createRoot()", level: 2 },
-  { id: "untracking", title: "Reading Without Tracking (untrack)", level: 2 },
-  { id: "api-reference", title: "API Reference", level: 2 },
-];
-
 High-performance reactive systems must prevent intermediate glitch states and eliminate memory leaks. Visage provides `batch()` to group multiple state mutations into an atomic update, and hierarchical `Scope` trees to manage subscriber lifecycles automatically.
 
-<div className="doc-features-grid">
-  <div className="doc-feature-card">
-    <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "6px" }}>
-      <Zap size={16} color="var(--pink-500)" />
-      <div className="doc-feature-title">Glitch-Free Batching</div>
-    </div>
-    <div className="doc-feature-desc">
-      Mutating multiple signals inside <code>batch()</code> queues pending effects and flushes them in a single synchronous pass once the batch depth returns to zero.
-    </div>
-  </div>
+<FeatureGrid>
+  <FeatureCard icon="zap" title="Glitch-Free Batching">
+    Mutating multiple signals inside <code>batch()</code> queues pending effects and flushes them in a single synchronous pass once the batch depth returns to zero.
+  </FeatureCard>
 
-  <div className="doc-feature-card">
-    <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "6px" }}>
-      <Layers size={16} color="var(--pink-500)" />
-      <div className="doc-feature-title">Hierarchical Scopes</div>
-    </div>
-    <div className="doc-feature-desc">
-      Every component, <code>&lt;Show&gt;</code> branch, and <code>createRoot</code> owns a <code>Scope</code>. When parent scopes dispose, all child computeds, effects, and listeners teardown automatically.
-    </div>
-  </div>
-</div>
+  <FeatureCard icon="layers" title="Hierarchical Scopes">
+    Every component, <code>&lt;Show&gt;</code> branch, and <code>createRoot</code> owns a <code>Scope</code>. When parent scopes dispose, all child computeds, effects, and listeners teardown automatically.
+  </FeatureCard>
+</FeatureGrid>
 
 ## Atomic Updates with batch()
 

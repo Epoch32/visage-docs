@@ -1,42 +1,17 @@
-import { CodeBlock } from "../components/CodeBlock";
-import { Activity, Cpu, Eye, GitFork, Sparkles, Terminal } from "lucide-react";
-
 export const title = "Live DAG Graph DevTools";
 export const breadcrumb = "Documentation / Full-Stack & Tools";
 
-export const toc = [
-  { id: "overview", title: "Overview", level: 2 },
-  { id: "mounting-devtools", title: "Mounting the DevTools (<VisageDevTools>)", level: 2 },
-  { id: "signals-tab", title: "Signals & Stores Inspector", level: 2 },
-  { id: "dag-tab", title: "Live DAG Graph Visualization", level: 2 },
-  { id: "queries-rpc-tab", title: "Queries & RPC Network Timeline", level: 2 },
-  { id: "element-highlighter", title: "DOM Element Highlighter", level: 2 },
-  { id: "api-reference", title: "API Reference", level: 2 },
-];
-
 Visage features an in-browser visual debugger (`visage/devtools`). Unlike generic React or Vue DevTools that only show tree hierarchies, Visage visualizes the actual live topological dependency graph (DAG) of signals, computed nodes, queries, and DOM bindings.
 
-<div className="doc-features-grid">
-  <div className="doc-feature-card">
-    <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "6px" }}>
-      <GitFork size={16} color="var(--pink-500)" />
-      <div className="doc-feature-title">Live DAG Graph</div>
-    </div>
-    <div className="doc-feature-desc">
-      Interactive visual graph of your application's reactive nodes. Watch signals flash in real-time when updated and track downstream computed recalculations.
-    </div>
-  </div>
+<FeatureGrid>
+  <FeatureCard icon="fork" title="Live DAG Graph">
+    Interactive visual graph of your application's reactive nodes. Watch signals flash in real-time when updated and track downstream computed recalculations.
+  </FeatureCard>
 
-  <div className="doc-feature-card">
-    <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "6px" }}>
-      <Activity size={16} color="var(--pink-500)" />
-      <div className="doc-feature-title">Zero Production Overhead</div>
-    </div>
-    <div className="doc-feature-desc">
-      Completely tree-shaken from production builds. DevTools hooks exist solely in development mode or when explicitly mounted.
-    </div>
-  </div>
-</div>
+  <FeatureCard icon="activity" title="Zero Production Overhead">
+    Completely tree-shaken from production builds. DevTools hooks exist solely in development mode or when explicitly mounted.
+  </FeatureCard>
+</FeatureGrid>
 
 ## Mounting the DevTools (&lt;VisageDevTools&gt;)
 

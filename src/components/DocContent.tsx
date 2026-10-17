@@ -1,7 +1,35 @@
 import { Show, toast } from "@epoch32/visage";
-import { Share2 } from "lucide-react";
+import { Share2 } from "lucide";
 import { getDocPage } from "../docs";
+import { Callout } from "./Callout";
+import { CodeBlock } from "./CodeBlock";
+import { Feature, FeatureCard, FeatureGrid } from "./FeatureGrid";
+import { BatchSimulator } from "./BatchSimulator";
+import { ControlFlowSandbox } from "./ControlFlowSandbox";
+import { DirtyLoadingSimulator } from "./DirtyLoadingSimulator";
+import { EffectLoggerSandbox } from "./EffectLoggerSandbox";
+import { SignalPlayground } from "./SignalPlayground";
+import { StoreSandbox } from "./StoreSandbox";
 import "../styles/doc-content.css";
+
+const defaultMdxComponents = {
+	Callout,
+	Feature,
+	FeatureCard,
+	FeatureGrid,
+	CodeBlock,
+	BatchSimulator,
+	ControlFlowSandbox,
+	DirtyLoadingSimulator,
+	EffectLoggerSandbox,
+	SignalPlayground,
+	StoreSandbox,
+	table: (props: any) => (
+		<div class="doc-table-wrapper">
+			<table {...props} />
+		</div>
+	),
+};
 
 interface DocContentProps {
 	activeSection: () => string;
@@ -53,7 +81,7 @@ export function DocContent(props: DocContentProps) {
 									<span>Share</span>
 								</button>
 							</div>
-							<Content />
+							<Content components={defaultMdxComponents} />
 						</div>
 					);
 				}}

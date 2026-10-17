@@ -1,44 +1,17 @@
-import { CodeBlock } from "../components/CodeBlock";
-import { Globe, Languages, RefreshCw, Sparkles, Users, Zap } from "lucide-react";
-
 export const title = "Fine-Grained I18n & Localization";
 export const breadcrumb = "Documentation / Full-Stack & Tools";
 
-export const toc = [
-  { id: "overview", title: "Overview", level: 2 },
-  { id: "setup", title: "Quickstart (createI18n)", level: 2 },
-  { id: "fine-grained-reactivity", title: "Fine-Grained Reactive Translations", level: 2 },
-  { id: "pluralization", title: "CLDR Standard Pluralization", level: 2 },
-  { id: "community-tools", title: "Crowdin & Weblate Community Integration", level: 2 },
-  { id: "dynamic-loader", title: "Dynamic / OTA Async Dictionaries", level: 2 },
-  { id: "in-context", title: "In-Context Visual Editing", level: 2 },
-  { id: "intl-formatting", title: "Native Intl Date & Number Formatting", level: 2 },
-  { id: "api-reference", title: "API Reference", level: 2 },
-];
-
 Visage I18n (`visage/i18n`) provides a zero-dependency, ultra-lightweight localization engine designed specifically for fine-grained reactive applications. Unlike traditional i18n libraries that force full virtual DOM component re-renders, Visage updates **only the targeted text nodes** when the active locale changes.
 
-<div className="doc-features-grid">
-  <div className="doc-feature-card">
-    <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "6px" }}>
-      <Zap size={16} color="var(--pink-500)" />
-      <div className="doc-feature-title">Zero Component Re-renders</div>
-    </div>
-    <div className="doc-feature-desc">
-      Translations bind directly to signal subscribers. Switching languages updates on-screen text instantly without re-mounting components or re-running setup logic.
-    </div>
-  </div>
+<FeatureGrid>
+  <FeatureCard icon="zap" title="Zero Component Re-renders">
+    Translations bind directly to signal subscribers. Switching languages updates on-screen text instantly without re-mounting components or re-running setup logic.
+  </FeatureCard>
 
-  <div className="doc-feature-card">
-    <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "6px" }}>
-      <Users size={16} color="var(--pink-500)" />
-      <div className="doc-feature-title">Native Crowdin & Weblate Sync</div>
-    </div>
-    <div className="doc-feature-desc">
-      Accepts standard JSON key-value and nested dictionaries produced by community translation platforms, with in-context live visual editing tags.
-    </div>
-  </div>
-</div>
+  <FeatureCard icon="users" title="Native Crowdin & Weblate Sync">
+    Accepts standard JSON key-value and nested dictionaries produced by community translation platforms, with in-context live visual editing tags.
+  </FeatureCard>
+</FeatureGrid>
 
 ## Quickstart (createI18n)
 

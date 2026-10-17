@@ -1,43 +1,17 @@
-import { CodeBlock } from "../components/CodeBlock";
-import { AlignCenter, Columns, Grid3x3, Layout, Rows, Sparkles } from "lucide-react";
-
 export const title = "<Stack>, <Row>, <Grid>";
 export const breadcrumb = "Documentation / Spatial & Styles";
 
-export const toc = [
-  { id: "overview", title: "Overview", level: 2 },
-  { id: "stack-primitive", title: "Vertical Stack (<Stack>)", level: 2 },
-  { id: "row-primitive", title: "Horizontal Row (<Row>)", level: 2 },
-  { id: "grid-primitive", title: "CSS Grid (<Grid>)", level: 2 },
-  { id: "center-primitive", title: "Centering (<Center>)", level: 2 },
-  { id: "spacer-primitive", title: "Elastic Spacers (<Spacer>)", level: 2 },
-  { id: "spatial-props", title: "Shared Spatial Props", level: 2 },
-  { id: "api-reference", title: "API Reference", level: 2 },
-];
-
 Visage provides composable layout primitives that encode spatial consistency directly into JSX. They eliminate margin hacks, flexbox alignment boilerplate, and messy media query breakpoints.
 
-<div className="doc-features-grid">
-  <div className="doc-feature-card">
-    <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "6px" }}>
-      <Rows size={16} color="var(--pink-500)" />
-      <div className="doc-feature-title">Zero Margin Collapse</div>
-    </div>
-    <div className="doc-feature-desc">
-      <code>&lt;Stack&gt;</code> and <code>&lt;Row&gt;</code> rely on standard flex gap, eliminating margin bleed and collapsing bugs between components.
-    </div>
-  </div>
+<FeatureGrid>
+  <FeatureCard icon="rows" title="Zero Margin Collapse">
+    <code>&lt;Stack&gt;</code> and <code>&lt;Row&gt;</code> rely on standard flex gap, eliminating margin bleed and collapsing bugs between components.
+  </FeatureCard>
 
-  <div className="doc-feature-card">
-    <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "6px" }}>
-      <Grid3x3 size={16} color="var(--pink-500)" />
-      <div className="doc-feature-title">Auto-Fit Responsive Grids</div>
-    </div>
-    <div className="doc-feature-desc">
-      <code>&lt;Grid minChildWidth=&#123;260&#125;&gt;</code> produces self-wrapping responsive columns without requiring manual CSS media queries.
-    </div>
-  </div>
-</div>
+  <FeatureCard icon="grid-3x3" title="Auto-Fit Responsive Grids">
+    <code>&lt;Grid minChildWidth=&#123;260&#125;&gt;</code> produces self-wrapping responsive columns without requiring manual CSS media queries.
+  </FeatureCard>
+</FeatureGrid>
 
 ## Vertical Stack (&lt;Stack&gt;)
 
