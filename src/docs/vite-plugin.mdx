@@ -42,6 +42,7 @@ export default defineConfig({
         router: appRouter,
         endpoint: "/api/rpc",
       },
+      pages: true,    // File-system driven MPA pages router & SSG
       experimental: {
         secureTransforms: {
           urlShield: true,
@@ -235,6 +236,33 @@ export default defineConfig({
 
 Client requests to `/api/rpc` are handled directly by your typed server procedures inside Vite.
 
+## File-System MPA Pages Router (visage/pages)
+
+Visage includes a built-in, zero-configuration file-system router for Multi-Page Applications (MPAs). By creating page components inside `src/pages` (or `pages/`), Visage automatically discovers routes, synthesizes virtual client entry points, handles root layouts (`_layout.tsx`), matches dynamic parameters (`[slug].tsx`), and pre-renders static HTML files during production builds (`vite build`):
+
+<CodeBlock
+  filename="vite.config.ts"
+  lang="ts"
+  code={`import { defineConfig } from "vite";
+import visage, { visagePages } from "@epoch32/visage/vite";
+
+export default defineConfig({
+  plugins: [
+    visage({
+      pages: {
+        dir: "src/pages",
+        title: "My Visage MPA",
+        ssg: true, // Pre-renders static HTML files into dist/ at build time
+      },
+    }),
+  ],
+});`}
+/>
+
+<Callout type="tip" title="Dedicated MPA Documentation">
+  For complete routing conventions, dynamic parameters, catch-all routes, nested layouts, custom 404 handling, and edge deployment guides, see the dedicated [Opinionated MPA Pages Router](/mpa-pages) documentation.
+</Callout>
+
 ## API Reference
 
 ### VisagePluginOptions
@@ -247,6 +275,9 @@ Client requests to `/api/rpc` are handled directly by your typed server procedur
 | `extractCss` | `boolean` | `true` | Stable | Extracts static `<Style>` tags into production CSS bundle. |
 | `ssr` | `boolean` | `false` | Stable | Configures SSR module resolution and output. |
 | `rpc` | `{ router, endpoint? }` | `undefined` | Stable | Attaches full-stack RPC procedure handler to dev server. |
+| `pages` | `boolean \| PagesOptions` | `false` | Stable | Enables file-system driven MPA pages router and build-time SSG. |
+| `experimental.storagePreboot` | `boolean \| StoragePrebootOptions` | `undefined` | **Experimental** | Preboots persisted signal state from localStorage before initial DOM mount. |
 | `experimental.secureTransforms` | `SecureTransformsOptions` | `undefined` | **Experimental** | Automated compile-time security shields. |
 | `experimental.csp` | `CSPOptions` | `undefined` | **Experimental** | Automatic Content Security Policy generation. |
 | `experimental.zigNative` | `ZigNativeOptions` | `undefined` | **Experimental** | Scaffolds and builds native Zig desktop host executables. |
+

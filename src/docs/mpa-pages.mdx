@@ -1,0 +1,292 @@
+export const title = "Opinionated MPA Pages Router";
+export const breadcrumb = "Documentation / Full-Stack & Tools";
+
+Visage provides an opinionated, file-system driven Multi-Page Application (MPA) pages router built directly into the official Vite plugin (`@epoch32/visage/vite`). It transforms conventional page components into isolated HTML documents with automated client mounting, shared root layouts, dynamic URL parameters, and build-time Static Site Generation (SSG).
+
+<FeatureGrid>
+  <FeatureCard icon="folder-tree" title="File-System Routing">
+    Files inside <code>src/pages/</code> automatically map to clean URLs: index routes, nested paths, dynamic segments (<code>[slug].tsx</code>), and catch-alls (<code>[...all].tsx</code>).
+  </FeatureCard>
+
+  <FeatureCard icon="layers" title="Shared Root Layouts">
+    A single <code>_layout.tsx</code> wraps all discovered pages in a consistent application shell, header, navigation, and theme provider without repeating boilerplate.
+  </FeatureCard>
+
+  <FeatureCard icon="zap" title="Static Site Generation (SSG)">
+    Enabled by default: <code>vite build</code> pre-renders static HTML files into <code>dist/</code>, producing zero-runtime edge-ready deployments for Cloudflare Pages, Vercel, Netlify, or Nginx.
+  </FeatureCard>
+
+  <FeatureCard icon="sparkles" title="Hot Route Discovery">
+    Adding or deleting page files in development is immediately detected by the Vite file watcher with instant route updates—no dev server restarts required.
+  </FeatureCard>
+</FeatureGrid>
+
+## Why Multi-Page Applications (MPAs)?
+
+Visage supports both client-side Single-Page Applications via the [SPA Router](/spa-router) and multi-page architectures via the MPA Pages Router. While SPAs load a monolithic bundle and handle navigation purely in client memory, Multi-Page Applications offer compelling advantages for content-rich websites:
+
+- **Isolated Page Bundles:** Each page only loads the JavaScript, styles, and assets it actually needs, dramatically reducing initial download sizes.
+- **True HTML Multi-Page Delivery:** Every route is backed by a physical or synthesized HTML shell. Search engine crawlers and social preview bots receive full, indexable HTML on first request.
+- **Instant Time to First Byte (TTFB):** Static HTML files can be cached directly on global CDN edge nodes (Cloudflare Pages, Fastly, CloudFront) for sub-50ms responses.
+- **Fine-Grained Reactivity Per Page:** When a page mounts, Visage's fine-grained reactivity (`createSignal`, `computed`, `effect`) runs with zero Virtual DOM overhead, delivering high-performance UI islands.
+
+## Activation & Setup
+
+The MPA router is integrated into `@epoch32/visage/vite`. You can enable it directly via the `pages` option in `visage()` or by importing the standalone `visagePages()` plugin.
+
+### Method 1: Enabling in `visage()`
+
+<CodeBlock
+  filename="vite.config.ts"
+  lang="ts"
+  code={`import { defineConfig } from "vite";
+import visage from "@epoch32/visage/vite";
+
+export default defineConfig({
+  plugins: [
+    visage({
+      pages: true, // Enables file-system MPA router scanning src/pages (or pages/)
+    }),
+  ],
+});`}
+/>
+
+### Method 2: Custom Options or Standalone `visagePages()`
+
+For dedicated configuration or standalone plugin usage, import `visagePages`:
+
+<CodeBlock
+  filename="vite.config.ts"
+  lang="ts"
+  code={`import { defineConfig } from "vite";
+import visage, { visagePages } from "@epoch32/visage/vite";
+
+export default defineConfig({
+  plugins: [
+    visage(),
+    visagePages({
+      dir: "src/pages",        // Custom pages root directory
+      title: "My Visage MPA",  // Default HTML title
+      ssg: true,               // Pre-render static HTML in production build
+      rootId: "visage-root",   // Target DOM container ID
+    }),
+  ],
+});`}
+/>
+
+## Directory Conventions & Route Mapping
+
+By default, Visage inspects `src/pages` (or `pages` at the project root). The directory hierarchy maps directly to your application's URL paths:
+
+<CodeBlock
+  filename="Directory Structure"
+  lang="text"
+  code={`src/pages/
+├── _layout.tsx           # Global root layout wrapping all pages
+├── _document.tsx         # Custom HTML document shell template
+├── 404.tsx               # Custom 404 Not Found component
+├── index.tsx             # Maps to /
+├── about.tsx             # Maps to /about
+├── contact/
+│   └── index.tsx         # Maps to /contact
+├── blog/
+│   ├── index.tsx         # Maps to /blog
+│   └── [slug].tsx        # Maps to /blog/:slug (dynamic param)
+├── users/
+│   └── [id]/
+│       └── settings.tsx  # Maps to /users/:id/settings
+└── docs/
+    └── [...all].tsx      # Maps to /docs/* (catch-all route)`}
+/>
+
+### Route Resolution Rules
+
+| File Path | URL Route | Type | Extracted `props.params` |
+| :--- | :--- | :--- | :--- |
+| `src/pages/index.tsx` | `/` | Root Index | `{}` |
+| `src/pages/about.tsx` | `/about` | Static Page | `{}` |
+| `src/pages/contact/index.tsx` | `/contact` | Nested Index | `{}` |
+| `src/pages/blog/index.tsx` | `/blog` | Nested Index | `{}` |
+| `src/pages/blog/[slug].tsx` | `/blog/:slug` | Dynamic Segment | `{ slug: string }` |
+| `src/pages/users/[id]/settings.tsx` | `/users/:id/settings` | Nested Dynamic | `{ id: string }` |
+| `src/pages/docs/[...all].tsx` | `/docs/*` | Catch-All Segment | `{ all: string }` |
+
+- **Index Routes:** Files named `index.tsx` map to the root of their directory segment. For example, `src/pages/index.tsx` resolves to `/`, and `src/pages/blog/index.tsx` resolves to `/blog`.
+- **Dynamic Segments (`[param].tsx`):** Square brackets define named parameters. The matching URL value is decoded and passed to the component via `props.params`.
+- **Catch-All Routes (`[...param].tsx`):** Ellipsis syntax captures all remaining path segments into a single parameter string.
+- **Private Files (`_*.tsx`):** Any file prefixed with an underscore (except `_layout.tsx`, `_document.tsx`, and `_404.tsx`) is ignored by the route scanner. This allows you to co-locate private utilities, styles, and sub-components alongside your pages.
+- **Route Precedence:** Visage sorts routes with deterministic priority: static routes take precedence over dynamic routes, which take precedence over catch-all routes. Deeper segments are prioritized over shallow ones.
+
+## Writing Page Components
+
+Page components export a default function that receives `props.params` containing extracted route parameters:
+
+<CodeBlock
+  filename="src/pages/blog/[slug].tsx"
+  lang="tsx"
+  code={`import { createSignal } from "@epoch32/visage";
+
+interface BlogPostPageProps {
+  params: {
+    slug: string;
+  };
+}
+
+export default function BlogPostPage(props: BlogPostPageProps) {
+  const [likes, setLikes] = createSignal(0);
+
+  return (
+    <article class="blog-post">
+      <span class="badge">Article</span>
+      <h1>Post: {props.params.slug}</h1>
+      <p>
+        This page was resolved from the URL segment and mounted with Visage fine-grained reactivity.
+      </p>
+
+      <button
+        type="button"
+        class="like-btn"
+        onClick={() => setLikes((l) => l + 1)}
+      >
+        Likes: {likes}
+      </button>
+    </article>
+  );
+}`}
+/>
+
+## Shared Root Layouts (`_layout.tsx`)
+
+When `_layout.tsx` is placed in your pages directory (or specified via the `layout` option), Visage wraps every page component inside the layout shell:
+
+<CodeBlock
+  filename="src/pages/_layout.tsx"
+  lang="tsx"
+  code={`import type { Child } from "@epoch32/visage";
+
+interface RootLayoutProps {
+  children: Child;
+  params: Record<string, string>;
+}
+
+export default function RootLayout(props: RootLayoutProps) {
+  return (
+    <div class="site-wrapper">
+      <header class="site-header">
+        <a href="/" class="site-brand">Visage MPA</a>
+        <nav class="site-nav">
+          <a href="/">Home</a>
+          <a href="/about">About</a>
+          <a href="/blog">Blog</a>
+          <a href="/contact">Contact</a>
+        </nav>
+      </header>
+
+      <main class="site-main">
+        {props.children}
+      </main>
+
+      <footer class="site-footer">
+        <p>&copy; 2026 Visage. Fine-grained reactive multi-page architecture.</p>
+      </footer>
+    </div>
+  );
+}`}
+/>
+
+<Callout type="tip" title="Layout Composition">
+  The root layout receives both <code>children</code> and the current route's <code>params</code>, enabling dynamic breadcrumbs, user session headers, and contextual navigation shells across all pages.
+</Callout>
+
+## Custom 404 / Not Found Pages (`404.tsx`)
+
+To provide a branded 404 experience, place `404.tsx` (or `_404.tsx`) in your pages directory:
+
+<CodeBlock
+  filename="src/pages/404.tsx"
+  lang="tsx"
+  code={`export default function NotFoundPage() {
+  return (
+    <div class="not-found-container">
+      <h1 class="error-code">404</h1>
+      <h2>Page Not Found</h2>
+      <p>We could not find the page you were looking for.</p>
+      <a href="/" class="back-home-link">
+        Return to Homepage
+      </a>
+    </div>
+  );
+}`}
+/>
+
+### 404 Handling Behavior:
+- **Development Server:** Unmatched GET requests are served with HTTP status code `404` and render your custom `404.tsx` component.
+- **Default Fallback:** If no custom 404 component is present, Visage automatically generates a styled dark-theme 404 fallback page.
+- **Production Build (SSG):** Emits `dist/404.html`, providing instant error routing for static hosts (Cloudflare Pages, GitHub Pages, Netlify).
+
+## Static Site Generation (SSG)
+
+Visage's MPA router includes zero-configuration build-time Static Site Generation enabled by default (`ssg: true`):
+
+```bash
+bun run build
+# or: npx vite build
+```
+
+During the build phase (`closeBundle`), Visage scans discovered routes and emits physical static HTML files into the output directory (`dist/`):
+
+<CodeBlock
+  filename="Build Output (dist/)"
+  lang="text"
+  code={`dist/
+├── index.html              # Pre-rendered from src/pages/index.tsx
+├── 404.html                # Pre-rendered from src/pages/404.tsx
+├── about/
+│   └── index.html          # Pre-rendered from src/pages/about.tsx
+├── contact/
+│   └── index.html          # Pre-rendered from src/pages/contact/index.tsx
+├── blog/
+│   └── index.html          # Pre-rendered from src/pages/blog/index.tsx
+└── assets/                 # Compiled JavaScript and CSS bundles`}
+/>
+
+### Deploying Static Builds
+
+Because each route generates a self-contained HTML document with an entry script, the build output can be deployed directly to any static file hosting service:
+
+- **Cloudflare Pages:** `wrangler pages deploy dist`
+- **Vercel:** `vercel deploy --prebuilt`
+- **Netlify:** `netlify deploy --dir=dist`
+- **GitHub Pages / AWS S3 / Nginx:** Serve `dist/` directly with standard static file servers.
+
+<Callout type="info" title="Dynamic Routes in Static Generation">
+  Fully static routes are automatically pre-rendered to HTML files. Dynamic routes (such as <code>/blog/:slug</code>) can be paired with Visage Server-Side Rendering (SSR) or served via server middleware.
+</Callout>
+
+## How It Works Under the Hood
+
+The MPA plugin operates through several coordinated subsystems in Vite:
+
+1. **Virtual Client Entry Generator (`/@visage-pages-entry`):**
+   Rather than requiring a manual `index.html` and entry script per page, Visage dynamically synthesizes virtual JavaScript modules that import `@epoch32/visage`, wrap the page in `_layout.tsx`, serialize route parameters, and call `render()` on the target DOM container (`#visage-root`).
+
+2. **Vite Development Middleware:**
+   During development (`vite`), a custom Connect middleware intercepts incoming GET requests, executes the compiled route regexes from `matchRoute()`, and invokes `server.transformIndexHtml()` to deliver a live development document.
+
+3. **Live File-System Watcher:**
+   Vite's file watcher monitors the pages directory for `add` and `unlink` events. When you create or delete a page component, Visage recalculates the route table instantly.
+
+## Configuration Reference (`PagesOptions`)
+
+Pass these options to `visage({ pages: { ... } })` or `visagePages({ ... })`:
+
+| Option | Type | Default | Description |
+| :--- | :--- | :--- | :--- |
+| `dir` | `string` | `"src/pages"` | Root directory to scan for page components. Falls back to `"pages"` if `"src/pages"` does not exist. |
+| `title` | `string` | `"Visage App"` | Default document `<title>` in generated HTML shells. |
+| `ssg` | `boolean` | `true` | Pre-renders static HTML files into `dist/` during `vite build`. |
+| `layout` | `string` | `undefined` | Custom file path to root layout component (defaults to `_layout.tsx` in `dir`). |
+| `document` | `string` | `undefined` | Custom file path to document shell template (defaults to `_document.tsx` in `dir`). |
+| `notFound` | `string` | `undefined` | Custom file path to 404 component (defaults to `404.tsx` in `dir`). |
+| `rootId` | `string` | `"visage-root"` | Target DOM element ID where client entry mounts. |
+| `base` | `string` | `"/"` | Base URL path prefix for all generated routes. |

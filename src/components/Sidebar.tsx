@@ -68,6 +68,7 @@ export const navigationSections: NavSection[] = [
 			{ id: "ssr", title: "Server-Side Rendering (SSR)" },
 			{ id: "native", title: "Native Desktop Bridge", badge: "Experimental" },
 			{ id: "file-api", title: "Opinionated File-Based API" },
+			{ id: "mpa-pages", title: "Opinionated MPA Pages" },
 			{ id: "rpc-sse", title: "End-to-End Typed RPC & SSE" },
 			{ id: "i18n", title: "I18n & Community Sync" },
 			{ id: "devtools", title: "Live DAG Graph DevTools" },
