@@ -5,7 +5,7 @@
     "": {
       "name": "visage-docs",
       "dependencies": {
-        "@epoch32/visage": "^1.13.0",
+        "@epoch32/visage": "^2.0.0-dev.16.a3af7f6",
         "lucide": "^1.55.0",
         "shiki": "^4.5.0",
       },
@@ -39,7 +39,7 @@
 
     "@emnapi/runtime": ["@emnapi/runtime@1.11.3", "", { "dependencies": { "tslib": "^2.4.0" } }, "sha512-Xz4Tpyki7XyrpbUK1jR1AhdAdaXyhhY4lZ3neLodmhpuWfy2PAQN5B46sAiU4liOXGLkHypn/qU+jvfWSCYYLA=="],
 
-    "@epoch32/visage": ["@epoch32/visage@1.13.0", "", {}, "sha512-uKFVnLcEtuppxRZN6T7zU8FireJIbKkSFdXYt3G7fD7KqRL4/sbe9+yT3dSMPt+3uT5zAaGlmatHlPtHK3Uefg=="],
+    "@epoch32/visage": ["@epoch32/visage@2.0.0-dev.16.a3af7f6", "", {}, "sha512-OhmW4wJFAFqPaIJPPlybFWtcScpdYeanUvmzSnYdbaqIznTFiUW8UHrh7oY1iwQh64VzZ4gTs3higFMQzN0FhA=="],
 
     "@esbuild/aix-ppc64": ["@esbuild/aix-ppc64@0.28.2", "", { "os": "aix", "cpu": "ppc64" }, "sha512-XExcO+dvLKvVtNTibSTBej1NCAbaGhWn9Ww1ZPx80qsahhPFe/8jgWP0IchNe0F3HwkU7n8ejhH8bjonqht8mQ=="],
 

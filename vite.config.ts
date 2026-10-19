@@ -82,7 +82,6 @@ export default defineConfig({
 			rehypePlugins: [rehypeHeadingIds],
 		}),
 		visage(),
-		visageLucide(),
 	],
 	optimizeDeps: {
 		exclude: ["@epoch32/visage", "visage"],
