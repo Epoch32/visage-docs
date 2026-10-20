@@ -68,7 +68,7 @@ export const navigationSections: NavSection[] = [
 		items: [
 			{ id: "query", title: "Async Query & Mutations" },
 			{ id: "ssr", title: "Server-Side Rendering (SSR)" },
-			{ id: "native", title: "Native Desktop Bridge", badge: "Experimental" },
+			{ id: "native", title: "Native Desktop Bridge" },
 			{ id: "file-api", title: "Opinionated File-Based API" },
 			{ id: "mpa-pages", title: "Opinionated MPA Pages" },
 			{ id: "rpc-sse", title: "End-to-End Typed RPC & SSE" },
@@ -156,9 +156,7 @@ export function Sidebar(props: SidebarProps) {
 												</span>
 
 												<Show when={() => Boolean(item.badge)}>
-													<span
-														class={`sidebar-badge ${item.badge?.toLowerCase() === "experimental" ? "experimental" : ""}`}
-													>
+													<span class="sidebar-badge">
 														{item.badge}
 													</span>
 												</Show>

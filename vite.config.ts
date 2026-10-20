@@ -102,5 +102,11 @@ export default defineConfig({
 				},
 			},
 		},
+		rolldownOptions: {
+			output: {
+				codeSplitting: true
+			}
+		},
+		chunkSizeWarningLimit: 700
 	},
 });

@@ -205,10 +205,6 @@ Passing `native={true}` (or `popover="auto"` / `popover="manual"` on `<PopoverCo
 
 Using `side="top" | "bottom" | "left" | "right"` or `positionArea="block-end span-inline-end"` automatically applies CSS Anchor Positioning (`anchor-name`, `position-anchor`, `position-area`, `position-try-fallbacks`, `inset: auto`). The browser flips the overlay on overflow without executing expensive `getBoundingClientRect()` scroll calculations in JavaScript!
 
-<Callout type="experimental" title="Emerging CSS Standard" tag="CSS Anchor Positioning">
-  CSS Anchor Positioning (<code>position-area</code>, <code>anchor-name</code>) is supported natively in modern Chromium browsers (Chrome 125+, Edge 125+) and is being actively implemented across Safari and Firefox. For legacy browser environments, provide fallback absolute coordinate styles or polyfills.
-</Callout>
-
 ## Dropdown Menu (&lt;DropdownMenu&gt;)
 
 Dropdown menus provide roving keyboard navigation (ArrowUp, ArrowDown, Home, End) and selection triggers:

@@ -122,10 +122,6 @@ When a route is active (matching `href`), `activeClass` (defaults to `"active"`)
 
 Visage features first-class integration with the browser's native **View Transitions API** (`document.startViewTransition()`). It enables smooth, GPU-accelerated page transitions without bloated external animation frameworks.
 
-<Callout type="experimental" title="Progressive Enhancement" tag="Browser Feature">
-  The document View Transitions API (<code>document.startViewTransition</code>) is progressively enhanced. In browsers where the API is unavailable, Visage automatically falls back to synchronous DOM updates without throwing runtime errors or disrupting navigation.
-</Callout>
-
 ### Router-Level View Transitions
 
 Enable view transitions globally on the `<Router>`:
@@ -184,10 +180,6 @@ If the user's browser does not yet support `document.startViewTransition`, Visag
 ## Speculative Prefetching (Speculation Rules)
 
 Visage leverages modern browser **Speculation Rules API** (`<script type="speculationrules">`) to initiate next-page loading before the user even clicks, achieving instant 0ms perceived navigation.
-
-<Callout type="experimental" title="Emerging Web Standard" tag="Speculation Rules">
-  The W3C Speculation Rules API is supported in modern Chromium browsers (Chrome 109+, Edge 109+). In Safari and Firefox, Visage gracefully falls back to injecting standard <code>&lt;link rel="prefetch"&gt;</code> elements into the document head.
-</Callout>
 
 ### Automatic Hover & Render Prefetching
 

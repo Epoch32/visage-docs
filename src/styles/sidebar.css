@@ -196,22 +196,6 @@
 	background: var(--pink-200);
 }
 
-.sidebar-badge.experimental {
-	background: rgba(245, 158, 11, 0.15);
-	color: #d97706;
-	border-color: rgba(245, 158, 11, 0.35);
-}
-
-.sidebar-nav-item:hover .sidebar-badge.experimental {
-	background: rgba(245, 158, 11, 0.25);
-}
-
-[data-theme="dark"] .sidebar-badge.experimental {
-	background: rgba(245, 158, 11, 0.2);
-	color: #fbbf24;
-	border-color: rgba(245, 158, 11, 0.45);
-}
-
 @media (prefers-reduced-motion: reduce) {
 	.sidebar-nav-item,
 	.sidebar-badge {

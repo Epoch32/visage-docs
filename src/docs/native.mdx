@@ -3,10 +3,6 @@ export const breadcrumb = "Documentation / Full-Stack & Tools";
 
 Visage Native (`@epoch32/visage/native`) provides a unified, type-safe IPC (Inter-Process Communication) bridge between your Visage web UI and a lightweight native desktop host written in Zig. Instead of shipping a 150MB+ Chromium runtime like Electron, Visage pairs with native OS web engines (WebView2 on Windows, WKWebView on macOS, and WebKitGTK on Linux) to produce executables under 10MB that start instantaneously.
 
-<Callout type="experimental" title="Experimental Feature" tag="Active Development">
-  The Visage Native desktop runtime and compiled Zig host integration (<code>@epoch32/visage/native</code> and <code>experimental.zigNative</code>) are currently in active experimentation. APIs, IPC protocols, and host build configurations are subject to changes prior to the Visage 2.0 release.
-</Callout>
-
 <FeatureGrid>
   <FeatureCard icon="zap" title="Sub-10MB Native Bundles">
     Leverages the native platform webview rather than bundling Chromium, cutting memory usage from 200MB+ to under 30MB.
@@ -135,11 +131,7 @@ await native.minimize();
 await native.maximize();`}
 />
 
-## Vite Plugin Zig Scaffolding (Experimental)
-
-<Callout type="experimental" title="Experimental Option" tag="experimental.zigNative">
-  To enable native executable builds, configure <code>experimental.zigNative</code> in <code>vite.config.ts</code>. You must have a compatible Zig toolchain (0.13+) installed on your machine.
-</Callout>
+## Vite Plugin Zig Scaffolding
 
 Enable desktop compilation directly inside `vite.config.ts`:
 

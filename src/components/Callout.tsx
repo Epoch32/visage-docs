@@ -2,7 +2,7 @@ import { AlertCircle, AlertTriangle, HelpCircle, Sparkles } from "lucide";
 import "../styles/doc-content.css";
 
 export interface CalloutProps {
-	type?: "info" | "warning" | "experimental" | "tip" | "danger";
+	type?: "info" | "warning" | "tip" | "danger";
 	title?: string;
 	tag?: string;
 	children: any;
@@ -10,12 +10,9 @@ export interface CalloutProps {
 
 export function Callout(props: CalloutProps) {
 	const type = props.type ?? "info";
-	const isExperimental = type === "experimental";
 
 	const getIcon = () => {
 		switch (type) {
-			case "experimental":
-				return <AlertTriangle size={18} color="#f59e0b" />;
 			case "warning":
 			case "danger":
 				return <AlertTriangle size={18} color="var(--pink-500)" />;
@@ -30,8 +27,6 @@ export function Callout(props: CalloutProps) {
 	const getTitle = () => {
 		if (props.title) return props.title;
 		switch (type) {
-			case "experimental":
-				return "Experimental Feature";
 			case "warning":
 				return "Warning";
 			case "danger":
@@ -45,12 +40,12 @@ export function Callout(props: CalloutProps) {
 	};
 
 	return (
-		<div class={isExperimental ? "doc-callout-experimental" : "doc-callout"}>
+		<div class="doc-callout">
 			<div class="doc-callout-icon">{getIcon()}</div>
 			<div class="doc-callout-body">
 				<div class="doc-callout-title">
 					<span>{getTitle()}</span>
-					{props.tag && <span class="doc-tag-experimental">{props.tag}</span>}
+					{props.tag && <span class="doc-callout-tag">{props.tag}</span>}
 				</div>
 				<div>{props.children}</div>
 			</div>
