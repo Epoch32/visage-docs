@@ -255,13 +255,58 @@ export default defineConfig({
   For complete routing conventions, dynamic parameters, catch-all routes, nested layouts, custom 404 handling, and edge deployment guides, see the dedicated [Opinionated MPA Pages Router](/mpa-pages) documentation.
 </Callout>
 
+## Compiler Diagnostics & Build Summary
+
+Visage's AOT JSX compiler provides comprehensive insight into all transformations performed during builds:
+
+### Default Build Summary Dashboard
+
+On every production build (`vite build`), Visage automatically outputs a clean summary dashboard reporting key compiler metrics:
+
+```
+[visage:compiler] AOT JSX Compiler Build Summary:
+  • Transformed:      14 modules
+  • Templates:        32 hoisted DOM templates
+  • Delegated Events: click, input, keydown (3 global)
+  • Security Shields: _safeUrl (4), _cleanSpread (2)
+  • Runtime Helpers:  template, delegate, insert, effect
+  • Transform Time:   18.4ms
+```
+
+### Verbose Transform Diagnostics
+
+To inspect compiler decisions on a per-file basis during development or build, enable `verbose: true`:
+
+<CodeBlock
+  filename="vite.config.ts"
+  lang="ts"
+  code={`import { defineConfig } from "vite";
+import visage from "@epoch32/visage/vite";
+
+export default defineConfig({
+  plugins: [
+    visage({
+      verbose: true, // Enables per-file compilation logs
+    }),
+  ],
+});`}
+/>
+
+When enabled, Visage logs detailed metrics for each transformed component:
+
+```
+[visage:compiler] Transformed src/App.tsx (2 templates, events: [click], shields: [_safeUrl]) [1.8ms]
+[visage:compiler] Transformed src/components/Nav.tsx (1 template, events: [click]) [0.9ms]
+```
+
 ## API Reference
 
 ### VisagePluginOptions
 
 | Option | Type | Default | Status | Description |
 | :--- | :--- | :--- | :--- | :--- |
-| `compiler` | `boolean \| CompilerOptions` | `false` | Stable | Enables AOT JSX template cloneNode compilation. |
+| `compiler` | `boolean \| CompilerOptions` | `true` | Stable | Enables AOT JSX template cloneNode compilation. |
+| `verbose` | `boolean` | `false` | Stable | Enables per-file compiler transform diagnostics. |
 | `devtools` | `boolean` | `true` | Stable | Auto-injects Visage DAG DevTools in dev mode. |
 | `hmr` | `boolean` | `true` | Stable | Enables signal state preservation during HMR. |
 | `extractCss` | `boolean` | `true` | Stable | Extracts static `<Style>` tags into production CSS bundle. |
