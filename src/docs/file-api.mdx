@@ -69,7 +69,7 @@ const zodProcedure = mutation()
   .input(z.object({ email: z.string().email(), age: z.number().min(18) }));`}
 />
 
-If validation fails, Visage automatically halts execution and returns a typed `BAD_REQUEST` error payload with formatted field error messages.
+If validation fails, Visage automatically halts execution and returns a typed `BAD_REQUEST` error payload. When `problemDetails: true` is enabled or the client specifies `Accept: application/problem+json`, errors are formatted according to **RFC 9457 Problem Details** with structured `invalidParams` identifying the failing field paths and validation issues.
 
 ## Type-Safe Middleware (defineMiddleware)
 

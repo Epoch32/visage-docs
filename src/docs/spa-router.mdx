@@ -118,6 +118,8 @@ Visage's `<Link>` accepts either `class` or `className` and seamlessly preserves
 
 When a route is active (matching `href`), `activeClass` (defaults to `"active"`) is appended to your base class. When inactive, your base class remains intact, preventing links from accidentally dropping their styling or reverting to browser default blue unstyled links.
 
+Additionally, active `<Link>` elements automatically set `aria-current="page"` (unless explicitly overridden), providing accessible semantics for screen readers and assistive technologies out of the box in accordance with WCAG recommendations.
+
 ## Native View Transitions API
 
 Visage features first-class integration with the browser's native **View Transitions API** (`document.startViewTransition()`). It enables smooth, GPU-accelerated page transitions without bloated external animation frameworks.

@@ -168,12 +168,17 @@ Sends a command with an optional payload to the native Zig desktop host. Resolve
 <CodeBlock
   lang="ts"
   filename="signature"
-  code={`function invoke<T = any>(command: string, payload?: any): Promise<T>`}
+  code={`function invoke<T = any>(
+  command: string,
+  payload?: any,
+  options?: { timeout?: number }
+): Promise<T>`}
 />
 
 #### Parameters
 - `command` (`string`): The IPC command name registered in the Zig host handler.
 - `payload` (`any`, optional): Data passed to the host command handler.
+- `options.timeout` (`number`, optional): Timeout in milliseconds before rejecting with a timeout error and evicting the pending IPC call (defaults to no timeout).
 
 #### Returns
 - `Promise<T>`: Resolves with the payload response returned by the host.

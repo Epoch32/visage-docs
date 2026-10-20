@@ -158,6 +158,31 @@ export function VolumeSlider() {
 }`}
 />
 
+## Switch (&lt;Switch&gt;)
+
+The Switch primitive renders an accessible toggle switch with full keyboard navigation (Space, Enter), ARIA state binding, and standard HTML `<form>` integration via a hidden input checkbox when `name` is provided:
+
+<CodeBlock
+  filename="SwitchExample.tsx"
+  lang="tsx"
+  code={`import { Switch, createSignal } from "@epoch32/visage";
+
+export function NotificationToggle() {
+  const [enabled, setEnabled] = createSignal(true);
+
+  return (
+    <label class="flex items-center gap-3 cursor-pointer">
+      <span>Push Notifications</span>
+      <Switch
+        checked={enabled}
+        onCheckedChange={setEnabled}
+        name="pushNotifications" // Automatically binds to FormData on form submission
+      />
+    </label>
+  );
+}`}
+/>
+
 ## Popover & CSS Anchor Positioning (&lt;Popover&gt;)
 
 The Popover primitive positions non-modal floating overlays with click-outside and Escape key dismissal. It supports both standard signal-based positioning and cutting-edge **Browser-Native Popover API** with **CSS Anchor Positioning**:

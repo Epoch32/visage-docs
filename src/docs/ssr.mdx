@@ -146,6 +146,40 @@ app.get("*", (c) => {
 export default app;`}
 />
 
+## Request-Scoped SSR Styles (runWithSSRStyles)
+
+In concurrent server environments (Bun, Node, Cloudflare Workers), scoped CSS rules injected by components must be isolated per HTTP request to avoid cross-tenant leaks or memory leaks. Use `runWithSSRStyles` from `@epoch32/visage/style` to collect scoped CSS for the current request context:
+
+<CodeBlock
+  filename="server/isolated-styles.ts"
+  lang="tsx"
+  code={`import { renderToString } from "@epoch32/visage/server";
+import { runWithSSRStyles } from "@epoch32/visage/style";
+import { App } from "./src/App";
+
+export function handleRequest(req: Request): Response {
+  // Executes inside an isolated async request context:
+  const { result: appHtml, tags: styleTags } = runWithSSRStyles(() => {
+    return renderToString(() => <App path={new URL(req.url).pathname} />);
+  });
+
+  const html = \`<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    \${styleTags}
+  </head>
+  <body>
+    <div id="root">\${appHtml}</div>
+  </body>
+</html>\`;
+
+  return new Response(html, {
+    headers: { "Content-Type": "text/html; charset=utf-8" },
+  });
+}`}
+/>
+
 ## API Reference
 
 ### `renderToString()`

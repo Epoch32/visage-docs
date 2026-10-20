@@ -183,6 +183,52 @@ Available error codes:
 - `CONFLICT` (409)
 - `INTERNAL_SERVER_ERROR` (500)
 
+## RFC 9457 Problem Details for HTTP APIs
+
+Visage RPC includes first-class support for **RFC 9457** (`application/problem+json`). When enabled via `problemDetails: true`, errors emitted by your procedures or input validation failures are formatted according to the standard IETF specification:
+
+<CodeBlock
+  filename="server/problem-details.ts"
+  lang="ts"
+  code={`import { createFetchHandler } from "@epoch32/visage/rpc";
+import { appRouter } from "./router";
+
+export const handler = createFetchHandler({
+  router: appRouter,
+  endpoint: "/api/rpc",
+  problemDetails: true, // Emits RFC 9457 application/problem+json responses
+});`}
+/>
+
+When a client sends an `Accept: application/problem+json` header or `problemDetails` is enabled, error responses automatically serialize as:
+
+<CodeBlock
+  filename="example-problem-response.json"
+  lang="json"
+  code={`{
+  "type": "https://visage.dev/problems/bad-request",
+  "title": "Bad Request",
+  "status": 400,
+  "detail": "Invalid procedure arguments provided",
+  "invalidParams": [
+    {
+      "name": "id",
+      "reason": "Expected string, received number"
+    }
+  ]
+}`}
+/>
+
+On the client side, `createClient` transparently hydrates RFC 9457 error responses back into typed `RPCError` instances with populated `.invalidParams`.
+
+## RFC 9110 / 9111 HTTP Caching & 304 Revalidation
+
+Query procedures automatically support standard HTTP caching semantics:
+
+- **Automatic ETag Generation**: Visage hashes deterministic JSON query outputs into strong or weak ETags.
+- **Conditional Revalidation**: When the browser sends an `If-None-Match` header matching the current ETag, the server immediately returns a lightweight `304 Not Modified` response without sending the JSON body again, saving bandwidth.
+- **Cache-Control Headers**: Custom caching directives can be declared per query or route.
+
 ## API Reference
 
 ### `createRouter()`
@@ -215,6 +261,8 @@ Standard Web API fetch handler processing single queries, batch arrays, and SSE 
 #### Parameters
 - `options.router` (`Router`): The RPC router instance.
 - `options.createContext` (`(req: Request) => any`, *optional*): Context builder callback.
+- `options.problemDetails` (`boolean`, *optional*): When `true`, formats errors as RFC 9457 `application/problem+json`. Defaults to content-negotiation.
+- `options.cors` (`CorsOptions`, *optional*): CORS configuration allowing origins, headers, and preflight methods.
 
 <hr className="api-divider" />
 

@@ -97,6 +97,7 @@ To simplify migration from React and standard web conventions, Visage automatica
 - `className` is normalized to `class`.
 - `htmlFor` is normalized to `for`.
 - Event casing (`onClick`, `onKeyDown`, `onpointerdown`) maps cleanly to native event listeners without runtime overhead.
+- Capture event listeners (`onClickCapture`, `onKeyDownCapture`, `onPointerDownCapture`) are natively recognized and bound in the capture phase.
 
 <CodeBlock
   filename="Component.tsx"
@@ -299,6 +300,29 @@ When enabled, Visage logs detailed metrics for each transformed component:
 [visage:compiler] Transformed src/components/Nav.tsx (1 template, events: [click]) [0.9ms]
 ```
 
+## Automated _headers Synthesis for Edge CDNs
+
+Visage can automatically generate a standard `_headers` configuration file in `dist/` for Cloudflare Pages, Netlify, and edge static hosts:
+
+<CodeBlock
+  filename="vite.config.ts"
+  lang="ts"
+  code={`import { defineConfig } from "vite";
+import visage from "@epoch32/visage/vite";
+
+export default defineConfig({
+  plugins: [
+    visage({
+      headers: true, // Auto-generates dist/_headers with RFC 9111 & RFC 8246 caching rules
+    }),
+  ],
+});`}
+/>
+
+When built, Visage writes `dist/_headers` enforcing modern edge caching standards:
+- **Hashed Assets (`/assets/*`)**: Configured with `Cache-Control: public, max-age=31536000, immutable` (RFC 8246), eliminating redundant revalidation requests.
+- **HTML Entrypoints**: Configured with `Cache-Control: public, max-age=0, must-revalidate` (RFC 9111), ensuring users receive instant updates on deployments without stale cache issues.
+
 ## API Reference
 
 ### VisagePluginOptions
@@ -306,6 +330,7 @@ When enabled, Visage logs detailed metrics for each transformed component:
 | Option | Type | Default | Status | Description |
 | :--- | :--- | :--- | :--- | :--- |
 | `compiler` | `boolean \| CompilerOptions` | `true` | Stable | Enables AOT JSX template cloneNode compilation. |
+| `headers` | `boolean \| HeadersOptions` | `false` | Stable | Automatically synthesizes `_headers` with RFC 8246 & RFC 9111 rules for static hosts. |
 | `verbose` | `boolean` | `false` | Stable | Enables per-file compiler transform diagnostics. |
 | `devtools` | `boolean` | `true` | Stable | Auto-injects Visage DAG DevTools in dev mode. |
 | `hmr` | `boolean` | `true` | Stable | Enables signal state preservation during HMR. |

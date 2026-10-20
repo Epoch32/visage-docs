@@ -238,3 +238,15 @@ function onClear() {
 | `setFieldValue(name, val)` | `<K>(name: K, value: T[K]) => void` | Programmatically sets a field value signal. |
 | `setFieldError(name, err)` | `(name: keyof T, error: string \| null) => void` | Programmatically sets or clears a custom field error. |
 | `validate()` | `() => boolean` | Evaluates schema rules immediately and returns validation success. |
+
+<hr className="api-divider" />
+
+### `normalizeIssuePath()`
+
+Helper utility that converts standard schema issue path representations (string, array of segments, or Standard Schema objects) into standardized dot-notation field keys (`"profile.addresses.0.street"`).
+
+<CodeBlock
+  lang="ts"
+  filename="signature"
+  code={`function normalizeIssuePath(path?: IssuePath): string`}
+/>

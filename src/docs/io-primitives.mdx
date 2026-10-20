@@ -30,7 +30,8 @@ export function FileUploader() {
     <div>
       <DropZone
         accept={["image/*", ".pdf"]}
-        maxSize={10 * 1024 * 1024} // 10MB
+        minSize={1024} // 1KB minimum
+        maxSize={10 * 1024 * 1024} // 10MB maximum
         maxFiles={5}
         onDrop={(accepted, rejections) => {
           setFiles((prev) => [...prev, ...accepted]);
@@ -196,7 +197,7 @@ Configures drag-and-drop events on a target element with zero-flicker nested cou
 
 #### Parameters
 - `target` (`() => HTMLElement | null`): Accessor returning the drop zone container DOM element.
-- `options` (`CreateDropZoneOptions`): Configuration options including `onDrop`, `accept`, and `multiple`.
+- `options` (`CreateDropZoneOptions`): Configuration options including `onDrop`, `accept`, `minSize`, `maxSize`, and `multiple`.
 
 #### Returns
 - `DropZoneReturn`: An object containing `{ isOver, files }` signals.
