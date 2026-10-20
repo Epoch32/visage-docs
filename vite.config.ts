@@ -5,7 +5,7 @@ import visage, { visageLucide } from "@epoch32/visage/vite";
 import remarkFrontmatter from "remark-frontmatter";
 import remarkGfm from "remark-gfm";
 import { defineConfig, type Plugin } from "vite";
-import { rehypeHeadingIds, remarkAutoToc, slugify } from "./src/lib/mdxPlugins.ts";
+import { rehypeHeadingIds, remarkAutoToc, remarkPreHighlight, slugify } from "./src/lib/mdxPlugins.ts";
 
 function docsMetadataPlugin(): Plugin {
 	const virtualId = "virtual:docs-metadata";
@@ -78,7 +78,7 @@ export default defineConfig({
 		docsMetadataPlugin(),
 		mdx({
 			jsxImportSource: "@epoch32/visage",
-			remarkPlugins: [remarkGfm, remarkFrontmatter, remarkAutoToc],
+			remarkPlugins: [remarkGfm, remarkFrontmatter, remarkAutoToc, remarkPreHighlight],
 			rehypePlugins: [rehypeHeadingIds],
 		}),
 		visage(),
@@ -90,9 +90,6 @@ export default defineConfig({
 		rollupOptions: {
 			output: {
 				manualChunks(id) {
-					if (id.includes("node_modules/shiki") || id.includes("node_modules/@shikijs")) {
-						return "shiki";
-					}
 					if (id.includes("node_modules/lucide")) {
 						return "lucide";
 					}

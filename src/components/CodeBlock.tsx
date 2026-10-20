@@ -1,27 +1,17 @@
-import { createSignal, effect, Show, toast } from "@epoch32/visage";
+import { createSignal, Show, toast } from "@epoch32/visage";
 import { Check, Copy } from "lucide";
-import { highlightCode } from "../lib/highlighter";
 import "../styles/codeblock.css";
 
 interface CodeBlockProps {
 	code: string;
 	lang?: string;
 	filename?: string;
+	highlightedHtml?: string;
 }
 
 export function CodeBlock(props: CodeBlockProps) {
-	const [html, setHtml] = createSignal("");
 	const [copied, setCopied] = createSignal(false);
-
 	const lang = props.lang ?? "tsx";
-
-	highlightCode(props.code.trim(), lang)
-		.then((res) => {
-			setHtml(res);
-		})
-		.catch((err) => {
-			console.error("[Shiki] Failed to highlight code:", err);
-		});
 
 	const handleCopy = () => {
 		navigator.clipboard.writeText(props.code.trim());
@@ -71,20 +61,19 @@ export function CodeBlock(props: CodeBlockProps) {
 			<div
 				ref={(el) => {
 					if (!el) return;
-					effect(() => {
-						const content = html();
-						if (content) {
-							el.innerHTML = content;
-						}
-					});
+					if (props.highlightedHtml) {
+						el.innerHTML = props.highlightedHtml;
+					}
 				}}
 			>
-				<pre
-					class="shiki"
-					style="background-color: #141320; color: #e0def4; padding: 14px 18px; margin: 0;"
-				>
-					<code>{props.code.trim()}</code>
-				</pre>
+				<Show when={() => !props.highlightedHtml}>
+					<pre
+						class="shiki"
+						style="background-color: #141320; color: #e0def4; padding: 14px 18px; margin: 0;"
+					>
+						<code>{props.code.trim()}</code>
+					</pre>
+				</Show>
 			</div>
 		</div>
 	);
