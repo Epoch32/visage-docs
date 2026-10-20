@@ -90,12 +90,6 @@ effect(() => {
   </ul>
 </Callout>
 
-## Interactive Effect & Cleanup Logger
-
-The logger below is wired to a live Visage `effect` with an embedded cleanup callback. Toggle the active state or change the frequency to observe the cleanup lifecycle executing before each run:
-
-<EffectLoggerSandbox />
-
 ## Cleanups & Lifecycle
 
 Effects frequently set up asynchronous operations like event listeners, intervals, WebSockets, or third-party canvas instances. Visage gives you two equivalent ways to register teardown logic:
@@ -169,99 +163,46 @@ batch(() => {
 
 ## API Reference
 
-<div className="doc-api-section">
-  <div className="doc-fn-card">
-    <div className="doc-fn-header">
-      <div className="doc-fn-meta">
-        <span className="doc-fn-kind">Function</span>
-      </div>
-      <div className="doc-fn-signature">
-        effect(fn: () =&gt; void | CleanupFn): CleanupFn
-      </div>
-    </div>
+### `effect()`
 
-    <div className="doc-fn-body">
-      <div className="doc-fn-desc">
-        Creates an eager reactive side-effect runner. Runs immediately and subscribes to all signals accessed during execution. Re-executes automatically when those dependencies change.
-      </div>
+Creates an eager reactive side-effect runner. Runs immediately and subscribes to all signals accessed during execution. Re-executes automatically when those dependencies change.
 
-      <div>
-        <div className="doc-fn-subheading">Parameters</div>
-        <div className="doc-params-list">
-          <div className="doc-param-row">
-            <div className="doc-param-meta">
-              <span className="doc-param-name">fn</span>
-              <span className="doc-param-type">() =&gt; void | CleanupFn</span>
-              <span className="doc-param-badge required">Required</span>
-            </div>
-            <div className="doc-param-desc">
-              The side-effect callback. May optionally return a cleanup function to teardown resources before re-execution or unmount.
-            </div>
-          </div>
-        </div>
-      </div>
+<CodeBlock
+  lang="ts"
+  filename="signature"
+  code={`function effect(fn: () => void | CleanupFn): CleanupFn`}
+/>
 
-      <div>
-        <div className="doc-fn-subheading">Returns</div>
-        <div className="doc-returns-card">
-          <div className="doc-returns-header">
-            <span className="doc-returns-type">CleanupFn</span>
-          </div>
-          <div className="doc-param-desc">
-            A manual disposal function <code>() =&gt; void</code> that stops the effect and tears down all registered cleanups and subscriptions.
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
+#### Parameters
+- `fn` (`() => void | CleanupFn`): The side-effect callback. May optionally return a cleanup function to teardown resources before re-execution or unmount.
 
-  <div className="doc-fn-card">
-    <div className="doc-fn-header">
-      <div className="doc-fn-meta">
-        <span className="doc-fn-kind">Lifecycle Utility</span>
-      </div>
-      <div className="doc-fn-signature">
-        onCleanup(fn: CleanupFn): void
-      </div>
-    </div>
+#### Returns
+- `CleanupFn`: A manual disposal function `() => void` that stops the effect and tears down all registered cleanups and subscriptions.
 
-    <div className="doc-fn-body">
-      <div className="doc-fn-desc">
-        Registers a teardown callback for the currently executing effect or active component scope. Runs right before the effect re-runs or when the scope is destroyed.
-      </div>
+<hr className="api-divider" />
 
-      <div>
-        <div className="doc-fn-subheading">Parameters</div>
-        <div className="doc-params-list">
-          <div className="doc-param-row">
-            <div className="doc-param-meta">
-              <span className="doc-param-name">fn</span>
-              <span className="doc-param-type">() =&gt; void</span>
-              <span className="doc-param-badge required">Required</span>
-            </div>
-            <div className="doc-param-desc">
-              The cleanup function to execute on teardown.
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
+### `onCleanup()`
 
-  <div className="doc-fn-card">
-    <div className="doc-fn-header">
-      <div className="doc-fn-meta">
-        <span className="doc-fn-kind">Alias</span>
-      </div>
-      <div className="doc-fn-signature">
-        createEffect(fn: () =&gt; void | CleanupFn): CleanupFn
-      </div>
-    </div>
+Registers a teardown callback for the currently executing effect or active component scope. Runs right before the effect re-runs or when the scope is destroyed.
 
-    <div className="doc-fn-body">
-      <div className="doc-fn-desc">
-        A drop-in, Solid-compatible alias for <code>effect</code>. Identical in behavior and signature.
-      </div>
-    </div>
-  </div>
-</div>
+<CodeBlock
+  lang="ts"
+  filename="signature"
+  code={`function onCleanup(fn: CleanupFn): void`}
+/>
+
+#### Parameters
+- `fn` (`() => void`): The cleanup function to execute on teardown.
+
+<hr className="api-divider" />
+
+### `createEffect()`
+
+A drop-in, Solid-compatible alias for `effect`. Identical in behavior and signature.
+
+<CodeBlock
+  lang="ts"
+  filename="signature"
+  code={`function createEffect(fn: () => void | CleanupFn): CleanupFn`}
+/>
+

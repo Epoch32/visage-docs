@@ -179,80 +179,35 @@ export function CanvasWidget(): Child {
 
 ## API Reference
 
-<div className="doc-api-section">
-  <div className="doc-fn-card">
-    <div className="doc-fn-header">
-      <div className="doc-fn-meta">
-        <span className="doc-fn-kind">Function</span>
-      </div>
-      <div className="doc-fn-signature">
-        render(fn: () =&gt; Child, container: HTMLElement | DocumentFragment): () =&gt; void
-      </div>
-    </div>
+### `render()`
 
-    <div className="doc-fn-body">
-      <div className="doc-fn-desc">
-        Mounts a Visage component tree into a DOM container inside an isolated reactive root, returning a cleanup function that disposes all child effects and unmounts the rendered nodes.
-      </div>
+Mounts a Visage component tree into a DOM container inside an isolated reactive root, returning a cleanup function that disposes all child effects and unmounts the rendered nodes.
 
-      <div>
-        <div className="doc-fn-subheading">Parameters</div>
-        <div className="doc-params-list">
-          <div className="doc-param-row">
-            <div className="doc-param-meta">
-              <span className="doc-param-name">fn</span>
-              <span className="doc-param-type">() =&gt; Child</span>
-              <span className="doc-param-badge required">Required</span>
-            </div>
-            <div className="doc-param-desc">
-              Component factory function returning JSX elements or reactive children.
-            </div>
-          </div>
+<CodeBlock
+  lang="ts"
+  filename="signature"
+  code={`function render(
+  fn: () => Child,
+  container: HTMLElement | DocumentFragment
+): () => void`}
+/>
 
-          <div className="doc-param-row">
-            <div className="doc-param-meta">
-              <span className="doc-param-name">container</span>
-              <span className="doc-param-type">HTMLElement | DocumentFragment</span>
-              <span className="doc-param-badge required">Required</span>
-            </div>
-            <div className="doc-param-desc">
-              Target DOM element to mount within. Existing container textContent is cleared.
-            </div>
-          </div>
-        </div>
-      </div>
+#### Parameters
+- `fn` (`() => Child`): Component factory function returning JSX elements or reactive children.
+- `container` (`HTMLElement | DocumentFragment`): Target DOM element to mount within.
 
-      <div>
-        <div className="doc-fn-subheading">Returns</div>
-        <div className="doc-params-list">
-          <div className="doc-param-row">
-            <div className="doc-param-meta">
-              <span className="doc-param-name">dispose</span>
-              <span className="doc-param-type">() =&gt; void</span>
-            </div>
-            <div className="doc-param-desc">
-              Teardown function that disposes root signals/effects and removes mounted elements from the DOM.
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
+#### Returns
+- `() => void`: Teardown function that disposes root signals/effects and removes mounted elements from the DOM.
 
-  <div className="doc-fn-card">
-    <div className="doc-fn-header">
-      <div className="doc-fn-meta">
-        <span className="doc-fn-kind">Prop</span>
-      </div>
-      <div className="doc-fn-signature">
-        ref=&#123;(el: HTMLElement | null) =&gt; void&#125;
-      </div>
-    </div>
+<hr className="api-divider" />
 
-    <div className="doc-fn-body">
-      <div className="doc-fn-desc">
-        Direct DOM element ref callback invoked synchronously when the node is instantiated.
-      </div>
-    </div>
-  </div>
-</div>
+### `ref`
+
+Direct DOM element ref callback invoked synchronously when the node is instantiated.
+
+<CodeBlock
+  lang="tsx"
+  filename="signature"
+  code={`ref={(el: HTMLElement | null) => void}`}
+/>
+

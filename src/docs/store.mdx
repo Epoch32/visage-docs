@@ -13,12 +13,6 @@ While signals manage primitive and discrete values, `createStore` provides deepl
   </FeatureCard>
 </FeatureGrid>
 
-## Interactive Store Sandbox
-
-Try modifying individual nested fields below. Notice how changing the user's name does not trigger or dirty the commits counter:
-
-<StoreSandbox />
-
 ## How Stores Work: Proxy Architecture
 
 In traditional frameworks, updating a deeply nested object requires creating copies of every parent object along the tree:
@@ -117,134 +111,56 @@ window.postMessage(unwrapStore(store.config), "*");`}
 
 ## API Reference
 
-<div className="doc-api-section">
-  <div className="doc-fn-card">
-    <div className="doc-fn-header">
-      <div className="doc-fn-meta">
-        <span className="doc-fn-kind">Function</span>
-      </div>
-      <div className="doc-fn-signature">
-        createStore&lt;T extends object&gt;(initialState: T): Store&lt;T&gt;
-      </div>
-    </div>
+### `createStore()`
 
-    <div className="doc-fn-body">
-      <div className="doc-fn-desc">
-        Creates a deeply reactive proxy store with per-property signal tracking. Supports direct assignments, nested objects, and array mutations.
-      </div>
+Creates a deeply reactive proxy store with per-property signal tracking. Supports direct assignments, nested objects, and array mutations.
 
-      <div>
-        <div className="doc-fn-subheading">Parameters</div>
-        <div className="doc-params-list">
-          <div className="doc-param-row">
-            <div className="doc-param-meta">
-              <span className="doc-param-name">initialState</span>
-              <span className="doc-param-type">T extends object</span>
-              <span className="doc-param-badge required">Required</span>
-            </div>
-            <div className="doc-param-desc">
-              An object or array representing the initial state tree.
-            </div>
-          </div>
-        </div>
-      </div>
+<CodeBlock
+  lang="ts"
+  filename="signature"
+  code={`function createStore<T extends object>(initialState: T): Store<T>`}
+/>
 
-      <div>
-        <div className="doc-fn-subheading">Returns</div>
-        <div className="doc-returns-card">
-          <div className="doc-returns-header">
-            <span className="doc-returns-type">Store&lt;T&gt;</span>
-          </div>
-          <div className="doc-param-desc">
-            A reactive proxy wrapping the state tree. Reading properties subscribes to them; writing properties triggers fine-grained notifications.
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
+#### Parameters
+- `initialState` (`T extends object`): An object or array representing the initial state tree.
 
-  <div className="doc-fn-card">
-    <div className="doc-fn-header">
-      <div className="doc-fn-meta">
-        <span className="doc-fn-kind">Utility Function</span>
-      </div>
-      <div className="doc-fn-signature">
-        mutateStore&lt;T extends object&gt;(store: Store&lt;T&gt;, mutator: (draft: T) =&gt; void): void
-      </div>
-    </div>
+#### Returns
+- `Store<T>`: A reactive proxy wrapping the state tree. Reading properties subscribes to them; writing properties triggers fine-grained notifications.
 
-    <div className="doc-fn-body">
-      <div className="doc-fn-desc">
-        Executes a mutator callback inside an atomic synchronous batch, preventing intermediate updates and triggering subscribers once.
-      </div>
+<hr className="api-divider" />
 
-      <div>
-        <div className="doc-fn-subheading">Parameters</div>
-        <div className="doc-params-list">
-          <div className="doc-param-row">
-            <div className="doc-param-meta">
-              <span className="doc-param-name">store</span>
-              <span className="doc-param-type">Store&lt;T&gt;</span>
-              <span className="doc-param-badge required">Required</span>
-            </div>
-            <div className="doc-param-desc">The store to mutate.</div>
-          </div>
+### `mutateStore()`
 
-          <div className="doc-param-row">
-            <div className="doc-param-meta">
-              <span className="doc-param-name">mutator</span>
-              <span className="doc-param-type">(draft: T) =&gt; void</span>
-              <span className="doc-param-badge required">Required</span>
-            </div>
-            <div className="doc-param-desc">
-              Synchronous callback receiving the store to perform multiple mutations.
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
+Executes a mutator callback inside an atomic synchronous batch, preventing intermediate updates and triggering subscribers once.
 
-  <div className="doc-fn-card">
-    <div className="doc-fn-header">
-      <div className="doc-fn-meta">
-        <span className="doc-fn-kind">Utility Function</span>
-      </div>
-      <div className="doc-fn-signature">
-        unwrapStore&lt;T&gt;(store: T): T
-      </div>
-    </div>
+<CodeBlock
+  lang="ts"
+  filename="signature"
+  code={`function mutateStore<T extends object>(
+  store: Store<T>,
+  mutator: (draft: T) => void
+): void`}
+/>
 
-    <div className="doc-fn-body">
-      <div className="doc-fn-desc">
-        Unwraps a reactive store proxy to access the underlying raw, un-proxied JavaScript object. Useful for serialization, cloning, or third-party libraries.
-      </div>
+#### Parameters
+- `store` (`Store<T>`): The store to mutate.
+- `mutator` (`(draft: T) => void`): Synchronous callback receiving the store to perform multiple mutations.
 
-      <div>
-        <div className="doc-fn-subheading">Parameters</div>
-        <div className="doc-params-list">
-          <div className="doc-param-row">
-            <div className="doc-param-meta">
-              <span className="doc-param-name">store</span>
-              <span className="doc-param-type">T</span>
-              <span className="doc-param-badge required">Required</span>
-            </div>
-            <div className="doc-param-desc">The store proxy to unwrap.</div>
-          </div>
-        </div>
-      </div>
+<hr className="api-divider" />
 
-      <div>
-        <div className="doc-fn-subheading">Returns</div>
-        <div className="doc-returns-card">
-          <div className="doc-returns-header">
-            <span className="doc-returns-type">T</span>
-          </div>
-          <div className="doc-param-desc">
-            The raw underlying JavaScript object.
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
+### `unwrapStore()`
+
+Unwraps a reactive store proxy to access the underlying raw, un-proxied JavaScript object. Useful for serialization, cloning, or third-party libraries.
+
+<CodeBlock
+  lang="ts"
+  filename="signature"
+  code={`function unwrapStore<T>(store: T): T`}
+/>
+
+#### Parameters
+- `store` (`T`): The store proxy to unwrap.
+
+#### Returns
+- `T`: The raw underlying JavaScript object.
+

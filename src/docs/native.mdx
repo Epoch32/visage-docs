@@ -169,124 +169,71 @@ export default defineConfig({
 
 ## API Reference
 
-<div className="doc-api-section">
-  <div className="doc-fn-card">
-    <div className="doc-fn-header">
-      <div className="doc-fn-meta">
-        <span className="doc-fn-kind">Method</span>
-      </div>
-      <div className="doc-fn-signature">
-        native.invoke&lt;T = any&gt;(command: string, payload?: any): Promise&lt;T&gt;
-      </div>
-    </div>
+### `native.invoke()`
 
-    <div className="doc-fn-body">
-      <div className="doc-fn-desc">
-        Sends a command with an optional payload to the native Zig desktop host. Resolves when the host responds or falls back to browser mock mode in non-native environments.
-      </div>
+Sends a command with an optional payload to the native Zig desktop host. Resolves when the host responds or falls back to browser mock mode in non-native environments.
 
-      <div>
-        <div className="doc-fn-subheading">Parameters</div>
-        <div className="doc-params-list">
-          <div className="doc-param-row">
-            <div className="doc-param-meta">
-              <span className="doc-param-name">command</span>
-              <span className="doc-param-type">string</span>
-              <span className="doc-param-badge required">Required</span>
-            </div>
-            <div className="doc-param-desc">
-              The IPC command name registered in the Zig host handler.
-            </div>
-          </div>
-          <div className="doc-param-row">
-            <div className="doc-param-meta">
-              <span className="doc-param-name">payload</span>
-              <span className="doc-param-type">any</span>
-              <span className="doc-param-badge optional">Optional</span>
-            </div>
-            <div className="doc-param-desc">
-              Data passed to the host command handler.
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
+<CodeBlock
+  lang="ts"
+  filename="signature"
+  code={`function invoke<T = any>(command: string, payload?: any): Promise<T>`}
+/>
 
-  <div className="doc-fn-card">
-    <div className="doc-fn-header">
-      <div className="doc-fn-meta">
-        <span className="doc-fn-kind">Method</span>
-      </div>
-      <div className="doc-fn-signature">
-        native.on(event: string, callback: (payload: any) =&gt; void): () =&gt; void
-      </div>
-    </div>
+#### Parameters
+- `command` (`string`): The IPC command name registered in the Zig host handler.
+- `payload` (`any`, optional): Data passed to the host command handler.
 
-    <div className="doc-fn-body">
-      <div className="doc-fn-desc">
-        Subscribes to asynchronous native events broadcast from the Zig desktop host. Automatically unbinds when the returned cleanup disposal function is invoked or when the component scope tears down.
-      </div>
+#### Returns
+- `Promise<T>`: Resolves with the payload response returned by the host.
 
-      <div>
-        <div className="doc-fn-subheading">Parameters</div>
-        <div className="doc-params-list">
-          <div className="doc-param-row">
-            <div className="doc-param-meta">
-              <span className="doc-param-name">event</span>
-              <span className="doc-param-type">string</span>
-              <span className="doc-param-badge required">Required</span>
-            </div>
-            <div className="doc-param-desc">
-              The event channel name emitted by the native application.
-            </div>
-          </div>
-          <div className="doc-param-row">
-            <div className="doc-param-meta">
-              <span className="doc-param-name">callback</span>
-              <span className="doc-param-type">(payload: any) =&gt; void</span>
-              <span className="doc-param-badge required">Required</span>
-            </div>
-            <div className="doc-param-desc">
-              Listener invoked whenever the host pushes an event on this channel.
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
+<hr className="api-divider" />
 
-  <div className="doc-fn-card">
-    <div className="doc-fn-header">
-      <div className="doc-fn-meta">
-        <span className="doc-fn-kind">Method</span>
-      </div>
-      <div className="doc-fn-signature">
-        native.isNativeApp(): boolean
-      </div>
-    </div>
+### `native.on()`
 
-    <div className="doc-fn-body">
-      <div className="doc-fn-desc">
-        Returns <code>true</code> when running inside a supported native desktop webview environment (WebView2 on Windows, WKWebView on macOS, WebKitGTK on Linux), or <code>false</code> in standard web browsers.
-      </div>
-    </div>
-  </div>
+Subscribes to asynchronous native events broadcast from the Zig desktop host. Automatically unbinds when the returned cleanup disposal function is invoked or when the component scope tears down.
 
-  <div className="doc-fn-card">
-    <div className="doc-fn-header">
-      <div className="doc-fn-meta">
-        <span className="doc-fn-kind">Window Controls</span>
-      </div>
-      <div className="doc-fn-signature">
-        native.close() | native.minimize() | native.maximize()
-      </div>
-    </div>
+<CodeBlock
+  lang="ts"
+  filename="signature"
+  code={`function on(event: string, callback: (payload: any) => void): () => void`}
+/>
 
-    <div className="doc-fn-body">
-      <div className="doc-fn-desc">
-        Convenience functions that invoke <code>"window:close"</code>, <code>"window:minimize"</code>, and <code>"window:maximize"</code> on the host window manager for custom frameless titlebars.
-      </div>
-    </div>
-  </div>
-</div>
+#### Parameters
+- `event` (`string`): The event channel name emitted by the native application.
+- `callback` (`(payload: any) => void`): Listener invoked whenever the host pushes an event on this channel.
+
+#### Returns
+- `() => void`: Unsubscribe cleanup function.
+
+<hr className="api-divider" />
+
+### `native.isNativeApp()`
+
+Returns `true` when running inside a supported native desktop webview environment (WebView2 on Windows, WKWebView on macOS, WebKitGTK on Linux), or `false` in standard web browsers.
+
+<CodeBlock
+  lang="ts"
+  filename="signature"
+  code={`function isNativeApp(): boolean`}
+/>
+
+#### Returns
+- `boolean`: `true` if executing within a native desktop shell, `false` otherwise.
+
+<hr className="api-divider" />
+
+### `native.close()` / `minimize()` / `maximize()`
+
+Convenience functions that invoke `"window:close"`, `"window:minimize"`, and `"window:maximize"` on the host window manager for custom frameless titlebars.
+
+<CodeBlock
+  lang="ts"
+  filename="signature"
+  code={`function close(): Promise<void>
+function minimize(): Promise<void>
+function maximize(): Promise<void>`}
+/>
+
+#### Returns
+- `Promise<void>`: Resolves once the window state change command is dispatched.
+

@@ -13,11 +13,6 @@ Signals are the atomic reactive building blocks in Visage. Unlike frameworks tha
   </FeatureCard>
 </FeatureGrid>
 
-## Interactive Playground
-
-Try modifying this live reactive counter. Observe how the DOM updates surgically without re-rendering the component:
-
-<SignalPlayground />
 
 ## Anatomy & Syntax
 
@@ -124,119 +119,43 @@ const [coords, setCoords] = createSignal(
 
 ## API Reference
 
-<div className="doc-api-section">
-  <div className="doc-fn-card">
-    <div className="doc-fn-header">
-      <div className="doc-fn-meta">
-        <span className="doc-fn-kind">Function</span>
-      </div>
-      <div className="doc-fn-signature">
-        createSignal&lt;T&gt;(initialValue: T, options?: SignalOptions&lt;T&gt;): [Accessor&lt;T&gt;, Setter&lt;T&gt;]
-      </div>
-    </div>
+### `createSignal()`
 
-    <div className="doc-fn-body">
-      <div className="doc-fn-desc">
-        Creates a reactive state signal container. Returns a tuple containing a read-only getter accessor and a state setter function.
-      </div>
+Creates an atomic reactive state signal container. Returns a 2-tuple containing a read-only getter accessor and a state setter function.
 
-      <div>
-        <div className="doc-fn-subheading">Parameters</div>
-        <div className="doc-params-list">
-          <div className="doc-param-row">
-            <div className="doc-param-meta">
-              <span className="doc-param-name">initialValue</span>
-              <span className="doc-param-type">T</span>
-              <span className="doc-param-badge required">Required</span>
-            </div>
-            <div className="doc-param-desc">
-              The initial value assigned to the signal upon creation.
-            </div>
-          </div>
+<CodeBlock
+  lang="ts"
+  filename="signature"
+  code={`function createSignal<T>(
+  initialValue: T,
+  options?: SignalOptions<T>
+): [Accessor<T>, Setter<T>]`}
+/>
 
-          <div className="doc-param-row">
-            <div className="doc-param-meta">
-              <span className="doc-param-name">options.equals</span>
-              <span className="doc-param-type">false | ((prev: T, next: T) =&gt; boolean)</span>
-              <span className="doc-param-badge optional">Optional</span>
-            </div>
-            <div className="doc-param-desc">
-              Custom equality comparator function. Pass <code>false</code> to bypass equality checks and always trigger downstream reactions.
-            </div>
-            <div className="doc-param-default">
-              Default: <code>Object.is</code>
-            </div>
-          </div>
+#### Parameters
+- `initialValue` (`T`): The initial value assigned to the signal upon creation.
+- `options.equals` (`false | ((prev: T, next: T) => boolean)`, *optional*): Custom equality comparator function. Pass `false` to bypass equality checks and always trigger downstream reactions. Defaults to `Object.is`.
+- `options.persist` (`string`, *optional*): Storage key to automatically persist and rehydrate this signal's value in `localStorage` across reloads.
 
-          <div className="doc-param-row">
-            <div className="doc-param-meta">
-              <span className="doc-param-name">options.persist</span>
-              <span className="doc-param-type">string</span>
-              <span className="doc-param-badge optional">Optional</span>
-            </div>
-            <div className="doc-param-desc">
-              Storage key to automatically persist and rehydrate this signal's value in <code>localStorage</code> across browser reloads.
-            </div>
-          </div>
-        </div>
-      </div>
+#### Returns
+- `[Accessor<T>, Setter<T>]`: A 2-tuple where index `0` is the getter accessor function `() => T`, and index `1` is the setter function `(value: T | ((prev: T) => T)) => void`.
 
-      <div>
-        <div className="doc-fn-subheading">Returns</div>
-        <div className="doc-returns-card">
-          <div className="doc-returns-header">
-            <span className="doc-returns-type">[Accessor&lt;T&gt;, Setter&lt;T&gt;]</span>
-          </div>
-          <div className="doc-param-desc">
-            A 2-tuple where index 0 is the accessor function <code>() =&gt; T</code>, and index 1 is the setter function <code>(value: T | ((prev: T) =&gt; T)) =&gt; void</code>.
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
+<hr className="api-divider" />
 
-  <div className="doc-fn-card">
-    <div className="doc-fn-header">
-      <div className="doc-fn-meta">
-        <span className="doc-fn-kind">Utility Function</span>
-      </div>
-      <div className="doc-fn-signature">
-        untrack&lt;T&gt;(fn: () =&gt; T): T
-      </div>
-    </div>
+### `untrack()`
 
-    <div className="doc-fn-body">
-      <div className="doc-fn-desc">
-        Executes a block of code without registering any dynamic reactive subscriptions to signals read inside it. Useful when you need to read a signal's value inside an effect or computed without re-triggering when that specific signal changes.
-      </div>
+Executes a block of code without registering dynamic reactive subscriptions to any signals read inside it. Useful when reading a signal's value inside an effect or computed without re-triggering when that signal updates.
 
-      <div>
-        <div className="doc-fn-subheading">Parameters</div>
-        <div className="doc-params-list">
-          <div className="doc-param-row">
-            <div className="doc-param-meta">
-              <span className="doc-param-name">fn</span>
-              <span className="doc-param-type">() =&gt; T</span>
-              <span className="doc-param-badge required">Required</span>
-            </div>
-            <div className="doc-param-desc">
-              Function to run in an untracked reactive execution scope.
-            </div>
-          </div>
-        </div>
-      </div>
+<CodeBlock
+  lang="ts"
+  filename="signature"
+  code={`function untrack<T>(fn: () => T): T`}
+/>
 
-      <div>
-        <div className="doc-fn-subheading">Returns</div>
-        <div className="doc-returns-card">
-          <div className="doc-returns-header">
-            <span className="doc-returns-type">T</span>
-          </div>
-          <div className="doc-param-desc">
-            Returns the synchronous return value of <code>fn()</code>.
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
+#### Parameters
+- `fn` (`() => T`): Function to execute in an untracked reactive execution scope.
+
+#### Returns
+- `T`: The synchronous return value of `fn()`.
+
+

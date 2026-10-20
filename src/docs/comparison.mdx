@@ -104,16 +104,8 @@ React relies on whole-component re-evaluation and Virtual DOM diffing.
 
 ## When Should You Choose Visage?
 
-<div className="doc-api-section">
-  <div className="doc-api-header">
-    <div className="doc-api-name">Ideal Use Cases for Visage</div>
-  </div>
-  <div className="doc-api-body">
-    <ul style={{ paddingLeft: "20px", margin: "0", color: "var(--text-body)", lineHeight: "1.8" }}>
-      <li><strong>Data-Dense SaaS Dashboards</strong>: High-frequency real-time updates (WebSockets, SSE streams) where Virtual DOM reconciliation would cause dropped animation frames.</li>
-      <li><strong>Interactive Visualizations & Tooling</strong>: Applications requiring reactive SVG charts, canvas scrubbers, and live parameter tuning that need zero-overhead 120 FPS rendering.</li>
-      <li><strong>Unified Full-Stack Projects</strong>: Teams that want a clean, batteries-included stack with built-in typed RPC, headless UI, and spatial layout engines without maintaining dozens of third-party dependencies.</li>
-      <li><strong>Edge & Micro-Frontend Apps</strong>: Workloads where tiny runtime footprint, high-speed hydration, and zero-build tagged template literal support are critical.</li>
-    </ul>
-  </div>
-</div>
+- **Data-Dense SaaS Dashboards**: High-frequency real-time updates (WebSockets, SSE streams) where Virtual DOM reconciliation would cause dropped animation frames.
+- **Interactive Visualizations & Tooling**: Applications requiring reactive SVG charts, canvas scrubbers, and live parameter tuning that need zero-overhead 120 FPS rendering.
+- **Unified Full-Stack Projects**: Teams that want a clean, batteries-included stack with built-in typed RPC, headless UI, and spatial layout engines without maintaining dozens of third-party dependencies.
+- **Edge & Micro-Frontend Apps**: Workloads where tiny runtime footprint, high-speed hydration, and zero-build tagged template literal support are critical.
+

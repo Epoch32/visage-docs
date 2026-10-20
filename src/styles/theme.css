@@ -1,19 +1,19 @@
 /* Visage Documentation Design System & Theme */
 
 :root {
-	/* Canvas Background: light, muted/grayed out, not blinding white */
-	--bg-canvas: #f2f3f6;
-	--bg-dots: rgba(244, 167, 187, 0.55); /* Subtle pastel pink dot pattern */
+	/* Canvas Background: clean, crisp white */
+	--bg-canvas: #ffffff;
 
-	/* Glass Surfaces & Cards */
-	--surface-card: rgba(255, 255, 255, 0.88);
-	--surface-glass: rgba(255, 255, 255, 0.75);
-	--surface-header: rgba(242, 243, 246, 0.85);
-	--surface-sidebar: rgba(248, 249, 251, 0.7);
+	/* Surfaces & Rails */
+	--surface-card: #ffffff;
+	--surface-glass: rgba(255, 255, 255, 0.85);
+	--surface-header: rgba(255, 255, 255, 0.9);
+	--surface-sidebar: #fafafa;
 
 	/* Borders */
-	--border-subtle: rgba(228, 228, 231, 0.85);
-	--border-pink: rgba(244, 167, 187, 0.4);
+	--border-subtle: rgba(228, 228, 231, 0.9);
+	--border-pink: rgba(244, 167, 187, 0.35);
+	--border-divider: rgba(244, 167, 187, 0.25);
 	--border-active: #ec4899;
 
 	/* Typography */
@@ -29,15 +29,14 @@
 	--pink-300: #f9a8d4;
 	--pink-400: #f472b6;
 	--pink-500: #ec4899;
-	--pink-600: #db2777;
+	--pink-600: #c2417c;
 	--pink-badge-bg: rgba(244, 114, 182, 0.12);
 	--pink-badge-text: #be185d;
 
-	/* Code & Pre */
-	--code-bg: #1e2430;
-	--code-text: #f1f5f9;
-	--code-inline-bg: rgba(244, 114, 182, 0.1);
-	--code-inline-text: #db2777;
+	/* Code & Pre: Editor background, with pure text-colored highlighting (no bubbles) */
+	--code-bg: #1e1e2e;
+	--code-text: #e0def4;
+	--code-inline-color: #c2417c;
 
 	/* Cute Rounded Typography */
 	--font-heading: "Quicksand", "Nunito", -apple-system, sans-serif;
@@ -71,13 +70,6 @@ body {
 	font-family: var(--font-body);
 	color: var(--text-body);
 	background-color: var(--bg-canvas);
-	background-image: radial-gradient(
-		circle,
-		var(--bg-dots) 1.25px,
-		transparent 1.25px
-	);
-	background-size: 24px 24px;
-	background-attachment: fixed;
 	-webkit-font-smoothing: antialiased;
 	-moz-osx-font-smoothing: grayscale;
 	line-height: 1.6;
@@ -94,8 +86,8 @@ h6 {
 
 /* Custom scrollbars with pink thumb */
 ::-webkit-scrollbar {
-	width: 7px;
-	height: 7px;
+	width: 6px;
+	height: 6px;
 }
 
 ::-webkit-scrollbar-track {
@@ -111,19 +103,19 @@ h6 {
 	background: var(--pink-300);
 }
 
-/* Dedicated Inset Floating Sidebar Scrollbar */
+/* Dedicated Inset Docked Sidebar Scrollbar */
 .sidebar-scroll {
 	scrollbar-width: thin;
 	scrollbar-color: var(--pink-400) transparent;
 }
 
 .sidebar-scroll::-webkit-scrollbar {
-	width: 6px;
+	width: 5px;
 }
 
 .sidebar-scroll::-webkit-scrollbar-track {
 	background: transparent;
-	margin: 12px 0;
+	margin: 8px 0;
 }
 
 .sidebar-scroll::-webkit-scrollbar-thumb {
@@ -148,24 +140,25 @@ h6 {
 
 /* Shiki Code Highlighting */
 .shiki {
-	padding: 18px 20px !important;
+	padding: 16px 18px !important;
 	margin: 0 !important;
 	overflow-x: auto;
 	font-family: var(--font-mono) !important;
-	font-size: 13.5px !important;
+	font-size: 13px !important;
 	line-height: 1.6 !important;
-	border-radius: 0 0 12px 12px;
+	border-radius: 8px;
+	background-color: transparent !important;
 }
 
-/* Global Inline Code */
+/* Global Inline Code: Clean text coloring, NO BUBBLES */
 :not(pre) > code {
 	font-family: var(--font-mono);
-	font-size: 0.88em;
-	padding: 2px 6px;
-	border-radius: 6px;
-	background: var(--code-inline-bg);
-	color: var(--code-inline-text);
-	border: 1px solid var(--border-pink);
+	font-size: 0.9em;
+	padding: 0 1px;
+	background: transparent !important;
+	color: var(--code-inline-color) !important;
+	border: none !important;
+	border-radius: 0;
+	font-weight: 600;
 	word-break: break-word;
 }
-

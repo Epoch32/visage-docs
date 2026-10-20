@@ -181,52 +181,63 @@ const cleanup = onPaste({
 
 ## API Reference
 
-<div className="doc-api-section">
-  <div className="doc-fn-card">
-    <div className="doc-fn-header">
-      <div className="doc-fn-meta">
-        <span className="doc-fn-kind">Primitive</span>
-      </div>
-      <div className="doc-fn-signature">
-        createDropZone(target: () =&gt; HTMLElement | null, options: CreateDropZoneOptions): DropZoneReturn
-      </div>
-    </div>
-    <div className="doc-fn-body">
-      <div className="doc-fn-desc">
-        Configures drag-and-drop events on a target element with zero-flicker nested counter tracking and file validation.
-      </div>
-    </div>
-  </div>
+### `createDropZone()`
 
-  <div className="doc-fn-card">
-    <div className="doc-fn-header">
-      <div className="doc-fn-meta">
-        <span className="doc-fn-kind">Primitive</span>
-      </div>
-      <div className="doc-fn-signature">
-        createClipboard(options?: CreateClipboardOptions): ClipboardReturn
-      </div>
-    </div>
-    <div className="doc-fn-body">
-      <div className="doc-fn-desc">
-        Provides reactive clipboard write/read methods with an auto-resetting <code>copied()</code> boolean signal.
-      </div>
-    </div>
-  </div>
+Configures drag-and-drop events on a target element with zero-flicker nested counter tracking and file validation.
 
-  <div className="doc-fn-card">
-    <div className="doc-fn-header">
-      <div className="doc-fn-meta">
-        <span className="doc-fn-kind">Primitive</span>
-      </div>
-      <div className="doc-fn-signature">
-        createMediaUrl(source: () =&gt; Blob | MediaSource | null | undefined): () =&gt; string | null
-      </div>
-    </div>
-    <div className="doc-fn-body">
-      <div className="doc-fn-desc">
-        Creates a temporary object URL that automatically cleans up via <code>URL.revokeObjectURL</code> on scope disposal.
-      </div>
-    </div>
-  </div>
-</div>
+<CodeBlock
+  lang="ts"
+  filename="signature"
+  code={`function createDropZone(
+  target: () => HTMLElement | null,
+  options: CreateDropZoneOptions
+): DropZoneReturn`}
+/>
+
+#### Parameters
+- `target` (`() => HTMLElement | null`): Accessor returning the drop zone container DOM element.
+- `options` (`CreateDropZoneOptions`): Configuration options including `onDrop`, `accept`, and `multiple`.
+
+#### Returns
+- `DropZoneReturn`: An object containing `{ isOver, files }` signals.
+
+<hr className="api-divider" />
+
+### `createClipboard()`
+
+Provides reactive clipboard write/read methods with an auto-resetting `copied()` boolean signal.
+
+<CodeBlock
+  lang="ts"
+  filename="signature"
+  code={`function createClipboard(
+  options?: CreateClipboardOptions
+): ClipboardReturn`}
+/>
+
+#### Parameters
+- `options` (`CreateClipboardOptions`, optional): Configuration including `delay` (timeout in ms before `copied` resets to `false`).
+
+#### Returns
+- `ClipboardReturn`: An object containing `{ copied, text, copy, read }`.
+
+<hr className="api-divider" />
+
+### `createMediaUrl()`
+
+Creates a temporary object URL that automatically cleans up via `URL.revokeObjectURL` on scope disposal.
+
+<CodeBlock
+  lang="ts"
+  filename="signature"
+  code={`function createMediaUrl(
+  source: () => Blob | MediaSource | null | undefined
+): () => string | null`}
+/>
+
+#### Parameters
+- `source` (`() => Blob | MediaSource | null | undefined`): Reactive accessor returning the source blob or media object.
+
+#### Returns
+- `() => string | null`: Reactive accessor returning the generated object URL string, or null when source is unavailable.
+

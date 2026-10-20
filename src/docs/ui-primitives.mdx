@@ -395,115 +395,74 @@ const dismiss = useDismiss(() => containerRef.current, {
 
 ## API Reference
 
-<div className="doc-api-section">
-  <div className="doc-fn-card">
-    <div className="doc-fn-header">
-      <div className="doc-fn-meta">
-        <span className="doc-fn-kind">Component</span>
-      </div>
-      <div className="doc-fn-signature">
-        &lt;Dialog open=&#123;ReadonlySignal&lt;boolean&gt;&#125; onOpenChange=&#123;(open: boolean) =&gt; void&#125;&gt;&#123;children&#125;&lt;/Dialog&gt;
-      </div>
-    </div>
+### `<Dialog>`
 
-    <div className="doc-fn-body">
-      <div className="doc-fn-desc">
-        Root dialog state provider supporting controlled or uncontrolled modal states, ARIA modal attributes, and focus restore.
-      </div>
-    </div>
-  </div>
+Root dialog state provider supporting controlled or uncontrolled modal states, ARIA modal attributes, and focus restore.
 
-  <div className="doc-fn-card">
-    <div className="doc-fn-header">
-      <div className="doc-fn-meta">
-        <span className="doc-fn-kind">Component</span>
-      </div>
-      <div className="doc-fn-signature">
-        &lt;Popover open=&#123;ReadonlySignal&lt;boolean&gt;&#125; onOpenChange=&#123;(open: boolean) =&gt; void&#125;&gt;&#123;children&#125;&lt;/Popover&gt;
-      </div>
-    </div>
+<CodeBlock
+  lang="tsx"
+  filename="signature"
+  code={`function Dialog(props: {
+  open?: ReadonlySignal<boolean> | boolean;
+  onOpenChange?: (open: boolean) => void;
+  children?: Element | Element[];
+}): Element`}
+/>
 
-    <div className="doc-fn-body">
-      <div className="doc-fn-desc">
-        Non-modal floating content primitive with automatic click-outside and Escape key dismissal.
-      </div>
-    </div>
-  </div>
+#### Props
+- `open` (`ReadonlySignal<boolean> | boolean`, optional): Reactive signal or boolean controlling dialog visibility.
+- `onOpenChange` (`(open: boolean) => void`, optional): Callback fired whenever open state changes.
 
-  <div className="doc-fn-card">
-    <div className="doc-fn-header">
-      <div className="doc-fn-meta">
-        <span className="doc-fn-kind">Hook</span>
-      </div>
-      <div className="doc-fn-signature">
-        useDismiss(target: () =&gt; HTMLElement | null, options: UseDismissOptions)
-      </div>
-    </div>
+<hr className="api-divider" />
 
-    <div className="doc-fn-body">
-      <div className="doc-fn-desc">
-        Headless dismiss primitive unifying Escape key listening, pointer click-outside detection, focus trapping, and close selector delegation.
-      </div>
+### `<Popover>`
 
-      <div>
-        <div className="doc-fn-subheading">Options</div>
-        <div className="doc-params-list">
-          <div className="doc-param-row">
-            <div className="doc-param-meta">
-              <span className="doc-param-name">enabled</span>
-              <span className="doc-param-type">boolean | (() =&gt; boolean)</span>
-              <span className="doc-param-badge optional">Optional</span>
-            </div>
-            <div className="doc-param-desc">
-              Whether dismiss listeners are active. Defaults to <code>true</code>.
-            </div>
-          </div>
+Non-modal floating content primitive with automatic click-outside and Escape key dismissal.
 
-          <div className="doc-param-row">
-            <div className="doc-param-meta">
-              <span className="doc-param-name">onDismiss</span>
-              <span className="doc-param-type">() =&gt; void</span>
-              <span className="doc-param-badge required">Required</span>
-            </div>
-            <div className="doc-param-desc">
-              Callback invoked when Escape or click-outside occurs.
-            </div>
-          </div>
+<CodeBlock
+  lang="tsx"
+  filename="signature"
+  code={`function Popover(props: {
+  open?: ReadonlySignal<boolean> | boolean;
+  onOpenChange?: (open: boolean) => void;
+  children?: Element | Element[];
+}): Element`}
+/>
 
-          <div className="doc-param-row">
-            <div className="doc-param-meta">
-              <span className="doc-param-name">escapeKey</span>
-              <span className="doc-param-type">boolean</span>
-              <span className="doc-param-badge optional">Optional</span>
-            </div>
-            <div className="doc-param-desc">
-              Dismiss on Escape key press. Defaults to <code>true</code>.
-            </div>
-          </div>
+#### Props
+- `open` (`ReadonlySignal<boolean> | boolean`, optional): Reactive signal controlling popover state.
+- `onOpenChange` (`(open: boolean) => void`, optional): Callback fired when open state changes.
 
-          <div className="doc-param-row">
-            <div className="doc-param-meta">
-              <span className="doc-param-name">outsidePointer</span>
-              <span className="doc-param-type">boolean</span>
-              <span className="doc-param-badge optional">Optional</span>
-            </div>
-            <div className="doc-param-desc">
-              Dismiss on pointer clicks outside the target element. Defaults to <code>true</code>.
-            </div>
-          </div>
+<hr className="api-divider" />
 
-          <div className="doc-param-row">
-            <div className="doc-param-meta">
-              <span className="doc-param-name">trapFocus</span>
-              <span className="doc-param-type">boolean</span>
-              <span className="doc-param-badge optional">Optional</span>
-            </div>
-            <div className="doc-param-desc">
-              Confines Tab focus cycles within target children. Defaults to <code>false</code>.
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
+### `useDismiss()`
+
+Headless dismiss primitive unifying Escape key listening, pointer click-outside detection, focus trapping, and close selector delegation.
+
+<CodeBlock
+  lang="ts"
+  filename="signature"
+  code={`function useDismiss(
+  target: () => HTMLElement | null,
+  options: {
+    enabled?: boolean | (() => boolean);
+    onDismiss: () => void;
+    escapeKey?: boolean;
+    outsidePointer?: boolean;
+    trapFocus?: boolean;
+  }
+): void`}
+/>
+
+#### Parameters
+- `target` (`() => HTMLElement | null`): Accessor returning the container element to protect against dismiss events.
+- `options` (`UseDismissOptions`): Configuration object.
+  - `enabled` (`boolean | (() => boolean)`, optional): Whether dismiss listeners are active. Defaults to `true`.
+  - `onDismiss` (`() => void`): Callback invoked when Escape or click-outside occurs.
+  - `escapeKey` (`boolean`, optional): Dismiss on Escape key press. Defaults to `true`.
+  - `outsidePointer` (`boolean`, optional): Dismiss on pointer clicks outside the target element. Defaults to `true`.
+  - `trapFocus` (`boolean`, optional): Confines Tab focus cycles within target children. Defaults to `false`.
+
+#### Returns
+- `void`
+

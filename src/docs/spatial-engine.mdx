@@ -151,71 +151,61 @@ em(0.85); // "0.85em"`}
 
 ## API Reference
 
-<div className="doc-api-section">
-  <div className="doc-fn-card">
-    <div className="doc-fn-header">
-      <div className="doc-fn-meta">
-        <span className="doc-fn-kind">Function</span>
-      </div>
-      <div className="doc-fn-signature">
-        space(val: number | string | undefined | null): string
-      </div>
-    </div>
+### `space()`
 
-    <div className="doc-fn-body">
-      <div className="doc-fn-desc">
-        Resolves a spatial scale step or dimensional intent to a valid CSS measurement string. Numbers map to the 4px engineering grid (<code>1 = 4px, 2 = 8px, 4 = 16px</code>).
-      </div>
+Resolves a spatial scale step or dimensional intent to a valid CSS measurement string. Numbers map to the 4px engineering grid (`1 = 4px, 2 = 8px, 4 = 16px`).
 
-      <div>
-        <div className="doc-fn-subheading">Parameters</div>
-        <div className="doc-params-list">
-          <div className="doc-param-row">
-            <div className="doc-param-meta">
-              <span className="doc-param-name">val</span>
-              <span className="doc-param-type">number | string</span>
-              <span className="doc-param-badge required">Required</span>
-            </div>
-            <div className="doc-param-desc">
-              Spatial step number (multiplied by 4px) or dimension keyword (<code>"full", "screen", "half"</code>).
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
+<CodeBlock
+  lang="ts"
+  filename="signature"
+  code={`function space(val: number | string | undefined | null): string`}
+/>
 
-  <div className="doc-fn-card">
-    <div className="doc-fn-header">
-      <div className="doc-fn-meta">
-        <span className="doc-fn-kind">Function</span>
-      </div>
-      <div className="doc-fn-signature">
-        resolveDimension(val: number | string | undefined | null): string
-      </div>
-    </div>
+#### Parameters
+- `val` (`number | string | undefined | null`): Spatial step number (multiplied by 4px) or dimension keyword (`"full"`, `"screen"`, `"half"`).
 
-    <div className="doc-fn-body">
-      <div className="doc-fn-desc">
-        Resolves width, height, or grid sizing into CSS dimensions. Numbers &le; 48 map to the 4px scale, while numbers &gt; 48 are treated as raw pixels.
-      </div>
-    </div>
-  </div>
+#### Returns
+- `string`: CSS measurement string (e.g. `"16px"` or `"100%"`).
 
-  <div className="doc-fn-card">
-    <div className="doc-fn-header">
-      <div className="doc-fn-meta">
-        <span className="doc-fn-kind">Function</span>
-      </div>
-      <div className="doc-fn-signature">
-        fluid(minPx: number, maxPx: number, options?: &#123; minVw?: number; maxVw?: number &#125;): string
-      </div>
-    </div>
+<hr className="api-divider" />
 
-    <div className="doc-fn-body">
-      <div className="doc-fn-desc">
-        Calculates an exact CSS <code>clamp()</code> linear interpolation expression between viewport minimums (default 375px) and maximums (default 1280px).
-      </div>
-    </div>
-  </div>
-</div>
+### `resolveDimension()`
+
+Resolves width, height, or grid sizing into CSS dimensions. Numbers ≤ 48 map to the 4px scale, while numbers > 48 are treated as raw pixels.
+
+<CodeBlock
+  lang="ts"
+  filename="signature"
+  code={`function resolveDimension(val: number | string | undefined | null): string`}
+/>
+
+#### Parameters
+- `val` (`number | string | undefined | null`): Scale number, pixel dimension, or CSS value.
+
+#### Returns
+- `string`: Resolved CSS dimension string.
+
+<hr className="api-divider" />
+
+### `fluid()`
+
+Calculates an exact CSS `clamp()` linear interpolation expression between viewport minimums (default 375px) and maximums (default 1280px).
+
+<CodeBlock
+  lang="ts"
+  filename="signature"
+  code={`function fluid(
+  minPx: number,
+  maxPx: number,
+  options?: { minVw?: number; maxVw?: number }
+): string`}
+/>
+
+#### Parameters
+- `minPx` (`number`): Minimum size in pixels at lowest viewport width.
+- `maxPx` (`number`): Maximum size in pixels at highest viewport width.
+- `options` (`{ minVw?: number; maxVw?: number }`, optional): Viewport range boundaries (defaults: 375px to 1280px).
+
+#### Returns
+- `string`: CSS `clamp(...)` linear interpolation expression.
+

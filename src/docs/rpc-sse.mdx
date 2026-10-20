@@ -185,82 +185,50 @@ Available error codes:
 
 ## API Reference
 
-<div className="doc-api-section">
-  <div className="doc-fn-card">
-    <div className="doc-fn-header">
-      <div className="doc-fn-meta">
-        <span className="doc-fn-kind">Function</span>
-      </div>
-      <div className="doc-fn-signature">
-        createRouter(routes: ProcedureRecord): Router
-      </div>
-    </div>
+### `createRouter()`
 
-    <div className="doc-fn-body">
-      <div className="doc-fn-desc">
-        Constructs an RPC router collection grouping queries, mutations, and SSE subscriptions.
-      </div>
-    </div>
-  </div>
+Constructs an RPC router collection grouping queries, mutations, and SSE subscriptions.
 
-  <div className="doc-fn-card">
-    <div className="doc-fn-header">
-      <div className="doc-fn-meta">
-        <span className="doc-fn-kind">Function</span>
-      </div>
-      <div className="doc-fn-signature">
-        createFetchHandler(options: FetchHandlerOptions): (req: Request) =&gt; Promise&lt;Response&gt;
-      </div>
-    </div>
+<CodeBlock
+  lang="ts"
+  filename="signature"
+  code={`function createRouter(routes: ProcedureRecord): Router`}
+/>
 
-    <div className="doc-fn-body">
-      <div className="doc-fn-desc">
-        Standard Web API fetch handler processing single queries, batch arrays, and SSE streams.
-      </div>
-    </div>
-  </div>
+#### Parameters
+- `routes` (`ProcedureRecord`): Map of typed procedure definitions.
 
-  <div className="doc-fn-card">
-    <div className="doc-fn-header">
-      <div className="doc-fn-meta">
-        <span className="doc-fn-kind">Function</span>
-      </div>
-      <div className="doc-fn-signature">
-        createClient&lt;TRouter&gt;(options: ClientOptions): ClientRouter&lt;TRouter&gt;
-      </div>
-    </div>
+<hr className="api-divider" />
 
-    <div className="doc-fn-body">
-      <div className="doc-fn-desc">
-        Instantiates an end-to-end typed client proxy with automatic microtask batching and SSE streaming support.
-      </div>
+### `createFetchHandler()`
 
-      <div>
-        <div className="doc-fn-subheading">Options</div>
-        <div className="doc-params-list">
-          <div className="doc-param-row">
-            <div className="doc-param-meta">
-              <span className="doc-param-name">baseUrl</span>
-              <span className="doc-param-type">string</span>
-              <span className="doc-param-badge required">Required</span>
-            </div>
-            <div className="doc-param-desc">
-              Base URL of the RPC HTTP endpoint.
-            </div>
-          </div>
+Standard Web API fetch handler processing single queries, batch arrays, and SSE streams.
 
-          <div className="doc-param-row">
-            <div className="doc-param-meta">
-              <span className="doc-param-name">headers</span>
-              <span className="doc-param-type">HeadersInit | (() =&gt; HeadersInit | Promise&lt;HeadersInit&gt;)</span>
-              <span className="doc-param-badge optional">Optional</span>
-            </div>
-            <div className="doc-param-desc">
-              Static or dynamic header generator for auth tokens and telemetry.
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
+<CodeBlock
+  lang="ts"
+  filename="signature"
+  code={`function createFetchHandler(
+  options: FetchHandlerOptions
+): (req: Request) => Promise<Response>`}
+/>
+
+#### Parameters
+- `options.router` (`Router`): The RPC router instance.
+- `options.createContext` (`(req: Request) => any`, *optional*): Context builder callback.
+
+<hr className="api-divider" />
+
+### `createClient()`
+
+Instantiates an end-to-end typed client proxy with automatic microtask batching and SSE streaming support.
+
+<CodeBlock
+  lang="ts"
+  filename="signature"
+  code={`function createClient<TRouter>(options: ClientOptions): ClientRouter<TRouter>`}
+/>
+
+#### Options
+- `baseUrl` (`string`): Base URL of the RPC HTTP endpoint.
+- `headers` (`HeadersInit | (() => HeadersInit | Promise<HeadersInit>)`, *optional*): Static or dynamic header generator for auth tokens and telemetry.
+

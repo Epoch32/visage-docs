@@ -166,93 +166,50 @@ console.log(profile.name); // "Alice Developer"`}
 
 ## API Reference
 
-<div className="doc-api-section">
-  <div className="doc-fn-card">
-    <div className="doc-fn-header">
-      <div className="doc-fn-meta">
-        <span className="doc-fn-kind">Builder</span>
-      </div>
-      <div className="doc-fn-signature">
-        query(): ProcedureBuilder&lt;TInput, TOutput&gt;
-      </div>
-    </div>
+### `query()`
 
-    <div className="doc-fn-body">
-      <div className="doc-fn-desc">
-        Creates a type-safe read-only query procedure builder supporting input schema validation, middleware chaining, and async handlers.
-      </div>
+Creates a type-safe read-only query procedure builder supporting input schema validation, middleware chaining, and async handlers.
 
-      <div>
-        <div className="doc-fn-subheading">Builder Methods</div>
-        <div className="doc-params-list">
-          <div className="doc-param-row">
-            <div className="doc-param-meta">
-              <span className="doc-param-name">.input(schema)</span>
-              <span className="doc-param-type">StandardSchemaV1</span>
-              <span className="doc-param-badge optional">Optional</span>
-            </div>
-            <div className="doc-param-desc">
-              Validates incoming procedure arguments with Standard Schema v1 (v, ArkType, Zod, Valibot).
-            </div>
-          </div>
+<CodeBlock
+  lang="ts"
+  filename="signature"
+  code={`function query(): ProcedureBuilder<TInput, TOutput>`}
+/>
 
-          <div className="doc-param-row">
-            <div className="doc-param-meta">
-              <span className="doc-param-name">.use(middleware)</span>
-              <span className="doc-param-type">MiddlewareDefinition</span>
-              <span className="doc-param-badge optional">Optional</span>
-            </div>
-            <div className="doc-param-desc">
-              Attaches authorization or logging middleware functions to the pipeline.
-            </div>
-          </div>
+#### Builder Methods
+- `.input(schema)`: Validates incoming procedure arguments with Standard Schema v1 (`v`, `arktype`, `zod`, `valibot`).
+- `.use(middleware)`: Attaches authorization, logging, or context-enrichment middleware functions.
+- `.handler(fn)`: Async execution logic receiving `{ input, ctx }` returning typed output payload.
 
-          <div className="doc-param-row">
-            <div className="doc-param-meta">
-              <span className="doc-param-name">.handler(fn)</span>
-              <span className="doc-param-type">(&#123; input, ctx &#125;) =&gt; Promise&lt;TOutput&gt;</span>
-              <span className="doc-param-badge required">Required</span>
-            </div>
-            <div className="doc-param-desc">
-              Async execution logic returning typed output payload.
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
+<hr className="api-divider" />
 
-  <div className="doc-fn-card">
-    <div className="doc-fn-header">
-      <div className="doc-fn-meta">
-        <span className="doc-fn-kind">Builder</span>
-      </div>
-      <div className="doc-fn-signature">
-        mutation(): ProcedureBuilder&lt;TInput, TOutput&gt;
-      </div>
-    </div>
+### `mutation()`
 
-    <div className="doc-fn-body">
-      <div className="doc-fn-desc">
-        Creates a side-effect mutation procedure builder executed via HTTP POST.
-      </div>
-    </div>
-  </div>
+Creates a side-effect mutation procedure builder executed via HTTP POST.
 
-  <div className="doc-fn-card">
-    <div className="doc-fn-header">
-      <div className="doc-fn-meta">
-        <span className="doc-fn-kind">Function</span>
-      </div>
-      <div className="doc-fn-signature">
-        defineMiddleware(fn: MiddlewareFn): MiddlewareDefinition
-      </div>
-    </div>
+<CodeBlock
+  lang="ts"
+  filename="signature"
+  code={`function mutation(): ProcedureBuilder<TInput, TOutput>`}
+/>
 
-    <div className="doc-fn-body">
-      <div className="doc-fn-desc">
-        Defines reusable, type-safe middleware that inspects requests and extends downstream context.
-      </div>
-    </div>
-  </div>
-</div>
+#### Builder Methods
+- `.input(schema)`: Validates incoming mutation payload.
+- `.use(middleware)`: Attaches middleware to pipeline.
+- `.handler(fn)`: Async execution logic receiving `{ input, ctx }`.
+
+<hr className="api-divider" />
+
+### `defineMiddleware()`
+
+Defines reusable, type-safe middleware that inspects requests and extends downstream context.
+
+<CodeBlock
+  lang="ts"
+  filename="signature"
+  code={`function defineMiddleware(fn: MiddlewareFn): MiddlewareDefinition`}
+/>
+
+#### Parameters
+- `fn` (`MiddlewareFn`): Async middleware function receiving `{ ctx, next }`.
+

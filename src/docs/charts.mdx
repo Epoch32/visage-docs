@@ -179,110 +179,96 @@ console.log(scaleX.bandwidth); // -> width of each bar`}
 
 ## API Reference
 
-<div className="doc-api-section">
-  <div className="doc-fn-card">
-    <div className="doc-fn-header">
-      <div className="doc-fn-meta">
-        <span className="doc-fn-kind">Component</span>
-      </div>
-      <div className="doc-fn-signature">
-        &lt;Chart data=&#123;any[]&#125; width=&#123;number&#125; height=&#123;number&#125; xKey=&#123;string&#125; yKey=&#123;string&#125;&gt;&#123;children&#125;&lt;/Chart&gt;
-      </div>
-    </div>
+### `<Chart>`
 
-    <div className="doc-fn-body">
-      <div className="doc-fn-desc">
-        Root SVG chart provider establishing Cartesian coordinate domains, responsive viewBox dimensions, and mouse scrub listeners.
-      </div>
+Root SVG chart provider establishing Cartesian coordinate domains, responsive viewBox dimensions, and mouse scrub listeners.
 
-      <div>
-        <div className="doc-fn-subheading">Props</div>
-        <div className="doc-params-list">
-          <div className="doc-param-row">
-            <div className="doc-param-meta">
-              <span className="doc-param-name">data</span>
-              <span className="doc-param-type">any[] | ReadonlySignal&lt;any[]&gt;</span>
-              <span className="doc-param-badge required">Required</span>
-            </div>
-            <div className="doc-param-desc">
-              Array or reactive signal containing dataset records.
-            </div>
-          </div>
+<CodeBlock
+  lang="tsx"
+  filename="signature"
+  code={`function Chart(props: {
+  data: any[] | ReadonlySignal<any[]>;
+  width: number;
+  height: number;
+  xKey?: string;
+  yKey?: string;
+  children?: Element | Element[];
+}): Element`}
+/>
 
-          <div className="doc-param-row">
-            <div className="doc-param-meta">
-              <span className="doc-param-name">width</span>
-              <span className="doc-param-type">number</span>
-              <span className="doc-param-badge required">Required</span>
-            </div>
-            <div className="doc-param-desc">
-              SVG viewBox width coordinate space.
-            </div>
-          </div>
+#### Props
+- `data` (`any[] | ReadonlySignal<any[]>`): Array or reactive signal containing dataset records.
+- `width` (`number`): SVG viewBox width coordinate space.
+- `height` (`number`): SVG viewBox height coordinate space.
+- `xKey` (`string`, optional): Property name for X-axis values.
+- `yKey` (`string`, optional): Property name for Y-axis values.
 
-          <div className="doc-param-row">
-            <div className="doc-param-meta">
-              <span className="doc-param-name">height</span>
-              <span className="doc-param-type">number</span>
-              <span className="doc-param-badge required">Required</span>
-            </div>
-            <div className="doc-param-desc">
-              SVG viewBox height coordinate space.
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
+<hr className="api-divider" />
 
-  <div className="doc-fn-card">
-    <div className="doc-fn-header">
-      <div className="doc-fn-meta">
-        <span className="doc-fn-kind">Component</span>
-      </div>
-      <div className="doc-fn-signature">
-        &lt;Line stroke=&#123;string&#125; strokeWidth=&#123;number&#125; smooth=&#123;boolean&#125; dot=&#123;boolean&#125; /&gt;
-      </div>
-    </div>
+### `<Line>`
 
-    <div className="doc-fn-body">
-      <div className="doc-fn-desc">
-        Renders a continuous SVG path line visualization with optional monotonic cubic Bezier spline smoothing.
-      </div>
-    </div>
-  </div>
+Renders a continuous SVG path line visualization with optional monotonic cubic Bezier spline smoothing.
 
-  <div className="doc-fn-card">
-    <div className="doc-fn-header">
-      <div className="doc-fn-meta">
-        <span className="doc-fn-kind">Component</span>
-      </div>
-      <div className="doc-fn-signature">
-        &lt;Area fill=&#123;string&#125; fillOpacity=&#123;number&#125; stroke=&#123;string&#125; smooth=&#123;boolean&#125; /&gt;
-      </div>
-    </div>
+<CodeBlock
+  lang="tsx"
+  filename="signature"
+  code={`function Line(props: {
+  stroke?: string;
+  strokeWidth?: number;
+  smooth?: boolean;
+  dot?: boolean;
+}): Element`}
+/>
 
-    <div className="doc-fn-body">
-      <div className="doc-fn-desc">
-        Closed area polygon SVG visualization filled from the data curve to the bottom baseline.
-      </div>
-    </div>
-  </div>
+#### Props
+- `stroke` (`string`, optional): Stroke color or theme token.
+- `strokeWidth` (`number`, optional): Line width in pixels.
+- `smooth` (`boolean`, optional): Enables cubic Bezier spline interpolation.
+- `dot` (`boolean`, optional): Renders marker points at each data coordinate.
 
-  <div className="doc-fn-card">
-    <div className="doc-fn-header">
-      <div className="doc-fn-meta">
-        <span className="doc-fn-kind">Component</span>
-      </div>
-      <div className="doc-fn-signature">
-        &lt;Pie valueKey=&#123;string&#125; labelKey=&#123;string&#125; donut=&#123;boolean&#125; innerRadius=&#123;number&#125; /&gt;
-      </div>
-    </div>
+<hr className="api-divider" />
 
-    <div className="doc-fn-body">
-      <div className="doc-fn-desc">
-        Radial arc pie or donut chart with customizable inner/outer radii and slice padding angles.
-      </div>
-    </div>
-  </div>
-</div>
+### `<Area>`
+
+Closed area polygon SVG visualization filled from the data curve to the bottom baseline.
+
+<CodeBlock
+  lang="tsx"
+  filename="signature"
+  code={`function Area(props: {
+  fill?: string;
+  fillOpacity?: number;
+  stroke?: string;
+  smooth?: boolean;
+}): Element`}
+/>
+
+#### Props
+- `fill` (`string`, optional): Fill color for the closed area.
+- `fillOpacity` (`number`, optional): Opacity value (0 to 1).
+- `stroke` (`string`, optional): Stroke color for the top boundary curve.
+- `smooth` (`boolean`, optional): Enables cubic Bezier spline interpolation.
+
+<hr className="api-divider" />
+
+### `<Pie>`
+
+Radial arc pie or donut chart with customizable inner/outer radii and slice padding angles.
+
+<CodeBlock
+  lang="tsx"
+  filename="signature"
+  code={`function Pie(props: {
+  valueKey: string;
+  labelKey?: string;
+  donut?: boolean;
+  innerRadius?: number;
+}): Element`}
+/>
+
+#### Props
+- `valueKey` (`string`): Property name corresponding to slice values.
+- `labelKey` (`string`, optional): Property name corresponding to segment labels.
+- `donut` (`boolean`, optional): When true, renders with an inner cutout radius.
+- `innerRadius` (`number`, optional): Inner radius offset in pixels for donut rendering.
+

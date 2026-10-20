@@ -1,10 +1,11 @@
 import { Link, Show } from "@epoch32/visage";
-import { Moon, Sun } from "lucide";
+import { Moon, Search, Sun } from "lucide";
 import { theme, toggleTheme } from "../theme";
 import "../styles/header-transitions.css";
 
 interface HeaderProps {
 	onOpenSearch?: () => void;
+	activeTab?: () => string;
 }
 
 export function Header(props: HeaderProps) {
@@ -16,64 +17,56 @@ export function Header(props: HeaderProps) {
 				top: 0,
 				zIndex: 50,
 				width: "100%",
-				height: "64px",
+				height: "60px",
 				background: "var(--surface-header)",
-				backdropFilter: "blur(12px)",
+				backdropFilter: "blur(16px)",
+				WebkitBackdropFilter: "blur(16px)",
 				borderBottom: "1px solid var(--border-pink)",
+				transform: "translateZ(0)",
 				display: "flex",
 				alignItems: "center",
 				justifyContent: "space-between",
-				padding: "0 28px",
+				padding: "0 24px",
+				boxSizing: "border-box",
 			}}
 		>
-			{/* Brand & Logo */}
+			{/* Left: Pure Wordmark Logo & Version Tag */}
 			<div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
 				<Link href="/introduction" class="header-brand">
 					<span className="header-brand-title">Visage</span>
 				</Link>
+				<span className="header-badge">v2.0</span>
 			</div>
 
-			{/* Center Search Bar */}
-			<div
-				className="header-search"
-				onClick={() => props.onOpenSearch?.()}
-				role="button"
-				tabIndex={0}
-				aria-label="Open search documentation"
-			>
-				<svg
-					className="header-search-icon"
-					aria-hidden="true"
-					width="14"
-					height="14"
-					viewBox="0 0 24 24"
-					fill="none"
-					stroke="currentColor"
-					strokeWidth="2"
-					strokeLinecap="round"
-					strokeLinejoin="round"
+			{/* Center: Top Section Tabs */}
+			<nav className="header-nav-links" style={{ display: "flex", alignItems: "center", gap: "20px" }}>
+				<Link href="/introduction" class="header-nav-link">
+					Documentation
+				</Link>
+				<Link href="/signals" class="header-nav-link">
+					API Reference
+				</Link>
+				<Link href="/ui-primitives" class="header-nav-link">
+					Components
+				</Link>
+			</nav>
+
+			{/* Right Actions: Search trigger, GitHub, Theme Toggle */}
+			<div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+				{/* Search Bar Trigger */}
+				<div
+					className="header-search"
+					onClick={() => props.onOpenSearch?.()}
+					role="button"
+					tabIndex={0}
+					aria-label="Open search documentation"
 				>
-					<circle cx="11" cy="11" r="8" />
-					<line x1="21" y1="21" x2="16.65" y2="16.65" />
-				</svg>
-				<span style={{ flex: 1 }}>Search documentation...</span>
-				<kbd className="header-search-kbd">⌘K</kbd>
-			</div>
-
-			{/* Nav Links & Social */}
-			<nav style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-				<div className="header-nav-links">
-					<Link href="/introduction" class="header-nav-link">
-						Documentation
-					</Link>
-					<Link href="/file-api" class="header-nav-link">
-						API Reference
-					</Link>
-					<Link href="/ui-primitives" class="header-nav-link">
-						Components
-					</Link>
+					<Search size={13} className="header-search-icon" />
+					<span style={{ flex: 1, fontSize: "12.5px" }}>Search docs...</span>
+					<kbd className="header-search-kbd">⌘K</kbd>
 				</div>
 
+				{/* GitHub Button */}
 				<a
 					href="https://github.com/Epoch32/visage"
 					target="_blank"
@@ -84,8 +77,8 @@ export function Header(props: HeaderProps) {
 				>
 					<svg
 						aria-hidden="true"
-						width="16"
-						height="16"
+						width="15"
+						height="15"
 						viewBox="0 0 24 24"
 						fill="currentColor"
 					>
@@ -94,7 +87,7 @@ export function Header(props: HeaderProps) {
 					<span className="header-github-text">GitHub</span>
 				</a>
 
-				{/* Theme Toggle Button (Icon only) */}
+				{/* Theme Toggle Button */}
 				<button
 					onClick={toggleTheme}
 					type="button"
@@ -104,12 +97,12 @@ export function Header(props: HeaderProps) {
 				>
 					<Show
 						when={() => theme() === "dark"}
-						fallback={() => <Moon size={18} color="#818cf8" />}
+						fallback={() => <Moon size={16} color="#818cf8" />}
 					>
-						{() => <Sun size={18} color="#fbbf24" />}
+						{() => <Sun size={16} color="#fbbf24" />}
 					</Show>
 				</button>
-			</nav>
+			</div>
 		</header>
 	);
 }

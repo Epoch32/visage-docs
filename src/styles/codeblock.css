@@ -1,134 +1,77 @@
+/* Visage Documentation - Seamless Flat Shiki Codeblocks */
+
 .codeblock-container {
-	border-radius: 12px;
+	position: relative;
+	border-radius: 8px;
 	overflow: hidden;
-	border: 1px solid var(--border-pink);
-	box-shadow: var(--shadow-sm);
-	margin: 20px 0;
-	background: #232136;
-	transition:
-		border-color 0.25s ease,
-		box-shadow 0.25s ease;
+	border: 1px solid rgba(244, 167, 187, 0.14);
+	margin: 16px 0 20px 0;
+	background: #141320;
+	transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
 .codeblock-container:hover {
-	border-color: rgba(244, 167, 187, 0.45);
-	box-shadow:
-		0 4px 18px -2px rgba(0, 0, 0, 0.15),
-		0 2px 8px rgba(244, 114, 182, 0.15);
+	border-color: rgba(244, 167, 187, 0.3);
+	box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.4);
 }
 
 .codeblock-header {
 	display: flex;
 	align-items: center;
-	justify-content: space-between;
-	padding: 10px 16px;
-	background: rgba(35, 33, 54, 0.95);
-	border-bottom: 1px solid rgba(244, 167, 187, 0.15);
-	font-size: 12px;
+	padding: 8px 16px;
+	background: rgba(20, 19, 32, 0.7);
+	border-bottom: 1px solid rgba(244, 167, 187, 0.1);
+	font-size: 11.5px;
 	font-family: var(--font-mono);
-	color: #f472b6;
+	color: var(--code-inline-color, #e06c9f);
 }
 
 .codeblock-filename {
-	font-weight: 600;
-	display: flex;
-	align-items: center;
-	gap: 8px;
+	font-weight: 500;
+	letter-spacing: 0.02em;
 }
 
 .code-copy-btn {
+	position: absolute;
+	top: 8px;
+	right: 8px;
+	z-index: 5;
 	display: inline-flex;
 	align-items: center;
-	gap: 6px;
-	background: rgba(255, 255, 255, 0.08);
-	border: 1px solid rgba(244, 167, 187, 0.25);
-	border-radius: 6px;
-	color: #f1f5f9;
-	padding: 5px 10px;
-	font-size: 11.5px;
+	gap: 5px;
+	background: rgba(255, 255, 255, 0.06);
+	border: 1px solid rgba(244, 167, 187, 0.18);
+	border-radius: 5px;
+	color: #d1d1d6;
+	padding: 4px 8px;
+	font-size: 11px;
 	font-family: var(--font-body);
 	cursor: pointer;
-	font-weight: 600;
+	font-weight: 500;
 	outline: none;
-	translate: 0 0;
-	scale: 1;
-	transition:
-		translate 0.2s cubic-bezier(0.34, 1.56, 0.64, 1),
-		scale 0.2s cubic-bezier(0.34, 1.56, 0.64, 1),
-		background-color 0.2s ease,
-		border-color 0.2s ease,
-		color 0.2s ease,
-		box-shadow 0.2s ease;
+	opacity: 0.75;
+	transition: all 0.2s ease;
+}
+
+.codeblock-container:hover .code-copy-btn {
+	opacity: 1;
 }
 
 .code-copy-btn:hover {
-	translate: 0 -1px;
-	scale: 1.04;
-	background: rgba(244, 114, 182, 0.22);
+	background: rgba(244, 114, 182, 0.2);
 	border-color: #f472b6;
 	color: #ffffff;
-	box-shadow: 0 2px 10px rgba(244, 114, 182, 0.35);
-}
-
-.code-copy-btn:active {
-	scale: 0.96;
-	translate: 0 0;
 }
 
 .code-copy-btn.copied {
 	background: rgba(16, 185, 129, 0.2);
 	border-color: rgba(52, 211, 153, 0.6);
 	color: #6ee7b7;
-	box-shadow: 0 2px 10px rgba(16, 185, 129, 0.3);
-}
-
-.code-copy-btn.copied:hover {
-	background: rgba(16, 185, 129, 0.28);
-	border-color: rgba(52, 211, 153, 0.8);
-	color: #a7f3d0;
-}
-
-.code-copy-icon {
-	translate: 0 0;
-	scale: 1;
-	transition: scale 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
-}
-
-.code-copy-btn:hover .code-copy-icon {
-	scale: 1.15;
+	opacity: 1;
 }
 
 .code-copy-inner {
 	display: inline-flex;
 	align-items: center;
-	gap: 5px;
-}
-
-[data-theme="dark"] .code-copy-btn {
-	background: rgba(255, 255, 255, 0.1);
-	border-color: rgba(244, 167, 187, 0.3);
-	color: #f3f4f6;
-}
-
-[data-theme="dark"] .code-copy-btn:hover {
-	background: rgba(244, 114, 182, 0.28);
-	border-color: #f472b6;
-	color: #ffffff;
-	box-shadow: 0 2px 12px rgba(244, 114, 182, 0.4);
-}
-
-[data-theme="dark"] .code-copy-btn.copied {
-	background: rgba(16, 185, 129, 0.22);
-	border-color: rgba(52, 211, 153, 0.7);
-	color: #6ee7b7;
-}
-
-@media (prefers-reduced-motion: reduce) {
-	.codeblock-container,
-	.code-copy-btn,
-	.code-copy-icon {
-		transition: none !important;
-		translate: 0 0 !important;
-		scale: 1 !important;
-	}
+	gap: 4px;
 }

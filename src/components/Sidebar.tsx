@@ -1,4 +1,5 @@
-import { Link } from "@epoch32/visage";
+import { createSignal, For, Link, Show } from "@epoch32/visage";
+import { Search } from "lucide";
 import { getDocPage } from "../docs";
 import "../styles/sidebar.css";
 
@@ -25,7 +26,7 @@ export const navigationSections: NavSection[] = [
 		],
 	},
 	{
-		title: "Reactivity",
+		title: "Reactivity Core",
 		items: [
 			{ id: "signals", title: "Signals (createSignal)" },
 			{ id: "computed", title: "Derived State (computed)" },
@@ -53,7 +54,7 @@ export const navigationSections: NavSection[] = [
 		],
 	},
 	{
-		title: "Headless UI & Charts",
+		title: "Headless UI & Data",
 		items: [
 			{ id: "ui-primitives", title: "Accessible UI Components" },
 			{ id: "forms", title: "Reactive Forms & Validation" },
@@ -84,54 +85,90 @@ interface SidebarProps {
 }
 
 export function Sidebar(props: SidebarProps) {
+	const [filterText, setFilterText] = createSignal("");
+
+	const filteredSections = () => {
+		const q = filterText().trim().toLowerCase();
+		if (!q) return navigationSections;
+
+		return navigationSections
+			.map((section) => ({
+				...section,
+				items: section.items.filter(
+					(item) =>
+						item.title.toLowerCase().includes(q) || item.id.toLowerCase().includes(q),
+				),
+			}))
+			.filter((section) => section.items.length > 0);
+	};
+
 	return (
-		<aside class="sidebar-container">
+		<aside class="sidebar-docked">
+			{/* Quick Filter */}
+			<div class="sidebar-filter-box">
+				<div class="sidebar-filter-input-wrap">
+					<Search size={13} />
+					<input
+						type="text"
+						class="sidebar-filter-input"
+						placeholder="Filter topics..."
+						value={filterText}
+						onInput={(e: any) => setFilterText(e.target.value)}
+					/>
+				</div>
+			</div>
+
+			{/* Navigation List */}
 			<div class="sidebar-scroll sidebar-scroll-wrapper">
 				<div class="sidebar-sections">
-					{navigationSections.map((section) => (
-						<div class="sidebar-section-group">
-							<div class="sidebar-section-title">{section.title}</div>
+					<For each={filteredSections}>
+						{(section) => (
+							<div class="sidebar-section-group">
+								<div class="sidebar-section-title">{section.title}</div>
 
-							<nav class="sidebar-nav-list">
-								{section.items.map((item) => (
-									<Link
-										href={`/${item.id}`}
-										class={() =>
-											`sidebar-nav-item ${props.activeId() === item.id ? "active" : ""}`
-										}
-										onPointerEnter={() => {
-											getDocPage(item.id)?.preload();
-										}}
-										onClick={() => {
-											if (typeof window !== "undefined") {
-												window.scrollTo({ top: 0, behavior: "instant" });
-											}
-											props.onSelect?.(item.id);
-										}}
-									>
-										<span
-											style={{
-												display: "flex",
-												alignItems: "center",
-												gap: "8px",
-											}}
-										>
-											<span class="sidebar-active-indicator" />
-											<span>{item.title}</span>
-										</span>
-
-										{item.badge && (
-											<span
-												class={`sidebar-badge ${item.badge.toLowerCase() === "experimental" ? "experimental" : ""}`}
+								<nav class="sidebar-nav-list">
+									<For each={() => section.items}>
+										{(item) => (
+											<Link
+												href={`/${item.id}`}
+												class={() =>
+													`sidebar-nav-item ${props.activeId() === item.id ? "active" : ""}`
+												}
+												onPointerEnter={() => {
+													getDocPage(item.id)?.preload();
+												}}
+												onClick={() => {
+													if (typeof window !== "undefined") {
+														window.scrollTo({ top: 0, behavior: "instant" });
+													}
+													props.onSelect?.(item.id);
+												}}
 											>
-												{item.badge}
-											</span>
+												<span
+													style={{
+														display: "flex",
+														alignItems: "center",
+														gap: "7px",
+													}}
+												>
+													<span class="sidebar-active-indicator" />
+													<span>{item.title}</span>
+												</span>
+
+												<Show when={() => Boolean(item.badge)}>
+													<span
+														class={`sidebar-badge ${item.badge?.toLowerCase() === "experimental" ? "experimental" : ""}`}
+													>
+														{item.badge}
+													</span>
+												</Show>
+											</Link>
 										)}
-									</Link>
-								))}
-							</nav>
-						</div>
-					))}
+									</For>
+								</nav>
+							</div>
+						)}
+					</For>
 				</div>
 			</div>
 		</aside>

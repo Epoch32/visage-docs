@@ -84,65 +84,38 @@ Hovering over a signal or reactive node in the DevTools panel highlights the ass
 
 ## API Reference
 
-<div className="doc-api-section">
-  <div className="doc-fn-card">
-    <div className="doc-fn-header">
-      <div className="doc-fn-meta">
-        <span className="doc-fn-kind">Component</span>
-      </div>
-      <div className="doc-fn-signature">
-        &lt;VisageDevTools position=&#123;Position&#125; defaultOpen=&#123;boolean&#125; /&gt;
-      </div>
-    </div>
+### `<VisageDevTools>`
 
-    <div className="doc-fn-body">
-      <div className="doc-fn-desc">
-        Floating in-browser reactive debugger panel providing Signals inspection, live DAG visualization, and query cache telemetry.
-      </div>
+Floating in-browser reactive debugger panel providing Signals inspection, live DAG visualization, and query cache telemetry.
 
-      <div>
-        <div className="doc-fn-subheading">Props</div>
-        <div className="doc-params-list">
-          <div className="doc-param-row">
-            <div className="doc-param-meta">
-              <span className="doc-param-name">position</span>
-              <span className="doc-param-type">"bottom-right" | "bottom-left" | "top-right" | "top-left"</span>
-              <span className="doc-param-badge optional">Optional</span>
-            </div>
-            <div className="doc-param-desc">
-              Screen corner anchor for the floating toggle launcher. Defaults to <code>"bottom-right"</code>.
-            </div>
-          </div>
+<CodeBlock
+  lang="tsx"
+  filename="signature"
+  code={`function VisageDevTools(props: {
+  position?: "bottom-right" | "bottom-left" | "top-right" | "top-left";
+  defaultOpen?: boolean;
+}): Element`}
+/>
 
-          <div className="doc-param-row">
-            <div className="doc-param-meta">
-              <span className="doc-param-name">defaultOpen</span>
-              <span className="doc-param-type">boolean</span>
-              <span className="doc-param-badge optional">Optional</span>
-            </div>
-            <div className="doc-param-desc">
-              Whether the inspector drawer starts expanded on initial mount. Defaults to <code>false</code>.
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
+#### Props
+- `position` (`"bottom-right" | "bottom-left" | "top-right" | "top-left"`, optional): Screen corner anchor for the floating toggle launcher. Defaults to `"bottom-right"`.
+- `defaultOpen` (`boolean`, optional): Whether the inspector drawer starts expanded on initial mount. Defaults to `false`.
 
-  <div className="doc-fn-card">
-    <div className="doc-fn-header">
-      <div className="doc-fn-meta">
-        <span className="doc-fn-kind">Function</span>
-      </div>
-      <div className="doc-fn-signature">
-        connectDevTools(client: QueryClient): void
-      </div>
-    </div>
+<hr className="api-divider" />
 
-    <div className="doc-fn-body">
-      <div className="doc-fn-desc">
-        Binds a QueryClient instance to the DevTools telemetry hub to sync cache entries, queries, and mutations.
-      </div>
-    </div>
-  </div>
-</div>
+### `connectDevTools()`
+
+Binds a `QueryClient` instance to the DevTools telemetry hub to sync cache entries, queries, and mutations.
+
+<CodeBlock
+  lang="ts"
+  filename="signature"
+  code={`function connectDevTools(client: QueryClient): void`}
+/>
+
+#### Parameters
+- `client` (`QueryClient`): Query client instance to monitor and observe.
+
+#### Returns
+- `void`
+

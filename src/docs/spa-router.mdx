@@ -305,121 +305,87 @@ prefetch("/docs/quickstart");`}
 
 ## API Reference
 
-<div className="doc-api-section">
-  <div className="doc-fn-card">
-    <div className="doc-fn-header">
-      <div className="doc-fn-meta">
-        <span className="doc-fn-kind">Component</span>
-      </div>
-      <div className="doc-fn-signature">
-        &lt;Router mode=&#123;"history" | "hash"&#125; base=&#123;string&#125; viewTransitions=&#123;boolean&#125; prefetch=&#123;"hover" | "render"&#125;&gt;&#123;children&#125;&lt;/Router&gt;
-      </div>
-    </div>
+### `<Router>`
 
-    <div className="doc-fn-body">
-      <div className="doc-fn-desc">
-        Root router provider establishing HTML5 history listeners, popstate synchronization, native View Transitions, and reactive location context.
-      </div>
+Root router provider establishing HTML5 history listeners, popstate synchronization, native View Transitions, and reactive location context.
 
-      <div>
-        <div className="doc-fn-subheading">Props</div>
-        <div className="doc-params-list">
-          <div className="doc-param-row">
-            <div className="doc-param-meta">
-              <span className="doc-param-name">mode</span>
-              <span className="doc-param-type">"history" | "hash"</span>
-              <span className="doc-param-badge optional">Optional</span>
-            </div>
-            <div className="doc-param-desc">
-              Navigation mode. Defaults to <code>"history"</code> for clean URL paths.
-            </div>
-          </div>
+<CodeBlock
+  lang="tsx"
+  filename="signature"
+  code={`function Router(props: {
+  mode?: "history" | "hash";
+  base?: string;
+  viewTransitions?: boolean;
+  prefetch?: boolean | "hover" | "render";
+  children?: Element | Element[];
+}): Element`}
+/>
 
-          <div className="doc-param-row">
-            <div className="doc-param-meta">
-              <span className="doc-param-name">viewTransitions</span>
-              <span className="doc-param-type">boolean</span>
-              <span className="doc-param-badge optional">Optional</span>
-            </div>
-            <div className="doc-param-desc">
-              When true, wraps page navigations in native <code>document.startViewTransition()</code>.
-            </div>
-          </div>
+#### Props
+- `mode` (`"history" | "hash"`, optional): Navigation mode. Defaults to `"history"`.
+- `base` (`string`, optional): Base URL path prefix for sub-path hosted deployments.
+- `viewTransitions` (`boolean`, optional): When true, wraps page navigations in native `document.startViewTransition()`.
+- `prefetch` (`boolean | "hover" | "render"`, optional): Default prefetch strategy cascaded to all child `<Link>` elements.
 
-          <div className="doc-param-row">
-            <div className="doc-param-meta">
-              <span className="doc-param-name">prefetch</span>
-              <span className="doc-param-type">boolean | "hover" | "render"</span>
-              <span className="doc-param-badge optional">Optional</span>
-            </div>
-            <div className="doc-param-desc">
-              Default prefetch strategy cascaded to all child <code>&lt;Link&gt;</code> elements.
-            </div>
-          </div>
+<hr className="api-divider" />
 
-          <div className="doc-param-row">
-            <div className="doc-param-meta">
-              <span className="doc-param-name">base</span>
-              <span className="doc-param-type">string</span>
-              <span className="doc-param-badge optional">Optional</span>
-            </div>
-            <div className="doc-param-desc">
-              Base URL path prefix for sub-path hosted deployments.
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
+### `<Link>`
 
-  <div className="doc-fn-card">
-    <div className="doc-fn-header">
-      <div className="doc-fn-meta">
-        <span className="doc-fn-kind">Component</span>
-      </div>
-      <div className="doc-fn-signature">
-        &lt;Link href=&#123;string&#125; class=&#123;string&#125; activeClass=&#123;string&#125; viewTransition=&#123;boolean&#125; prefetch=&#123;"hover" | "render"&#125;&gt;&#123;children&#125;&lt;/Link&gt;
-      </div>
-    </div>
+Client-side navigation link with automatic pushState click interception, active route class toggling, native View Transitions, and Speculation Rules prefetching.
 
-    <div className="doc-fn-body">
-      <div className="doc-fn-desc">
-        Client-side navigation link with automatic pushState click interception, active route class toggling, native View Transitions, and Speculation Rules prefetching.
-      </div>
-    </div>
-  </div>
+<CodeBlock
+  lang="tsx"
+  filename="signature"
+  code={`function Link(props: {
+  href: string;
+  class?: string;
+  activeClass?: string;
+  viewTransition?: boolean;
+  prefetch?: "hover" | "render" | false;
+  children?: Element | Element[];
+}): Element`}
+/>
 
-  <div className="doc-fn-card">
-    <div className="doc-fn-header">
-      <div className="doc-fn-meta">
-        <span className="doc-fn-kind">Hook</span>
-      </div>
-      <div className="doc-fn-signature">
-        useNavigate(): (to: string, options?: NavigateOptions) =&gt; void
-      </div>
-    </div>
+#### Props
+- `href` (`string`): Target route path or external URL.
+- `class` (`string`, optional): CSS class names applied to the `<a>` element.
+- `activeClass` (`string`, optional): CSS class applied when current URL matches `href`.
+- `viewTransition` (`boolean`, optional): Triggers native View Transition animation.
+- `prefetch` (`"hover" | "render" | false`, optional): Route code prefetch timing.
 
-    <div className="doc-fn-body">
-      <div className="doc-fn-desc">
-        Returns an imperative navigation function to transition between routes programmatically. Supports <code>&#123; replace?: boolean, viewTransition?: boolean &#125;</code>.
-      </div>
-    </div>
-  </div>
+<hr className="api-divider" />
 
-  <div className="doc-fn-card">
-    <div className="doc-fn-header">
-      <div className="doc-fn-meta">
-        <span className="doc-fn-kind">Function</span>
-      </div>
-      <div className="doc-fn-signature">
-        prefetch(url: string): void
-      </div>
-    </div>
+### `useNavigate()`
 
-    <div className="doc-fn-body">
-      <div className="doc-fn-desc">
-        Speculatively prefetches a URL using the Speculation Rules API when supported, falling back to <code>&lt;link rel="prefetch"&gt;</code>.
-      </div>
-    </div>
-  </div>
-</div>
+Returns an imperative navigation function to transition between routes programmatically.
+
+<CodeBlock
+  lang="ts"
+  filename="signature"
+  code={`function useNavigate(): (
+  to: string,
+  options?: { replace?: boolean; viewTransition?: boolean }
+) => void`}
+/>
+
+#### Returns
+- `(to: string, options?: NavigateOptions) => void`: Navigation function to push or replace history states.
+
+<hr className="api-divider" />
+
+### `prefetch()`
+
+Speculatively prefetches a URL using the Speculation Rules API when supported, falling back to `<link rel="prefetch">`.
+
+<CodeBlock
+  lang="ts"
+  filename="signature"
+  code={`function prefetch(url: string): void`}
+/>
+
+#### Parameters
+- `url` (`string`): Path to speculatively prefetch and cache in memory.
+
+#### Returns
+- `void`
+

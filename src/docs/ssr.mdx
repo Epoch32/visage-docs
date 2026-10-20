@@ -148,123 +148,63 @@ export default app;`}
 
 ## API Reference
 
-<div className="doc-api-section">
-  <div className="doc-fn-card">
-    <div className="doc-fn-header">
-      <div className="doc-fn-meta">
-        <span className="doc-fn-kind">Function</span>
-      </div>
-      <div className="doc-fn-signature">
-        renderToString(fn: () =&gt; Child): string
-      </div>
-    </div>
+### `renderToString()`
 
-    <div className="doc-fn-body">
-      <div className="doc-fn-desc">
-        Synchronously renders a Visage component tree to an escaped HTML string. Signals evaluate their current values at render time.
-      </div>
+Synchronously renders a Visage component tree to an escaped HTML string. Signals evaluate their current values at render time.
 
-      <div>
-        <div className="doc-fn-subheading">Parameters</div>
-        <div className="doc-params-list">
-          <div className="doc-param-row">
-            <div className="doc-param-meta">
-              <span className="doc-param-name">fn</span>
-              <span className="doc-param-type">() =&gt; Child</span>
-              <span className="doc-param-badge required">Required</span>
-            </div>
-            <div className="doc-param-desc">
-              The root component factory function to render to string.
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
+<CodeBlock
+  lang="ts"
+  filename="signature"
+  code={`function renderToString(fn: () => Child): string`}
+/>
 
-  <div className="doc-fn-card">
-    <div className="doc-fn-header">
-      <div className="doc-fn-meta">
-        <span className="doc-fn-kind">Function</span>
-      </div>
-      <div className="doc-fn-signature">
-        renderToStream(fn: () =&gt; Child, options?: StreamOptions): ReadableStream&lt;Uint8Array&gt;
-      </div>
-    </div>
+#### Parameters
+- `fn` (`() => Child`): The root component factory function to render to string.
 
-    <div className="doc-fn-body">
-      <div className="doc-fn-desc">
-        Streams HTML chunks progressively using standard WHATWG <code>ReadableStream&lt;Uint8Array&gt;</code>. Ideal for edge runtimes (Cloudflare Workers, Deno, Bun) and Node.js servers.
-      </div>
+#### Returns
+- `string`: Static HTML markup string.
 
-      <div>
-        <div className="doc-fn-subheading">Options</div>
-        <div className="doc-params-list">
-          <div className="doc-param-row">
-            <div className="doc-param-meta">
-              <span className="doc-param-name">options.onChunk</span>
-              <span className="doc-param-type">(chunk: string) =&gt; void</span>
-              <span className="doc-param-badge optional">Optional</span>
-            </div>
-            <div className="doc-param-desc">
-              Callback invoked as each HTML chunk is serialized.
-            </div>
-          </div>
-          <div className="doc-param-row">
-            <div className="doc-param-meta">
-              <span className="doc-param-name">options.onError</span>
-              <span className="doc-param-type">(error: any) =&gt; void</span>
-              <span className="doc-param-badge optional">Optional</span>
-            </div>
-            <div className="doc-param-desc">
-              Error handler invoked if stream serialization fails.
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
+<hr className="api-divider" />
 
-  <div className="doc-fn-card">
-    <div className="doc-fn-header">
-      <div className="doc-fn-meta">
-        <span className="doc-fn-kind">Function</span>
-      </div>
-      <div className="doc-fn-signature">
-        hydrate(fn: () =&gt; Child, container: HTMLElement | DocumentFragment): () =&gt; void
-      </div>
-    </div>
+### `renderToStream()`
 
-    <div className="doc-fn-body">
-      <div className="doc-fn-desc">
-        Attaches reactive signal subscriptions and DOM event listeners to existing server-rendered HTML nodes in <code>container</code> without re-creating nodes. Returns a cleanup disposal function.
-      </div>
+Streams HTML chunks progressively using standard WHATWG `ReadableStream<Uint8Array>`. Ideal for edge runtimes (Cloudflare Workers, Deno, Bun) and Node.js servers.
 
-      <div>
-        <div className="doc-fn-subheading">Parameters</div>
-        <div className="doc-params-list">
-          <div className="doc-param-row">
-            <div className="doc-param-meta">
-              <span className="doc-param-name">fn</span>
-              <span className="doc-param-type">() =&gt; Child</span>
-              <span className="doc-param-badge required">Required</span>
-            </div>
-            <div className="doc-param-desc">
-              The root component factory function matching the server-rendered tree.
-            </div>
-          </div>
-          <div className="doc-param-row">
-            <div className="doc-param-meta">
-              <span className="doc-param-name">container</span>
-              <span className="doc-param-type">HTMLElement | DocumentFragment</span>
-              <span className="doc-param-badge required">Required</span>
-            </div>
-            <div className="doc-param-desc">
-              The host DOM element containing server-rendered HTML nodes.
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
+<CodeBlock
+  lang="ts"
+  filename="signature"
+  code={`function renderToStream(
+  fn: () => Child,
+  options?: StreamOptions
+): ReadableStream<Uint8Array>`}
+/>
+
+#### Parameters
+- `fn` (`() => Child`): Root component factory function.
+- `options` (`StreamOptions`, optional): Configuration with `onChunk?: (chunk: string) => void` and `onError?: (error: any) => void`.
+
+#### Returns
+- `ReadableStream<Uint8Array>`: WHATWG web stream carrying progressive HTML chunks.
+
+<hr className="api-divider" />
+
+### `hydrate()`
+
+Attaches reactive signal subscriptions and DOM event listeners to existing server-rendered HTML nodes in `container` without re-creating nodes.
+
+<CodeBlock
+  lang="ts"
+  filename="signature"
+  code={`function hydrate(
+  fn: () => Child,
+  container: HTMLElement | DocumentFragment
+): () => void`}
+/>
+
+#### Parameters
+- `fn` (`() => Child`): The root component factory function matching the server-rendered tree.
+- `container` (`HTMLElement | DocumentFragment`): The host DOM element containing server-rendered HTML nodes.
+
+#### Returns
+- `() => void`: Cleanup disposal function that detaches listeners and tears down reactive scopes.
+

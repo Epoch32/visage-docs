@@ -125,93 +125,62 @@ export function PremiumFeatureCard() {
 
 ## API Reference
 
-<div className="doc-api-section">
-  <div className="doc-fn-card">
-    <div className="doc-fn-header">
-      <div className="doc-fn-meta">
-        <span className="doc-fn-kind">Function</span>
-      </div>
-      <div className="doc-fn-signature">
-        glass(options?: GlassOptions): Record&lt;string, string&gt;
-      </div>
-    </div>
+### `glass()`
 
-    <div className="doc-fn-body">
-      <div className="doc-fn-desc">
-        Generates tactile frosted glass styles with cross-browser backdrop filter blurs, background tinting, and light-reflective border accents.
-      </div>
+Generates tactile frosted glass styles with cross-browser backdrop filter blurs, background tinting, and light-reflective border accents.
 
-      <div>
-        <div className="doc-fn-subheading">Options</div>
-        <div className="doc-params-list">
-          <div className="doc-param-row">
-            <div className="doc-param-meta">
-              <span className="doc-param-name">blur</span>
-              <span className="doc-param-type">number | string</span>
-              <span className="doc-param-badge optional">Optional</span>
-            </div>
-            <div className="doc-param-desc">
-              Backdrop blur radius in pixels or CSS measurement. Defaults to <code>"20px"</code>.
-            </div>
-          </div>
+<CodeBlock
+  lang="ts"
+  filename="signature"
+  code={`function glass(options?: {
+  blur?: number | string;
+  tint?: string;
+  border?: string;
+}): Record<string, string>`}
+/>
 
-          <div className="doc-param-row">
-            <div className="doc-param-meta">
-              <span className="doc-param-name">tint</span>
-              <span className="doc-param-type">string</span>
-              <span className="doc-param-badge optional">Optional</span>
-            </div>
-            <div className="doc-param-desc">
-              Translucent background fill color. Defaults to <code>"rgba(255, 255, 255, 0.65)"</code>.
-            </div>
-          </div>
+#### Parameters
+- `options` (`GlassOptions`, optional): Configuration object.
+  - `blur` (`number | string`, optional): Backdrop blur radius in pixels or CSS measurement. Defaults to `"20px"`.
+  - `tint` (`string`, optional): Translucent background fill color. Defaults to `"rgba(255, 255, 255, 0.65)"`.
+  - `border` (`string`, optional): Border stroke CSS string. Defaults to `"1px solid rgba(255, 255, 255, 0.75)"`.
 
-          <div className="doc-param-row">
-            <div className="doc-param-meta">
-              <span className="doc-param-name">border</span>
-              <span className="doc-param-type">string</span>
-              <span className="doc-param-badge optional">Optional</span>
-            </div>
-            <div className="doc-param-desc">
-              Border stroke CSS string. Defaults to <code>"1px solid rgba(255, 255, 255, 0.75)"</code>.
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
+#### Returns
+- `Record<string, string>`: Style object containing CSS properties for backdrop-filter, background, and border.
 
-  <div className="doc-fn-card">
-    <div className="doc-fn-header">
-      <div className="doc-fn-meta">
-        <span className="doc-fn-kind">Function</span>
-      </div>
-      <div className="doc-fn-signature">
-        shadow(variant: ShadowVariant | string): string
-      </div>
-    </div>
+<hr className="api-divider" />
 
-    <div className="doc-fn-body">
-      <div className="doc-fn-desc">
-        Returns calibrated multi-layer box shadows designed for optical depth (<code>sm, md, lg, xl, soft, glow, inner</code>).
-      </div>
-    </div>
-  </div>
+### `shadow()`
 
-  <div className="doc-fn-card">
-    <div className="doc-fn-header">
-      <div className="doc-fn-meta">
-        <span className="doc-fn-kind">Function</span>
-      </div>
-      <div className="doc-fn-signature">
-        radius(variant: RadiusVariant): string
-      </div>
-    </div>
+Returns calibrated multi-layer box shadows designed for optical depth (`sm`, `md`, `lg`, `xl`, `soft`, `glow`, `inner`).
 
-    <div className="doc-fn-body">
-      <div className="doc-fn-desc">
-        Returns standardized curvature radii (<code>sm, md, lg, xl, 2xl, 3xl, full</code> or explicit numbers in pixels).
-      </div>
-    </div>
-  </div>
-</div>
+<CodeBlock
+  lang="ts"
+  filename="signature"
+  code={`function shadow(variant: ShadowVariant | string): string`}
+/>
+
+#### Parameters
+- `variant` (`ShadowVariant | string`): Shadow tier keyword name or custom elevation string.
+
+#### Returns
+- `string`: Complete CSS `box-shadow` property string.
+
+<hr className="api-divider" />
+
+### `radius()`
+
+Returns standardized curvature radii (`sm`, `md`, `lg`, `xl`, `2xl`, `3xl`, `full` or explicit numbers in pixels).
+
+<CodeBlock
+  lang="ts"
+  filename="signature"
+  code={`function radius(variant: RadiusVariant | number): string`}
+/>
+
+#### Parameters
+- `variant` (`RadiusVariant | number`): Curvature step identifier or number in pixels.
+
+#### Returns
+- `string`: CSS `border-radius` measurement string.
+

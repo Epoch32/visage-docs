@@ -33,12 +33,6 @@ Visage solves this with **Dirty Loading**:
   </FeatureCard>
 </FeatureGrid>
 
-## Interactive Subscriber Simulator
-
-Try incrementing Signal `A` below. Notice that Compute Node `Z` flips to <span style={{ color: "#f59e0b", fontWeight: 700 }}>DIRTY</span>, but its cached value does not update and the calculation does not run until you click **"Read Compute Node Z"**:
-
-<DirtyLoadingSimulator />
-
 ## Basic Syntax & Usage
 
 To create a computed node, import `computed` from `@epoch32/visage` and pass a pure computation function. It returns a read-only signal accessor:
@@ -112,77 +106,38 @@ const dashboardData = computed(() => {
 
 ## API Reference
 
-<div className="doc-api-section">
-  <div className="doc-fn-card">
-    <div className="doc-fn-header">
-      <div className="doc-fn-meta">
-        <span className="doc-fn-kind">Function</span>
-      </div>
-      <div className="doc-fn-signature">
-        computed&lt;T&gt;(fn: () =&gt; T, options?: ComputedOptions): ReadonlySignal&lt;T&gt;
-      </div>
-    </div>
+### `computed()`
 
-    <div className="doc-fn-body">
-      <div className="doc-fn-desc">
-        Creates a lazy, memoized, glitch-free derived reactive signal. Recalculates on demand only when accessed after an upstream dependency has marked it dirty.
-      </div>
+Creates a lazy, memoized, glitch-free derived reactive signal. Recalculates on demand only when accessed after an upstream dependency has marked it dirty.
 
-      <div>
-        <div className="doc-fn-subheading">Parameters</div>
-        <div className="doc-params-list">
-          <div className="doc-param-row">
-            <div className="doc-param-meta">
-              <span className="doc-param-name">fn</span>
-              <span className="doc-param-type">() =&gt; T</span>
-              <span className="doc-param-badge required">Required</span>
-            </div>
-            <div className="doc-param-desc">
-              The pure reactive computation function whose return value is derived and cached.
-            </div>
-          </div>
+<CodeBlock
+  lang="ts"
+  filename="signature"
+  code={`function computed<T>(
+  fn: () => T,
+  options?: ComputedOptions
+): ReadonlySignal<T>`}
+/>
 
-          <div className="doc-param-row">
-            <div className="doc-param-meta">
-              <span className="doc-param-name">options.name</span>
-              <span className="doc-param-type">string</span>
-              <span className="doc-param-badge optional">Optional</span>
-            </div>
-            <div className="doc-param-desc">
-              Optional debug name displayed in the Visage DAG DevTools graph.
-            </div>
-          </div>
-        </div>
-      </div>
+#### Parameters
+- `fn` (`() => T`): The pure reactive computation function whose return value is derived and cached.
+- `options.name` (`string`, *optional*): Optional debug name displayed in the Visage DAG DevTools graph.
 
-      <div>
-        <div className="doc-fn-subheading">Returns</div>
-        <div className="doc-returns-card">
-          <div className="doc-returns-header">
-            <span className="doc-returns-type">ReadonlySignal&lt;T&gt;</span>
-          </div>
-          <div className="doc-param-desc">
-            A read-only accessor function <code>() =&gt; T</code> with <code>.value</code> property getter support.
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
+#### Returns
+- `ReadonlySignal<T>`: A read-only accessor function `() => T` with `.value` property getter support.
 
-  <div className="doc-fn-card">
-    <div className="doc-fn-header">
-      <div className="doc-fn-meta">
-        <span className="doc-fn-kind">Alias</span>
-      </div>
-      <div className="doc-fn-signature">
-        createMemo&lt;T&gt;(fn: () =&gt; T, options?: ComputedOptions): ReadonlySignal&lt;T&gt;
-      </div>
-    </div>
+<hr className="api-divider" />
 
-    <div className="doc-fn-body">
-      <div className="doc-fn-desc">
-        A drop-in, Solid-compatible alias for <code>computed</code>. Identical in performance, semantics, and behavior.
-      </div>
-    </div>
-  </div>
-</div>
+### `createMemo()`
+
+A drop-in, Solid-compatible alias for `computed`. Identical in performance, semantics, and behavior.
+
+<CodeBlock
+  lang="ts"
+  filename="signature"
+  code={`function createMemo<T>(
+  fn: () => T,
+  options?: ComputedOptions
+): ReadonlySignal<T>`}
+/>
+

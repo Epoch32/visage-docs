@@ -146,109 +146,53 @@ export function AnalyticsPage() {
 
 ## API Reference
 
-<div className="doc-api-section">
-  <div className="doc-fn-card">
-    <div className="doc-fn-header">
-      <div className="doc-fn-meta">
-        <span className="doc-fn-kind">Component</span>
-      </div>
-      <div className="doc-fn-signature">
-        &lt;Portal mount=&#123;HTMLElement | null&#125;&gt;&#123;children&#125;&lt;/Portal&gt;
-      </div>
-    </div>
+### `<Portal>`
 
-    <div className="doc-fn-body">
-      <div className="doc-fn-desc">
-        Teleports child nodes to an external DOM container while preserving internal reactive scopes and context hierarchy.
-      </div>
+Teleports child nodes to an external DOM container while preserving internal reactive scopes and context hierarchy.
 
-      <div>
-        <div className="doc-fn-subheading">Props</div>
-        <div className="doc-params-list">
-          <div className="doc-param-row">
-            <div className="doc-param-meta">
-              <span className="doc-param-name">mount</span>
-              <span className="doc-param-type">HTMLElement | null</span>
-              <span className="doc-param-badge optional">Optional</span>
-            </div>
-            <div className="doc-param-desc">
-              Target DOM element to append children into. Defaults to <code>document.body</code>.
-            </div>
-          </div>
+<CodeBlock
+  lang="tsx"
+  filename="signature"
+  code={`function Portal(props: {
+  mount?: HTMLElement | null;
+  children: Child | (() => Child);
+}): Child`}
+/>
 
-          <div className="doc-param-row">
-            <div className="doc-param-meta">
-              <span className="doc-param-name">children</span>
-              <span className="doc-param-type">Child | (() =&gt; Child)</span>
-              <span className="doc-param-badge required">Required</span>
-            </div>
-            <div className="doc-param-desc">
-              Elements or components to render inside the teleported container.
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
+#### Props
+- `mount` (`HTMLElement | null`, *optional*): Target DOM element to append children into. Defaults to `document.body`.
+- `children` (`Child | (() => Child)`): Elements or components to render inside the teleported container.
 
-  <div className="doc-fn-card">
-    <div className="doc-fn-header">
-      <div className="doc-fn-meta">
-        <span className="doc-fn-kind">Component</span>
-      </div>
-      <div className="doc-fn-signature">
-        &lt;Suspense fallback=&#123;Child&#125;&gt;&#123;children&#125;&lt;/Suspense&gt;
-      </div>
-    </div>
+<hr className="api-divider" />
 
-    <div className="doc-fn-body">
-      <div className="doc-fn-desc">
-        Coordinates asynchronous operations across children. Displays fallback UI while registered resources or queries are loading.
-      </div>
+### `<Suspense>`
 
-      <div>
-        <div className="doc-fn-subheading">Props</div>
-        <div className="doc-params-list">
-          <div className="doc-param-row">
-            <div className="doc-param-meta">
-              <span className="doc-param-name">fallback</span>
-              <span className="doc-param-type">Child</span>
-              <span className="doc-param-badge required">Required</span>
-            </div>
-            <div className="doc-param-desc">
-              Loading placeholder JSX displayed while child promises are pending.
-            </div>
-          </div>
+Coordinates asynchronous operations across children. Displays fallback UI while registered resources or queries are loading.
 
-          <div className="doc-param-row">
-            <div className="doc-param-meta">
-              <span className="doc-param-name">children</span>
-              <span className="doc-param-type">Child | (() =&gt; Child)</span>
-              <span className="doc-param-badge required">Required</span>
-            </div>
-            <div className="doc-param-desc">
-              Child components that may initiate asynchronous resources or queries.
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
+<CodeBlock
+  lang="tsx"
+  filename="signature"
+  code={`function Suspense(props: {
+  fallback: Child;
+  children: Child | (() => Child);
+}): Child`}
+/>
 
-  <div className="doc-fn-card">
-    <div className="doc-fn-header">
-      <div className="doc-fn-meta">
-        <span className="doc-fn-kind">Function</span>
-      </div>
-      <div className="doc-fn-signature">
-        createResource&lt;T&gt;(fetcher: () =&gt; Promise&lt;T&gt;): [Resource&lt;T&gt;, ResourceActions&lt;T&gt;]
-      </div>
-    </div>
+#### Props
+- `fallback` (`Child`): Loading placeholder JSX displayed while child promises are pending.
+- `children` (`Child | (() => Child)`): Child components that may initiate asynchronous resources or queries.
 
-    <div className="doc-fn-body">
-      <div className="doc-fn-desc">
-        Creates a reactive async signal resource that integrates seamlessly with Suspense boundaries.
-      </div>
-    </div>
-  </div>
-</div>
+<hr className="api-divider" />
+
+### `createResource()`
+
+Creates a reactive async signal resource that integrates seamlessly with Suspense boundaries.
+
+<CodeBlock
+  lang="ts"
+  filename="signature"
+  code={`function createResource<T>(
+  fetcher: () => Promise<T>
+): [Resource<T>, ResourceActions<T>]`}
+/>
+

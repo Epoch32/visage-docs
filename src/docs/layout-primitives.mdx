@@ -185,116 +185,112 @@ All layout primitives support shorthand padding, margin, and dimension props:
 
 ## API Reference
 
-<div className="doc-api-section">
-  <div className="doc-fn-card">
-    <div className="doc-fn-header">
-      <div className="doc-fn-meta">
-        <span className="doc-fn-kind">Component</span>
-      </div>
-      <div className="doc-fn-signature">
-        &lt;Stack gap=&#123;number | string&#125; align=&#123;string&#125; justify=&#123;string&#125;&gt;&#123;children&#125;&lt;/Stack&gt;
-      </div>
-    </div>
+### `<Stack>`
 
-    <div className="doc-fn-body">
-      <div className="doc-fn-desc">
-        Vertical flex column container enforcing consistent gap spacing and zero margin collapse.
-      </div>
+Vertical flex column container enforcing consistent gap spacing and zero margin collapse.
 
-      <div>
-        <div className="doc-fn-subheading">Props</div>
-        <div className="doc-params-list">
-          <div className="doc-param-row">
-            <div className="doc-param-meta">
-              <span className="doc-param-name">gap</span>
-              <span className="doc-param-type">number | string</span>
-              <span className="doc-param-badge optional">Optional</span>
-            </div>
-            <div className="doc-param-desc">
-              Spacing between items mapped to the 4px spatial scale.
-            </div>
-          </div>
+<CodeBlock
+  lang="tsx"
+  filename="signature"
+  code={`function Stack(props: {
+  gap?: number | string;
+  align?: "start" | "center" | "end" | "stretch" | "baseline";
+  justify?: "start" | "center" | "end" | "between" | "around" | "evenly";
+  as?: string;
+  children?: Element | Element[];
+}): Element`}
+/>
 
-          <div className="doc-param-row">
-            <div className="doc-param-meta">
-              <span className="doc-param-name">align</span>
-              <span className="doc-param-type">"start" | "center" | "end" | "stretch" | "baseline"</span>
-              <span className="doc-param-badge optional">Optional</span>
-            </div>
-            <div className="doc-param-desc">
-              Cross-axis flex item alignment.
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
+#### Props
+- `gap` (`number | string`, optional): Spacing between items mapped to the 4px spatial scale.
+- `align` (`"start" | "center" | "end" | "stretch" | "baseline"`, optional): Cross-axis flex item alignment.
+- `justify` (`string`, optional): Main-axis flex distribution.
+- `as` (`string`, optional): HTML tag to render. Defaults to `"div"`.
 
-  <div className="doc-fn-card">
-    <div className="doc-fn-header">
-      <div className="doc-fn-meta">
-        <span className="doc-fn-kind">Component</span>
-      </div>
-      <div className="doc-fn-signature">
-        &lt;Row gap=&#123;number | string&#125; justify=&#123;string&#125; align=&#123;string&#125;&gt;&#123;children&#125;&lt;/Row&gt;
-      </div>
-    </div>
+<hr className="api-divider" />
 
-    <div className="doc-fn-body">
-      <div className="doc-fn-desc">
-        Horizontal flex row with default vertical centering (<code>align="center"</code>).
-      </div>
-    </div>
-  </div>
+### `<Row>`
 
-  <div className="doc-fn-card">
-    <div className="doc-fn-header">
-      <div className="doc-fn-meta">
-        <span className="doc-fn-kind">Component</span>
-      </div>
-      <div className="doc-fn-signature">
-        &lt;Grid columns=&#123;number | string&#125; minChildWidth=&#123;number | string&#125; gap=&#123;number&#125;&gt;&#123;children&#125;&lt;/Grid&gt;
-      </div>
-    </div>
+Horizontal flex row with default vertical centering (`align="center"`).
 
-    <div className="doc-fn-body">
-      <div className="doc-fn-desc">
-        CSS Grid primitive supporting fixed column counts or responsive self-wrapping <code>minChildWidth</code>.
-      </div>
-    </div>
-  </div>
+<CodeBlock
+  lang="tsx"
+  filename="signature"
+  code={`function Row(props: {
+  gap?: number | string;
+  align?: "start" | "center" | "end" | "stretch" | "baseline";
+  justify?: "start" | "center" | "end" | "between" | "around" | "evenly";
+  wrap?: boolean;
+  as?: string;
+  children?: Element | Element[];
+}): Element`}
+/>
 
-  <div className="doc-fn-card">
-    <div className="doc-fn-header">
-      <div className="doc-fn-meta">
-        <span className="doc-fn-kind">Component</span>
-      </div>
-      <div className="doc-fn-signature">
-        &lt;Center inline=&#123;boolean&#125;&gt;&#123;children&#125;&lt;/Center&gt;
-      </div>
-    </div>
+#### Props
+- `gap` (`number | string`, optional): Spacing between items.
+- `align` (`string`, optional): Cross-axis alignment. Defaults to `"center"`.
+- `justify` (`string`, optional): Main-axis distribution.
+- `wrap` (`boolean`, optional): Whether flex items wrap onto multiple lines.
 
-    <div className="doc-fn-body">
-      <div className="doc-fn-desc">
-        Centers child content horizontally and vertically without CSS boilerplate.
-      </div>
-    </div>
-  </div>
+<hr className="api-divider" />
 
-  <div className="doc-fn-card">
-    <div className="doc-fn-header">
-      <div className="doc-fn-meta">
-        <span className="doc-fn-kind">Component</span>
-      </div>
-      <div className="doc-fn-signature">
-        &lt;Spacer size=&#123;number | string&#125; flex=&#123;boolean | number&#125; /&gt;
-      </div>
-    </div>
+### `<Grid>`
 
-    <div className="doc-fn-body">
-      <div className="doc-fn-desc">
-        Expanding flex element (<code>flex: 1 1 0%</code>) or fixed dimensional spatial divider block.
-      </div>
-    </div>
-  </div>
-</div>
+CSS Grid primitive supporting fixed column counts or responsive self-wrapping `minChildWidth`.
+
+<CodeBlock
+  lang="tsx"
+  filename="signature"
+  code={`function Grid(props: {
+  columns?: number | string;
+  minChildWidth?: number | string;
+  gap?: number | string;
+  as?: string;
+  children?: Element | Element[];
+}): Element`}
+/>
+
+#### Props
+- `columns` (`number | string`, optional): Explicit number of columns (e.g. `3` or `"repeat(3, 1fr)"`).
+- `minChildWidth` (`number | string`, optional): Responsive min child size triggering `auto-fill`.
+- `gap` (`number | string`, optional): Grid gap spacing.
+
+<hr className="api-divider" />
+
+### `<Center>`
+
+Centers child content horizontally and vertically without CSS boilerplate.
+
+<CodeBlock
+  lang="tsx"
+  filename="signature"
+  code={`function Center(props: {
+  inline?: boolean;
+  as?: string;
+  children?: Element | Element[];
+}): Element`}
+/>
+
+#### Props
+- `inline` (`boolean`, optional): When true, renders as an inline-flex element.
+- `as` (`string`, optional): Tag name to render. Defaults to `"div"`.
+
+<hr className="api-divider" />
+
+### `<Spacer>`
+
+Expanding flex element (`flex: 1 1 0%`) or fixed dimensional spatial divider block.
+
+<CodeBlock
+  lang="tsx"
+  filename="signature"
+  code={`function Spacer(props: {
+  size?: number | string;
+  flex?: boolean | number;
+}): Element`}
+/>
+
+#### Props
+- `size` (`number | string`, optional): Explicit width or height dimension.
+- `flex` (`boolean | number`, optional): Flex grow/shrink factor. Defaults to `1`.
+

@@ -162,12 +162,6 @@ function TagEditor() {
   </table>
 </div>
 
-## Interactive Control Flow Sandbox
-
-This live task dashboard demonstrates both `<Show>` and `<For>` in action with dynamic filtering, toggling, and disposal:
-
-<ControlFlowSandbox />
-
 ## Type Narrowing with Accessor Children
 
 In TypeScript, if your `when` condition evaluates a nullable object (such as `User | null`), you can pass a callback as the child. Visage supplies a narrowed accessor `() => User` where `null` and `undefined` are guaranteed to be filtered out:
@@ -243,180 +237,66 @@ Developers coming from React often wonder why standard JavaScript loops and cond
 
 ## API Reference
 
-<div className="doc-api-section">
-  <div className="doc-fn-card">
-    <div className="doc-fn-header">
-      <div className="doc-fn-meta">
-        <span className="doc-fn-kind">Component</span>
-      </div>
-      <div className="doc-fn-signature">
-        &lt;Show&lt;T&gt; when=&#123;ReactiveValue&lt;T&gt;&#125; fallback=&#123;Child&#125;&gt;&#123;children&#125;&lt;/Show&gt;
-      </div>
-    </div>
+### `<Show>`
 
-    <div className="doc-fn-body">
-      <div className="doc-fn-desc">
-        Conditionally mounts JSX children when the <code>when</code> condition evaluates to a truthy value. Manages fine-grained scope disposal when switching branches.
-      </div>
+Conditionally mounts JSX children when the `when` condition evaluates to a truthy value. Manages fine-grained scope disposal when switching branches.
 
-      <div>
-        <div className="doc-fn-subheading">Props</div>
-        <div className="doc-params-list">
-          <div className="doc-param-row">
-            <div className="doc-param-meta">
-              <span className="doc-param-name">when</span>
-              <span className="doc-param-type">ReactiveValue&lt;T | false | null | undefined&gt;</span>
-              <span className="doc-param-badge required">Required</span>
-            </div>
-            <div className="doc-param-desc">
-              The reactive condition signal or accessor to observe.
-            </div>
-          </div>
+<CodeBlock
+  lang="tsx"
+  filename="signature"
+  code={`function Show<T>(props: {
+  when: ReactiveValue<T | false | null | undefined>;
+  fallback?: Child;
+  children: Child | ((item: () => T) => Child);
+}): Child`}
+/>
 
-          <div className="doc-param-row">
-            <div className="doc-param-meta">
-              <span className="doc-param-name">fallback</span>
-              <span className="doc-param-type">Child</span>
-              <span className="doc-param-badge optional">Optional</span>
-            </div>
-            <div className="doc-param-desc">
-              Fallback JSX rendered when the condition is falsy.
-            </div>
-          </div>
+#### Props
+- `when` (`ReactiveValue<T | false | null | undefined>`): The reactive condition signal or accessor to observe.
+- `fallback` (`Child`, *optional*): Fallback JSX rendered when the condition is falsy.
+- `children` (`Child | ((item: () => T) => Child)`): Child nodes to render, or a function accepting a narrowed accessor for non-null items.
 
-          <div className="doc-param-row">
-            <div className="doc-param-meta">
-              <span className="doc-param-name">children</span>
-              <span className="doc-param-type">Child | ((item: () =&gt; T) =&gt; Child)</span>
-              <span className="doc-param-badge required">Required</span>
-            </div>
-            <div className="doc-param-desc">
-              Child nodes to render, or a function accepting a narrowed accessor for non-null items.
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
+<hr className="api-divider" />
 
-  <div className="doc-fn-card">
-    <div className="doc-fn-header">
-      <div className="doc-fn-meta">
-        <span className="doc-fn-kind">Component</span>
-      </div>
-      <div className="doc-fn-signature">
-        &lt;For&lt;T&gt; each=&#123;ReactiveValue&lt;readonly T[]&gt;&#125; by=&#123;(item: T) =&gt; any&#125; fallback=&#123;Child&#125;&gt;&#123;(item, index) =&gt; Child&#125;&lt;/For&gt;
-      </div>
-    </div>
+### `<For>`
 
-    <div className="doc-fn-body">
-      <div className="doc-fn-desc">
-        Keyed list renderer that maps an array of items to DOM elements with referential stability, reusing existing elements on updates and reorders.
-      </div>
+Keyed list renderer that maps an array of items to DOM elements with referential stability, reusing existing elements on updates and reorders.
 
-      <div>
-        <div className="doc-fn-subheading">Props</div>
-        <div className="doc-params-list">
-          <div className="doc-param-row">
-            <div className="doc-param-meta">
-              <span className="doc-param-name">each</span>
-              <span className="doc-param-type">ReactiveValue&lt;readonly T[]&gt;</span>
-              <span className="doc-param-badge required">Required</span>
-            </div>
-            <div className="doc-param-desc">
-              The reactive array signal or getter to render.
-            </div>
-          </div>
+<CodeBlock
+  lang="tsx"
+  filename="signature"
+  code={`function For<T>(props: {
+  each: ReactiveValue<readonly T[]>;
+  by?: (item: T) => any;
+  fallback?: Child;
+  children: (item: T, index: () => number) => Child;
+}): Child`}
+/>
 
-          <div className="doc-param-row">
-            <div className="doc-param-meta">
-              <span className="doc-param-name">by</span>
-              <span className="doc-param-type">(item: T) =&gt; any</span>
-              <span className="doc-param-badge optional">Optional</span>
-            </div>
-            <div className="doc-param-desc">
-              Custom key extractor function. When omitted, items are keyed by identity.
-            </div>
-          </div>
+#### Props
+- `each` (`ReactiveValue<readonly T[]>`): The reactive array signal or getter to render.
+- `by` (`(item: T) => any`, *optional*): Custom key extractor function. When omitted, items are keyed by identity.
+- `fallback` (`Child`, *optional*): Fallback JSX rendered when the array is empty or null.
+- `children` (`(item: T, index: () => number) => Child`): Render function called once per item, providing the raw item and a reactive index getter.
 
-          <div className="doc-param-row">
-            <div className="doc-param-meta">
-              <span className="doc-param-name">fallback</span>
-              <span className="doc-param-type">Child</span>
-              <span className="doc-param-badge optional">Optional</span>
-            </div>
-            <div className="doc-param-desc">
-              Fallback JSX rendered when the array is empty or null.
-            </div>
-          </div>
+<hr className="api-divider" />
 
-          <div className="doc-param-row">
-            <div className="doc-param-meta">
-              <span className="doc-param-name">children</span>
-              <span className="doc-param-type">(item: T, index: () =&gt; number) =&gt; Child</span>
-              <span className="doc-param-badge required">Required</span>
-            </div>
-            <div className="doc-param-desc">
-              Render function called once per item, providing the raw item and a reactive index getter.
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
+### `<Index>`
 
-  <div className="doc-fn-card">
-    <div className="doc-fn-header">
-      <div className="doc-fn-meta">
-        <span className="doc-fn-kind">Component</span>
-      </div>
-      <div className="doc-fn-signature">
-        &lt;Index&lt;T&gt; each=&#123;ReactiveValue&lt;readonly T[]&gt;&#125; fallback=&#123;Child&#125;&gt;&#123;(item, index) =&gt; Child&#125;&lt;/Index&gt;
-      </div>
-    </div>
+Position-indexed list renderer that binds DOM elements to index slots. When item data changes, the item signal updates without moving DOM nodes.
 
-    <div className="doc-fn-body">
-      <div className="doc-fn-desc">
-        Position-indexed list renderer that binds DOM elements to index slots. When item data changes, the item signal updates without moving DOM nodes.
-      </div>
+<CodeBlock
+  lang="tsx"
+  filename="signature"
+  code={`function Index<T>(props: {
+  each: ReactiveValue<readonly T[]>;
+  fallback?: Child;
+  children: (item: () => T, index: number) => Child;
+}): Child`}
+/>
 
-      <div>
-        <div className="doc-fn-subheading">Props</div>
-        <div className="doc-params-list">
-          <div className="doc-param-row">
-            <div className="doc-param-meta">
-              <span className="doc-param-name">each</span>
-              <span className="doc-param-type">ReactiveValue&lt;readonly T[]&gt;</span>
-              <span className="doc-param-badge required">Required</span>
-            </div>
-            <div className="doc-param-desc">
-              The reactive array signal or getter to render.
-            </div>
-          </div>
+#### Props
+- `each` (`ReactiveValue<readonly T[]>`): The reactive array signal or getter to render.
+- `fallback` (`Child`, *optional*): Fallback JSX rendered when the array is empty or null.
+- `children` (`(item: () => T, index: number) => Child`): Render function called per slot, providing a reactive item signal accessor and fixed numeric index.
 
-          <div className="doc-param-row">
-            <div className="doc-param-meta">
-              <span className="doc-param-name">fallback</span>
-              <span className="doc-param-type">Child</span>
-              <span className="doc-param-badge optional">Optional</span>
-            </div>
-            <div className="doc-param-desc">
-              Fallback JSX rendered when the array is empty or null.
-            </div>
-          </div>
-
-          <div className="doc-param-row">
-            <div className="doc-param-meta">
-              <span className="doc-param-name">children</span>
-              <span className="doc-param-type">(item: () =&gt; T, index: number) =&gt; Child</span>
-              <span className="doc-param-badge required">Required</span>
-            </div>
-            <div className="doc-param-desc">
-              Render function called per slot, providing a reactive item signal accessor and fixed numeric index.
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>

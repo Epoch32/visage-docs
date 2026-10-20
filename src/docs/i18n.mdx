@@ -179,69 +179,19 @@ formatRelativeTime(-1, "day", { numeric: "auto" }); // "yesterday"`}
 
 ## API Reference
 
-<div className="doc-api-section">
-  <div className="doc-fn-card">
-    <div className="doc-fn-header">
-      <div className="doc-fn-meta">
-        <span className="doc-fn-kind">Function</span>
-      </div>
-      <div className="doc-fn-signature">
-        createI18n(options?: CreateI18nOptions): I18nInstance
-      </div>
-    </div>
-    <div className="doc-fn-body">
-      <div className="doc-fn-desc">
-        Creates a fine-grained reactive internationalization instance.
-      </div>
+### `createI18n()`
 
-      <div>
-        <div className="doc-fn-subheading">Options</div>
-        <div className="doc-params-list">
-          <div className="doc-param-row">
-            <div className="doc-param-meta">
-              <span className="doc-param-name">defaultLocale</span>
-              <span className="doc-param-type">string</span>
-              <span className="doc-param-badge optional">Optional</span>
-            </div>
-            <div className="doc-param-desc">
-              Initial active locale. Defaults to <code>"en"</code>.
-            </div>
-          </div>
+Creates a fine-grained reactive internationalization instance.
 
-          <div className="doc-param-row">
-            <div className="doc-param-meta">
-              <span className="doc-param-name">fallbackLocale</span>
-              <span className="doc-param-type">string</span>
-              <span className="doc-param-badge optional">Optional</span>
-            </div>
-            <div className="doc-param-desc">
-              Fallback locale when a key is missing. Defaults to <code>"en"</code>.
-            </div>
-          </div>
+<CodeBlock
+  lang="ts"
+  filename="signature"
+  code={`function createI18n(options?: CreateI18nOptions): I18nInstance`}
+/>
 
-          <div className="doc-param-row">
-            <div className="doc-param-meta">
-              <span className="doc-param-name">translations</span>
-              <span className="doc-param-type">TranslationsDict</span>
-              <span className="doc-param-badge optional">Optional</span>
-            </div>
-            <div className="doc-param-desc">
-              Preloaded locale translation dictionaries.
-            </div>
-          </div>
+#### Options
+- `defaultLocale` (`string`, *optional*): Initial active locale. Defaults to `"en"`.
+- `fallbackLocale` (`string`, *optional*): Fallback locale when a key is missing. Defaults to `"en"`.
+- `translations` (`TranslationsDict`, *optional*): Preloaded locale translation dictionaries.
+- `loader` (`(locale: string) => Promise<TranslationRecord>`, *optional*): Asynchronous dynamic dictionary loader for code splitting or OTA CDN loading.
 
-          <div className="doc-param-row">
-            <div className="doc-param-meta">
-              <span className="doc-param-name">loader</span>
-              <span className="doc-param-type">(locale: string) =&gt; Promise&lt;TranslationRecord&gt;</span>
-              <span className="doc-param-badge optional">Optional</span>
-            </div>
-            <div className="doc-param-desc">
-              Asynchronous dynamic dictionary loader for code splitting or OTA CDN loading.
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
