@@ -1,66 +1,102 @@
 export const title = "Visage Architecture & Future Roadmap";
 export const breadcrumb = "Documentation / Getting Started";
 
-Visage was created with an uncompromising philosophy: **zero virtual DOM overhead, zero runtime dependencies, and browser-native primitives**. As we expand from the hardened 2.0 release toward **Visage 3.0**, our mission is to eliminate compiler dependencies, bring true zero-JS resumability to the web, and expand native desktop and mobile capabilities powered by Zig.
+> **Roadmap Disclaimer:** This roadmap describes a tentative architectural direction, not a fixed release commitment. Features, implementation details, priorities, and release targets are subject to change as Visage evolves and technical feasibility is evaluated.
+
+Visage was created with an uncompromising philosophy: **zero virtual DOM overhead, zero runtime dependencies, and browser-native primitives**. As Visage evolves through the 2.x series and toward a potential **Visage 3.0**, our focus is on expanding standards support, eliminating unnecessary tooling, and exploring new approaches to resumability and native application development.
+
+Our goal is to make standards-compliant behavior a first-class part of the toolkit, allowing developers to build efficient, secure, and interoperable applications without reinventing established protocols or relying on unnecessary abstractions.
 
 ## Core Architectural Commitments
 
 <FeatureGrid>
   <FeatureCard icon="shield" title="Zero Runtime Dependencies">
-    Every client module shipped to production contains zero third-party runtime dependencies. The entire reactive engine, DOM binder, and router are self-contained.
+    Every client module shipped to production aims to remain free of third-party runtime dependencies. The reactive engine, DOM binder, and router use self-contained implementations and browser-native capabilities wherever practical.
   </FeatureCard>
 
-  <FeatureCard icon="zap" title="Surgical Sub-Millisecond Updates">
-    Components execute exactly once on mount. Reactive state updates bypass component re-rendering entirely, directly modifying specific DOM text nodes and attributes.
+  <FeatureCard icon="zap" title="Fine-Grained Reactivity">
+    Components should avoid unnecessary re-execution after mounting. Reactive updates target specific DOM nodes and attributes rather than relying on virtual DOM reconciliation.
   </FeatureCard>
 
-  <FeatureCard icon="globe" title="Standards-First APIs">
-    We leverage platform capabilities first: View Transitions API, Speculation Rules API, Popover API, CSS Anchor Positioning, and WHATWG Streams.
+  <FeatureCard icon="globe" title="Standards-First Architecture">
+    Prioritize established web platform APIs, HTTP semantics, and relevant IETF RFCs. Visage should build on native browser and server capabilities instead of introducing proprietary alternatives without a compelling reason.
   </FeatureCard>
 
-  <FeatureCard icon="cpu" title="Sub-10MB Native Targets">
-    Pairing with a compiled Zig host delivers lightweight native desktop and mobile executables without heavy Chromium or Node.js runtimes.
+  <FeatureCard icon="cpu" title="Lightweight Native Targets">
+    Explore a compiled Zig host for desktop and mobile applications, with a focus on minimal deployment size, efficient inter-process communication, and integration with native WebViews.
   </FeatureCard>
 </FeatureGrid>
 
 ## Current Phase: Visage 2.x Series
 
-The 2.x releases focus on refining full-stack ergonomics and trimming the compilation pipeline down to absolute essentials:
+The 2.x series focuses on **standards support, full-stack ergonomics, security, and a lean compilation pipeline**. The objective is to make standards-based functionality easier to use through Visage while keeping the framework itself small and dependency-light.
 
-### 1. Pure Vite + Babel Compiler Pipeline
-- **Babel & Vite Only**: Strip all auxiliary tooling, logging wrappers, and extra AST helper packages so the AOT JSX compiler relies strictly on `@babel/*` and Vite's plugin interface.
-- **In-House Markdown & Frontmatter**: Replace the heavy unified/remark/rehype dependency tree with a lightweight single-pass markdown compiler and native frontmatter parser.
-- **Semantic CSS Token Highlighting**: Eliminate heavy WebAssembly syntax highlighters in favor of a build-time semantic tokenizer that outputs compact class tokens (`<span class="v-kw">`) styled via theme CSS variables.
+### 1. HTTP and API Standards
 
-### 2. Hardened Tooling & Security
-- **Automated CSP Generation**: Deep AST scanning of production assets to auto-synthesize strict, W3C-compliant Content Security Policies with automated inline script hashing.
-- **Zero-FOUC Storage Preboot**: Standard top-level Vite configuration, eliminating dark-mode and theme flicker before the initial CSS paint.
+Implement and integrate relevant IETF standards across Visage's request handling, data-fetching, routing, and server-side infrastructure.
+
+- **HTTP Semantics and Caching, RFC 9110 and RFC 9111:** Support correct conditional requests, entity-tag validation, cache directives, and resource revalidation. Integrate with native browser caching rather than duplicating functionality unnecessarily.
+- **Problem Details, RFC 9457:** Provide consistent handling of structured HTTP API errors across client requests, server actions, route loaders, and development tooling.
+- **Digest Fields, RFC 9530:** Explore standards-compliant content integrity verification for HTTP requests and responses, with explicit trust and verification policies.
+- **Web Linking, RFC 8288:** Support parsing and consuming HTTP link relations for pagination, resource discovery, and navigation between related API resources.
+- **Structured Field Values, RFC 9651:** Provide reusable TypeScript utilities for parsing and serializing standardized HTTP header fields.
+- **Early Hints, RFC 8297:** Explore server-generated `103 Early Hints` responses and compiler-assisted preload discovery for SSR performance, subject to deployment platform support.
+- **Deprecation and Sunset, RFC 9745 and RFC 8594:** Surface API lifecycle metadata through optional development diagnostics and application-level tooling.
+
+These are candidate integration targets, not a claim that every RFC is already implemented. Support may consist of native platform integration, server-side functionality, or a first-party TypeScript implementation, depending on the standard.
+
+### 2. Standards-Based Web Platform Integration
+
+Prefer established browser APIs over framework-specific replacements wherever practical.
+
+- **View Transitions API:** Integrate browser-native transitions into navigation and supported UI updates.
+- **Speculation Rules API:** Explore declarative prerendering and prefetching for eligible navigations.
+- **Popover API and CSS Anchor Positioning:** Support native popovers, anchored overlays, and lightweight positioning patterns.
+- **WHATWG Streams:** Use native streams for streaming responses, SSR output, and efficient processing of request and response bodies.
+- **Content Security Policy:** Generate and validate production CSP configurations, including script hashes where appropriate, while accounting for deployment-specific policies and runtime requirements.
+
+### 3. Compiler and Tooling Simplification
+
+Reduce unnecessary build complexity without compromising standards compliance or developer experience.
+
+- **Lean Vite + Babel Pipeline:** Consolidate the JSX compiler around Babel and Vite's plugin interface, minimizing auxiliary tooling and AST dependencies where feasible.
+- **In-House Markdown and Frontmatter:** Explore a lightweight Markdown compiler and frontmatter parser to reduce the dependency footprint of documentation tooling.
+- **Build-Time Syntax Highlighting:** Prefer compact, build-time semantic tokenization over heavyweight client-side syntax-highlighting engines where it meets feature requirements.
+- **Semantic Compiler Diagnostics:** Use compiler analysis to identify opportunities for standards-compliant resource loading, cache handling, and security configuration.
+
+### 4. Security and Production Hardening
+
+- **Automated CSP Assistance:** Analyze generated assets and help synthesize restrictive Content Security Policy directives and hashes, with explicit handling of dynamic scripts, external resources, and deployment constraints.
+- **Zero-FOUC Storage Preboot:** Provide an early theme initialization strategy that minimizes visual flicker while respecting CSP and storage availability.
+- **Protocol-Aware Diagnostics:** Surface useful development warnings for malformed headers, deprecated resources, invalid cache policies, and other detectable standards integration issues.
 
 ---
 
 ## Future Milestone: Visage 3.0.0
 
-Visage 3.0 represents a generational shift away from conventional JavaScript-centric full-stack frameworks, introducing fine-grained resumability and high-performance native desktop capabilities.
+**Visage 3.0 is a tentative long-term vision, not a committed feature set.** It explores architectural changes that may extend Visage beyond conventional JavaScript-centric full-stack frameworks.
 
 <FeatureGrid>
-  <FeatureCard icon="layers" title="Zero-JS Resumability">
-    SSR serializes the signal graph into HTML comments. When a user lands on the page, 0 KB of component code runs until a specific element is interacted with.
+  <FeatureCard icon="layers" title="Fine-Grained Resumability">
+    Investigate serializing sufficient reactive and execution metadata during SSR to resume application behavior without unnecessarily re-executing component initialization. The long-term goal is to minimize client JavaScript and defer code loading until it is needed.
   </FeatureCard>
 
-  <FeatureCard icon="activity" title="Zero-Copy Native IPC">
-    SharedArrayBuffer and native memory pointers replace JSON pipe serialization for 60+ FPS high-throughput data streams between Zig and the webview.
+  <FeatureCard icon="activity" title="Efficient Native IPC">
+    Explore lower-overhead communication between a Zig host and embedded WebViews, potentially using shared memory where platform security rules and runtime constraints permit.
   </FeatureCard>
 
   <FeatureCard icon="database" title="Local-First Reactive Stores">
-    CRDT-backed state synchronization and embedded SQLite/libSQL support in the desktop and edge hosts for instant, offline-first application architectures.
+    Investigate CRDT-backed synchronization and embedded SQLite-compatible storage for offline-first applications, with consistent state integration across supported hosts.
   </FeatureCard>
 
-  <FeatureCard icon="smartphone" title="Mobile WebViews (iOS & Android)">
-    Extend the lightweight Zig host to Android WebView and iOS WKWebView, producing unified, sub-10MB cross-platform binaries without React Native or Flutter.
+  <FeatureCard icon="smartphone" title="Cross-Platform Native Hosts">
+    Explore Android WebView and iOS WKWebView integrations alongside desktop targets, aiming to reuse application code while respecting each platform's native constraints.
   </FeatureCard>
 </FeatureGrid>
 
-## Milestone Comparison Matrix
+These initiatives depend on technical validation, platform compatibility, security review, and community feedback. In particular, zero-JavaScript resumability, zero-copy native IPC, and sub-10MB native executables are research goals rather than guaranteed outcomes.
+
+## Tentative Milestone Comparison
 
 <div class="doc-table-wrapper">
   <table class="doc-table">
@@ -68,61 +104,79 @@ Visage 3.0 represents a generational shift away from conventional JavaScript-cen
       <tr>
         <th>Capability</th>
         <th>Visage 1.x</th>
-        <th>Visage 2.x (Current)</th>
-        <th>Visage 3.0 (Vision)</th>
+        <th>Visage 2.x (Current Direction)</th>
+        <th>Visage 3.0 (Exploratory)</th>
       </tr>
     </thead>
     <tbody>
       <tr>
         <td><strong>Virtual DOM</strong></td>
-        <td>None (Native Templates)</td>
-        <td>None (Native Templates)</td>
-        <td>None (Native Templates)</td>
+        <td>Direct DOM approach</td>
+        <td>Fine-grained DOM updates</td>
+        <td>Fine-grained DOM updates</td>
       </tr>
       <tr>
         <td><strong>Runtime Dependencies</strong></td>
-        <td>None</td>
-        <td>None</td>
-        <td>None</td>
+        <td>Zero-dependency goal</td>
+        <td>Maintain zero-dependency client runtime</td>
+        <td>Maintain zero-dependency client runtime</td>
       </tr>
       <tr>
-        <td><strong>Build Dependencies</strong></td>
-        <td>Vite, Babel, Rollup, Shiki, MDX</td>
-        <td>Vite + Babel (Pure)</td>
-        <td>Vite + Babel (Pure)</td>
+        <td><strong>Build Pipeline</strong></td>
+        <td>Existing compiler and tooling</td>
+        <td>Lean Vite + Babel pipeline</td>
+        <td>Further compiler simplification</td>
       </tr>
       <tr>
-        <td><strong>Client Hydration</strong></td>
-        <td>Full Client Re-render</td>
-        <td>Streaming SSR + DOM Adoption</td>
-        <td>Fine-Grained Zero-JS Resumability</td>
+        <td><strong>Standards Support</strong></td>
+        <td>Core web platform APIs</td>
+        <td>Broader HTTP, IETF RFC, and browser API integration</td>
+        <td>Expanded standards-driven runtime capabilities</td>
+      </tr>
+      <tr>
+        <td><strong>Client Execution</strong></td>
+        <td>Client initialization and updates</td>
+        <td>Streaming SSR and DOM adoption improvements</td>
+        <td>Research into fine-grained resumability</td>
       </tr>
       <tr>
         <td><strong>Native Targets</strong></td>
-        <td>Experimental IPC</td>
-        <td>Stable Zig WebView Host (Desktop)</td>
-        <td>Zero-Copy Shared Memory + Mobile (iOS/Android)</td>
+        <td>Initial experimentation</td>
+        <td>Desktop host refinement</td>
+        <td>Potential shared-memory IPC and mobile hosts</td>
       </tr>
       <tr>
         <td><strong>Data Synchronization</strong></td>
-        <td>Manual Signals + Query Cache</td>
-        <td>Signal-Native Query &amp; RPC</td>
-        <td>Local-First CRDT Stores + Embedded SQLite</td>
+        <td>Signals and query utilities</td>
+        <td>Standards-based HTTP data handling and RPC improvements</td>
+        <td>Potential CRDT-backed local-first stores</td>
       </tr>
       <tr>
-        <td><strong>Syntax Highlighting</strong></td>
-        <td>Client WASM Engine</td>
-        <td>Build-Time Pre-highlighting</td>
-        <td>Native Semantic CSS Token Engine</td>
+        <td><strong>Security</strong></td>
+        <td>Existing security mechanisms</td>
+        <td>CSP assistance, integrity verification, and protocol-aware diagnostics</td>
+        <td>Further native and distributed security research</td>
       </tr>
     </tbody>
   </table>
 </div>
 
-## Get Involved & Contribute
+## Standards Support Policy
 
-Visage is developed openly under the **Mozilla Public License 2.0 (MPL-2.0)**. We welcome community proposals, RFCs, and pull requests:
+Visage intends to prioritize standards according to practical utility, interoperability, security, implementation complexity, and compatibility with its supported environments.
 
-- **GitHub Repository**: [github.com/Epoch32/visage](https://github.com/Epoch32/visage)
-- **Documentation**: [visage.epoch32.org](https://visage.epoch32.org)
-- **Issue Tracker & RFCs**: Submit architectural proposals and track ongoing development milestones on GitHub.
+- **Native integration first:** Prefer browser, runtime, and server implementations where they already provide the required behavior.
+- **First-party implementations where useful:** Implement missing application-level functionality in TypeScript when doing so adds meaningful value without unnecessary dependencies.
+- **Graceful degradation:** Account for differences between browsers, server runtimes, CDNs, and native hosts. Features requiring platform support should not be assumed universally available.
+- **No blanket compliance claims:** Support for an RFC may be partial, optional, or environment-specific. Each implementation should document its supported requirements and limitations.
+- **Incremental adoption:** RFCs and APIs may be added, deferred, or removed from the roadmap as standards evolve and implementation experience improves.
+
+## Get Involved and Contribute
+
+Visage is developed openly under the **Mozilla Public License 2.0 (MPL-2.0)**. Community proposals, standards research, implementation feedback, and pull requests are welcome.
+
+- **GitHub Repository:** [github.com/Epoch32/visage](https://github.com/Epoch32/visage)
+- **Documentation:** [visage.epoch32.org](https://visage.epoch32.org)
+- **Issue Tracker and RFCs:** Submit architectural proposals and discuss potential standards integrations through the GitHub repository.
+
+This roadmap is intentionally flexible. The long-term direction is to make Visage a lightweight, standards-first full-stack toolkit whose compiler and runtime reduce the work required to build secure, efficient, and interoperable applications.
