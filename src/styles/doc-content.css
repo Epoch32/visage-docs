@@ -93,6 +93,30 @@
 	margin-bottom: 32px;
 }
 
+/* Hero Wordmark Banner */
+.doc-hero-banner {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	margin: 8px 0 28px 0;
+	background: #11131a;
+	border: 1px solid rgba(244, 167, 187, 0.2);
+	border-radius: 12px;
+	overflow: hidden;
+	box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.25), 0 2px 8px -1px rgba(244, 167, 187, 0.1);
+	padding: 8px 16px;
+	height: 190px;
+	box-sizing: border-box;
+}
+
+.doc-hero-img {
+	width: auto;
+	height: 100%;
+	max-width: 100%;
+	object-fit: contain;
+	display: block;
+}
+
 .doc-article p {
 	font-size: 15px;
 	line-height: 1.75;

@@ -104,6 +104,6 @@ export default defineConfig({
 				codeSplitting: true
 			}
 		},
-		chunkSizeWarningLimit: 700
+		chunkSizeWarningLimit: 200
 	},
 });
