@@ -1,0 +1,128 @@
+export const title = "Visage Architecture & Future Roadmap";
+export const breadcrumb = "Documentation / Getting Started";
+
+Visage was created with an uncompromising philosophy: **zero virtual DOM overhead, zero runtime dependencies, and browser-native primitives**. As we expand from the hardened 2.0 release toward **Visage 3.0**, our mission is to eliminate compiler dependencies, bring true zero-JS resumability to the web, and expand native desktop and mobile capabilities powered by Zig.
+
+## Core Architectural Commitments
+
+<FeatureGrid>
+  <FeatureCard icon="shield" title="Zero Runtime Dependencies">
+    Every client module shipped to production contains zero third-party runtime dependencies. The entire reactive engine, DOM binder, and router are self-contained.
+  </FeatureCard>
+
+  <FeatureCard icon="zap" title="Surgical Sub-Millisecond Updates">
+    Components execute exactly once on mount. Reactive state updates bypass component re-rendering entirely, directly modifying specific DOM text nodes and attributes.
+  </FeatureCard>
+
+  <FeatureCard icon="globe" title="Standards-First APIs">
+    We leverage platform capabilities first: View Transitions API, Speculation Rules API, Popover API, CSS Anchor Positioning, and WHATWG Streams.
+  </FeatureCard>
+
+  <FeatureCard icon="cpu" title="Sub-10MB Native Targets">
+    Pairing with a compiled Zig host delivers lightweight native desktop and mobile executables without heavy Chromium or Node.js runtimes.
+  </FeatureCard>
+</FeatureGrid>
+
+## Current Phase: Visage 2.x Series
+
+The 2.x releases focus on refining full-stack ergonomics and trimming the compilation pipeline down to absolute essentials:
+
+### 1. Pure Vite + Babel Compiler Pipeline
+- **Babel & Vite Only**: Strip all auxiliary tooling, logging wrappers, and extra AST helper packages so the AOT JSX compiler relies strictly on `@babel/*` and Vite's plugin interface.
+- **In-House Markdown & Frontmatter**: Replace the heavy unified/remark/rehype dependency tree with a lightweight single-pass markdown compiler and native frontmatter parser.
+- **Semantic CSS Token Highlighting**: Eliminate heavy WebAssembly syntax highlighters in favor of a build-time semantic tokenizer that outputs compact class tokens (`<span class="v-kw">`) styled via theme CSS variables.
+
+### 2. Hardened Tooling & Security
+- **Automated CSP Generation**: Deep AST scanning of production assets to auto-synthesize strict, W3C-compliant Content Security Policies with automated inline script hashing.
+- **Zero-FOUC Storage Preboot**: Standard top-level Vite configuration, eliminating dark-mode and theme flicker before the initial CSS paint.
+
+---
+
+## Future Milestone: Visage 3.0.0
+
+Visage 3.0 represents a generational shift away from conventional JavaScript-centric full-stack frameworks, introducing fine-grained resumability and high-performance native desktop capabilities.
+
+<FeatureGrid>
+  <FeatureCard icon="layers" title="Zero-JS Resumability">
+    SSR serializes the signal graph into HTML comments. When a user lands on the page, 0 KB of component code runs until a specific element is interacted with.
+  </FeatureCard>
+
+  <FeatureCard icon="activity" title="Zero-Copy Native IPC">
+    SharedArrayBuffer and native memory pointers replace JSON pipe serialization for 60+ FPS high-throughput data streams between Zig and the webview.
+  </FeatureCard>
+
+  <FeatureCard icon="database" title="Local-First Reactive Stores">
+    CRDT-backed state synchronization and embedded SQLite/libSQL support in the desktop and edge hosts for instant, offline-first application architectures.
+  </FeatureCard>
+
+  <FeatureCard icon="smartphone" title="Mobile WebViews (iOS & Android)">
+    Extend the lightweight Zig host to Android WebView and iOS WKWebView, producing unified, sub-10MB cross-platform binaries without React Native or Flutter.
+  </FeatureCard>
+</FeatureGrid>
+
+## Milestone Comparison Matrix
+
+<div class="doc-table-wrapper">
+  <table class="doc-table">
+    <thead>
+      <tr>
+        <th>Capability</th>
+        <th>Visage 1.x</th>
+        <th>Visage 2.x (Current)</th>
+        <th>Visage 3.0 (Vision)</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>Virtual DOM</strong></td>
+        <td>None (Native Templates)</td>
+        <td>None (Native Templates)</td>
+        <td>None (Native Templates)</td>
+      </tr>
+      <tr>
+        <td><strong>Runtime Dependencies</strong></td>
+        <td>None</td>
+        <td>None</td>
+        <td>None</td>
+      </tr>
+      <tr>
+        <td><strong>Build Dependencies</strong></td>
+        <td>Vite, Babel, Rollup, Shiki, MDX</td>
+        <td>Vite + Babel (Pure)</td>
+        <td>Vite + Babel (Pure)</td>
+      </tr>
+      <tr>
+        <td><strong>Client Hydration</strong></td>
+        <td>Full Client Re-render</td>
+        <td>Streaming SSR + DOM Adoption</td>
+        <td>Fine-Grained Zero-JS Resumability</td>
+      </tr>
+      <tr>
+        <td><strong>Native Targets</strong></td>
+        <td>Experimental IPC</td>
+        <td>Stable Zig WebView Host (Desktop)</td>
+        <td>Zero-Copy Shared Memory + Mobile (iOS/Android)</td>
+      </tr>
+      <tr>
+        <td><strong>Data Synchronization</strong></td>
+        <td>Manual Signals + Query Cache</td>
+        <td>Signal-Native Query &amp; RPC</td>
+        <td>Local-First CRDT Stores + Embedded SQLite</td>
+      </tr>
+      <tr>
+        <td><strong>Syntax Highlighting</strong></td>
+        <td>Client WASM Engine</td>
+        <td>Build-Time Pre-highlighting</td>
+        <td>Native Semantic CSS Token Engine</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+## Get Involved & Contribute
+
+Visage is developed openly under the **Mozilla Public License 2.0 (MPL-2.0)**. We welcome community proposals, RFCs, and pull requests:
+
+- **GitHub Repository**: [github.com/Epoch32/visage](https://github.com/Epoch32/visage)
+- **Documentation**: [visage.epoch32.org](https://visage.epoch32.org)
+- **Issue Tracker & RFCs**: Submit architectural proposals and track ongoing development milestones on GitHub.
