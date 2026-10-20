@@ -38,19 +38,6 @@ export function Header(props: HeaderProps) {
 				<span className="header-badge">v2.0</span>
 			</div>
 
-			{/* Center: Top Section Tabs */}
-			<nav className="header-nav-links" style={{ display: "flex", alignItems: "center", gap: "20px" }}>
-				<Link href="/introduction" class="header-nav-link">
-					Documentation
-				</Link>
-				<Link href="/signals" class="header-nav-link">
-					API Reference
-				</Link>
-				<Link href="/ui-primitives" class="header-nav-link">
-					Components
-				</Link>
-			</nav>
-
 			{/* Right Actions: Search trigger, GitHub, Theme Toggle */}
 			<div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
 				{/* Search Bar Trigger */}
